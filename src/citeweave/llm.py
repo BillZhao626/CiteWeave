@@ -13,7 +13,7 @@ from citeweave.circuit import Circuit
 from citeweave.costs import breakdown
 from citeweave.reliability import CircuitOpen, error_category
 from citeweave.settings import settings
-from citeweave.trace import record_call
+from citeweave.trace import network_timeout, record_call
 
 
 class ProviderError(Exception):
@@ -74,6 +74,10 @@ class DeepSeekProvider:
                             "POST",
                             "https://api.deepseek.com/chat/completions",
                             json=body,
+                            timeout=httpx.Timeout(
+                                await asyncio.to_thread(network_timeout, 25),
+                                connect=min(5, await asyncio.to_thread(network_timeout, 25)),
+                            ),
                             headers={"Authorization": "Bearer " + key},
                         ) as response:
                             item["http_status"] = response.status_code

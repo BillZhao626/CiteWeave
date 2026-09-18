@@ -842,6 +842,8 @@ export interface components {
             error_code: string | null;
             /** Error Message */
             error_message: string | null;
+            /** Absolute Deadline */
+            absolute_deadline?: string | null;
             /** Pipeline Version */
             pipeline_version: string;
             /** Events */
@@ -1006,6 +1008,10 @@ export interface components {
             reserved_yuan: number;
             /** Error Category */
             error_category: string | null;
+            /** Absolute Deadline */
+            absolute_deadline?: string | null;
+            /** Runtime Policy */
+            runtime_policy?: string | null;
             /**
              * Actual Charge
              * @default unavailable

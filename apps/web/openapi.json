@@ -2563,6 +2563,18 @@
             ],
             "title": "Error Message"
           },
+          "absolute_deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Absolute Deadline"
+          },
           "pipeline_version": {
             "type": "string",
             "title": "Pipeline Version"
@@ -2918,6 +2930,29 @@
               }
             ],
             "title": "Error Category"
+          },
+          "absolute_deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Absolute Deadline"
+          },
+          "runtime_policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runtime Policy"
           },
           "actual_charge": {
             "type": "string",

@@ -78,6 +78,7 @@ class IngestionJobRow(Stamp, Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     error_code: Mapped[str | None] = mapped_column(String(80))
     error_message: Mapped[str | None] = mapped_column(Text)
+    absolute_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     pipeline_version: Mapped[str] = mapped_column(String(100))
     events: Mapped[list] = mapped_column(JSONB, default=list)
 
@@ -105,6 +106,10 @@ class QueryRunRow(Stamp, Base):
     kb_id: Mapped[UUID] = mapped_column(ForeignKey("cw1_knowledge_bases.id"))
     key: Mapped[str] = mapped_column(String(128))
     fingerprint: Mapped[str] = mapped_column(String(64))
+    absolute_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    owner: Mapped[UUID | None] = mapped_column()
+    fence: Mapped[int | None] = mapped_column()
+    runtime_policy: Mapped[str | None] = mapped_column(String(40))
     question: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(24), default="RUNNING")
     versions: Mapped[list] = mapped_column(JSONB, default=list)

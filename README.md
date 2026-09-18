@@ -10,7 +10,7 @@
                         ↘ Run Inspector / 同题对比 / 版本治理 / 故障恢复
 ```
 
-引用绑定不可变文档版本、原文字符范围和坐标。PostgreSQL 保存业务事实；租约与 fencing 避免部分索引发布；Qdrant 可以从 PG + BlobStore 重建，Valkey 消息丢失不等于业务任务丢失。
+引用绑定不可变文档版本、原文字符范围和坐标。PostgreSQL 保存业务事实；租约与 fencing 避免部分索引发布；Qdrant 可以从 PG + BlobStore 重建，Redis 消息丢失不等于业务任务丢失。
 
 ## 快速开始
 
@@ -37,7 +37,7 @@
 | 可靠性 | 持久恢复、fencing、有界超时/重试/取消、共享熔断、单 GPU FIFO、未知费用保留预算 |
 | 恢复能力 | PG + 内容寻址原件备份，空 Qdrant 重建后重新解析历史引用 |
 
-后端：FastAPI / Pydantic / SQLAlchemy 2 / Alembic / PostgreSQL 18 / Valkey 8.1 / Celery 5.6 / Qdrant 1.16。检索：multilingual-e5-small + 中文 BM25 + RRF + BGE reranker v2-m3。前端：React 19 / TypeScript 6 / Vite 8 / Router / TanStack Query / Tailwind 4 / shadcn。API-first，OpenAPI 自动生成前端类型；没有新增无关基础设施。
+后端：FastAPI / Pydantic / SQLAlchemy 2 / Alembic / PostgreSQL 18 / Redis 8.2.9 / Celery 5.6 / Qdrant 1.16。检索：multilingual-e5-small + 中文 BM25 + RRF + BGE reranker v2-m3。前端：React 19 / TypeScript 6 / Vite 8 / Router / TanStack Query / Tailwind 4 / shadcn。API-first，OpenAPI 自动生成前端类型；没有新增无关基础设施。
 
 ## 真实质量证据
 

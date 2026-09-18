@@ -6,7 +6,7 @@ import json
 import logging
 import re
 from contextlib import aclosing
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from decimal import Decimal
 from uuid import uuid4
 from zoneinfo import ZoneInfo
@@ -32,6 +32,7 @@ from citeweave.hybrid import HybridRetriever
 from citeweave.lifecycle import governance_lock
 from citeweave.llm import DeepSeekProvider
 from citeweave.profiles import query_profile
+from citeweave.query_runtime import check_owned, expire_queries, remaining
 from citeweave.reliability import error_category
 from citeweave.settings import ROOT, settings
 from citeweave.trace import RunTrace, current_trace, runtime_config, stage
@@ -50,6 +51,8 @@ def begin_query(workspace, body, key, captured_bindings=None):
         # One local provider budget across all workspaces, serialized before reservation.
         db.execute(text("SELECT pg_advisory_xact_lock(17702201)"))
         governance_lock(db)
+        now = db.scalar(select(func.clock_timestamp()))
+        expire_queries(db, now)
         existing = db.scalar(
             select(QueryRunRow).where(QueryRunRow.workspace_id == workspace, QueryRunRow.key == key)
         )
@@ -59,20 +62,11 @@ def begin_query(workspace, body, key, captured_bindings=None):
             if existing.status == "RUNNING":
                 raise HTTPException(409, "query_running")
             return existing
-        now = datetime.now(timezone.utc)
-        stale = db.scalars(
-            select(QueryRunRow).where(
-                QueryRunRow.status == "RUNNING", QueryRunRow.created_at < now - timedelta(seconds=120)
-            )
-        ).all()
-        for run in stale:
-            run.status, run.error_code = "FAILED", "api_interrupted"
-            run.completed_at, run.error_category = now, "unknown_outcome"
         if (
             db.scalar(select(func.count()).select_from(QueryRunRow).where(QueryRunRow.status == "RUNNING"))
-            >= 1
+            >= settings().max_active_queries
         ):
-            raise HTTPException(429, "single_query_capacity")
+            raise HTTPException(429, "single_query_capacity", headers={"Retry-After": "2"})
         month = now.astimezone(ZoneInfo("Asia/Shanghai")).replace(
             day=1, hour=0, minute=0, second=0, microsecond=0
         )
@@ -153,6 +147,11 @@ def begin_query(workspace, body, key, captured_bindings=None):
             versions=[str(v) for v in versions],
             index_bindings=bindings,
             runtime_config=runtime_config(body.profile),
+            created_at=now,
+            absolute_deadline=now + timedelta(seconds=settings().query_deadline_seconds),
+            owner=uuid4(),
+            fence=1,
+            runtime_policy="runtime-deadlines-v1",
         )
         db.add(run)
         db.flush()
@@ -189,25 +188,24 @@ def validate_citations(answer, selected):
     return [available[label] for label in labels]
 
 
-def save_trace(run_id, trace):
+def save_trace(run_id, trace, owner=None, fence=None):
     with transaction() as db:
-        db.get(QueryRunRow, run_id).candidates = trace
+        row, _ = check_owned(db, run_id, owner, fence)
+        row.candidates = trace
 
 
-def save_usage(run_id, usage):
+def save_usage(run_id, usage, owner=None, fence=None):
     with transaction() as db:
-        row = db.get(QueryRunRow, run_id)
+        row, _ = check_owned(db, run_id, owner, fence)
         row.usage = usage
         row.estimated_yuan = estimated_cost(usage)
 
 
-def finish(run_id, answer):
+def finish(run_id, answer, owner=None, fence=None):
     with transaction() as db:
-        row = db.get(QueryRunRow, run_id)
-        if row.status != "RUNNING":
-            raise ValueError("run_no_longer_active")
+        row, stamp = check_owned(db, run_id, owner, fence)
         row.result, row.status = answer.model_dump(mode="json"), "COMPLETED"
-        row.completed_at = datetime.now(timezone.utc)
+        row.completed_at = stamp
         row.usage, row.estimated_yuan = answer.usage, answer.estimated_yuan
         for citation in answer.citations:
             db.add(CitationRow(run_id=run_id, evidence_id=citation.evidence_id))
@@ -215,10 +213,13 @@ def finish(run_id, answer):
 
 def failed(run_id, code, contacted):
     with transaction() as db:
-        row = db.get(QueryRunRow, run_id)
+        row = db.scalar(select(QueryRunRow).where(QueryRunRow.id == run_id).with_for_update())
         if row.status == "RUNNING":
             row.status, row.error_code = "FAILED", code
-            row.completed_at, row.error_category = datetime.now(timezone.utc), error_category(code)
+            row.completed_at, row.error_category = (
+                db.scalar(select(func.clock_timestamp())),
+                error_category(code),
+            )
             if not contacted or code in {"circuit_open", "llm_key_missing"}:
                 row.estimated_yuan = Decimal(0)
 
@@ -235,7 +236,7 @@ async def stream_answer(run, provider=None, retriever=None):
             async for part in stream:
                 yield part
         return
-    trace = RunTrace(run.id)
+    trace = RunTrace(run.id, run.owner, run.fence)
     token = current_trace.set(trace)
     try:
         with trace.stage("request_received", input_count=1, output_count=1):
@@ -261,7 +262,8 @@ async def _stream_answer(run, provider=None, retriever=None):
         return
     contacted, completed = False, False
     try:
-        async with asyncio.timeout(settings().query_deadline_seconds):
+        budget = await asyncio.to_thread(remaining, run.id, run.owner, run.fence)
+        async with asyncio.timeout(budget):
             yield sse(schemas.StreamEvent(type="stage", run_id=run.id, stage="混合检索与重排"))
             chunks, trace = await asyncio.to_thread(
                 (
@@ -274,7 +276,7 @@ async def _stream_answer(run, provider=None, retriever=None):
                 run.question,
                 run.versions,
             )
-            await asyncio.to_thread(save_trace, run.id, trace)
+            await asyncio.to_thread(save_trace, run.id, trace, run.owner, run.fence)
             with stage("evidence_binding", input_count=len(chunks), output_count=len(chunks)):
                 selected = [
                     await asyncio.to_thread(citation_for, chunk, f"E{i}") for i, chunk in enumerate(chunks, 1)
@@ -311,7 +313,7 @@ async def _stream_answer(run, provider=None, retriever=None):
                                 uncertain_retry=part.get("uncertain_retry", False),
                                 rate_card="deepseek-flash-CNY-2026-09-13",
                             )
-                            await asyncio.to_thread(save_usage, run.id, usage)
+                            await asyncio.to_thread(save_usage, run.id, usage, run.owner, run.fence)
                         if part.get("text"):
                             answer_text += part["text"]
                             if len(answer_text) > 8192:
@@ -338,7 +340,7 @@ async def _stream_answer(run, provider=None, retriever=None):
                 estimated_yuan=float(estimate) if estimate is not None else None,
             )
             with stage("final_response", input_count=1, output_count=1):
-                await asyncio.to_thread(finish, run.id, answer)
+                await asyncio.to_thread(finish, run.id, answer, run.owner, run.fence)
             completed = True
             yield sse(schemas.StreamEvent(type="final", run_id=run.id, answer=answer))
     except (asyncio.CancelledError, GeneratorExit):

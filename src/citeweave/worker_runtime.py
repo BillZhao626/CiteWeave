@@ -24,6 +24,7 @@ def main():
             "worker",
             "--loglevel=WARNING",
             "--concurrency=1",
+            "--queues=cw-ingestion,cw-evaluation",
             "--hostname=cw1-%h",
         ]
     )

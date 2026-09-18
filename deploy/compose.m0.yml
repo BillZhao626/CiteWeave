@@ -14,11 +14,16 @@ services:
       interval: 3s
       retries: 20
   broker:
-    image: valkey/valkey:8.1.5-alpine@sha256:918228e4ff7da6b3a4213cb18067f6e09d9f0503d0a08868699ba227cff71861
-    command: ["valkey-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction", "--maxmemory", "128mb"]
+    image: redis:8.2.9-alpine@sha256:e867773b6ef754e5cbee573e07c8ef9421b9a0a97bacfa10678667bfaae4aad4
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction", "--maxmemory", "128mb"]
     ports: ["127.0.0.1:16379:6379"]
-    volumes: ["brokerdata:/data"]
-    mem_limit: 192m
+    volumes: ["redis_brokerdata:/data"]
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
   qdrant:
     image: qdrant/qdrant:v1.16.3@sha256:0425e3e03e7fd9b3dc95c4214546afe19de2eb2e28ca621441a56663ac6e1f46
     ports: ["127.0.0.1:16333:6333"]
@@ -37,10 +42,11 @@ services:
       postgres:
         condition: service_healthy
       broker:
-        condition: service_started
+        condition: service_healthy
     command: ["celery", "-A", "citeweave.tasks:app", "worker", "--loglevel=WARNING", "--concurrency=1", "--hostname=cw-%h"]
     mem_limit: 320m
 volumes:
   pgdata:
-  brokerdata:
+  brokerdata: # Retained Valkey rollback volume; never mounted by Redis.
+  redis_brokerdata:
   qdrantdata:

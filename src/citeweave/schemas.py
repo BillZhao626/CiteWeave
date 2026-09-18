@@ -61,6 +61,7 @@ class Job(Contract):
     finished_at: datetime | None
     error_code: str | None
     error_message: str | None
+    absolute_deadline: datetime | None = None
     pipeline_version: str
     events: list[dict]
 
@@ -132,4 +133,6 @@ class Run(Contract):
     estimated_yuan: float | None
     reserved_yuan: float
     error_category: str | None
+    absolute_deadline: datetime | None = None
+    runtime_policy: str | None = None
     actual_charge: Literal["unavailable"] = "unavailable"

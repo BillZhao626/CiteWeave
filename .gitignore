@@ -39,3 +39,6 @@ coverage/
 /docs/reports/M2_ACCEPTANCE.md
 /docs/reports/m3-frontend-tests.json
 /docs/reports/m3-revisit-frontend-tests.json
+
+# Historical generated archive manifest was outside the C0 source allowlist.
+/docs/reports/m3-manifest.json

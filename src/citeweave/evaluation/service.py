@@ -346,6 +346,7 @@ def run_case(eval_id, case_id):
 
 def reconcile(send):
     completed = []
+    dispatch = None
     with transaction() as db:
         db.execute(text("SELECT pg_advisory_xact_lock(17702203)"))
         now = db.scalar(select(func.clock_timestamp()))
@@ -388,6 +389,8 @@ def reconcile(send):
             )
             if row:
                 row.status, row.lease_until = "QUEUED", now + timedelta(seconds=60)
-                send(str(row.eval_run_id), row.case_id)
+                dispatch = (str(row.eval_run_id), row.case_id)
+    if dispatch:
+        send(*dispatch)  # A failed send remains durable QUEUED and recovers after its lease.
     for identity in completed:
         refresh(identity)

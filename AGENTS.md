@@ -1,7 +1,7 @@
 # CiteWeave engineering rules
 
 - Personal, independently implemented evidence RAG. Read only this project's new code/specs for implementation; never read/copy former employer/lab/old RAG code, prompts, data or credentials. Keep `审计私有/` excluded from implementation and publication.
-- PostgreSQL is the business authority, Qdrant is a rebuildable index, Valkey is a recoverable broker. FastAPI + SQLAlchemy 2/Alembic + Celery; React 19/TypeScript/Vite/Router/TanStack Query/Tailwind/shadcn. Use LocalBlobStore; do not add unrelated infrastructure.
+- PostgreSQL is the business authority, Qdrant is a rebuildable index, Redis is a recoverable broker. FastAPI + SQLAlchemy 2/Alembic + Celery; React 19/TypeScript/Vite/Router/TanStack Query/Tailwind/shadcn. Use LocalBlobStore; do not add unrelated infrastructure.
 - Pydantic/OpenAPI defines API types. Generate frontend types. Specs and ADRs define invariants; do not silently change frozen evidence offsets, scope, ranking or task semantics.
 - Keep adapters separate from domain workflows. All durable schema changes use Alembic. Separate logical Document from immutable DocumentVersion.
 - Never expose an index until its durable READY commit. Fence stale attempts and isolate their external index writes. Execution is at least once; prove idempotent effective results.

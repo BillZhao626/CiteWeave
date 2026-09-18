@@ -20,6 +20,7 @@ from citeweave.parsing import parse_simple_pdf
 from citeweave.pipeline import chunk_blocks
 from citeweave.retrieval import BM25Encoder
 from citeweave.settings import settings
+from citeweave.trace import ingestion_guard
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +54,16 @@ def run_ingestion(job_id: str):
                 lost.set()
                 return
 
+    def guard():
+        with state.transaction() as db:
+            job = state.owned(db, job_id, fence)
+            return (
+                (job.absolute_deadline - state.now(db)).total_seconds()
+                if job.absolute_deadline
+                else lease["remaining_seconds"]
+            )
+
+    guard_token = ingestion_guard.set(guard)
     thread = threading.Thread(target=pulse, daemon=True)
     thread.start()
     try:
@@ -123,5 +134,6 @@ def run_ingestion(job_id: str):
         except state.StaleAttempt:
             log.warning("failure_after_lease_expired job=%s", job_id)
     finally:
+        ingestion_guard.reset(guard_token)
         stop.set()
         thread.join(timeout=5)

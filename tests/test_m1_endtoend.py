@@ -158,7 +158,9 @@ def test_abandoned_query_recovery_and_invalid_final_usage(monkeypatch):
     body = schemas.QueryCreate(kb_id=kb.id, question="湖畔站采样频率？")
     run = answering.begin_query(workspace, body, "interrupted")
     with transaction() as db:
-        db.get(QueryRunRow, run.id).created_at = ingestion_state.now(db) - timedelta(seconds=121)
+        stored = db.get(QueryRunRow, run.id)
+        stored.absolute_deadline = None  # Exercise the historical pre-deadline compatibility path.
+        stored.created_at = ingestion_state.now(db) - timedelta(seconds=121)
     ingestion_state.reconcile(lambda _: None)
     with transaction() as db:
         stored = db.get(QueryRunRow, run.id)

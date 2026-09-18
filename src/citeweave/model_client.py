@@ -11,7 +11,7 @@ from citeweave.circuit import Circuit
 from citeweave.embeddings import embedding_identity
 from citeweave.reliability import CircuitOpen, error_category
 from citeweave.settings import settings
-from citeweave.trace import current_trace, record_call
+from citeweave.trace import current_trace, network_timeout, record_call
 
 
 class Embedder(Protocol):
@@ -60,10 +60,12 @@ class ModelGateway:
                         response = client.post(
                             config.model_url + route,
                             json=body,
+                            timeout=httpx.Timeout(network_timeout(15), connect=min(3, network_timeout(15))),
                             headers={"Authorization": "Bearer " + config.gateway_token()},
                         )
                         item["http_status"] = response.status_code
                         if response.status_code == 200:
+                            network_timeout(15)
                             result = response.json()
                             succeeded = True
                             item["status"] = "COMPLETED"

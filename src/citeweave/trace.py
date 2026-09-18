@@ -7,6 +7,8 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from datetime import datetime, timezone
 
+from sqlalchemy import select
+
 from citeweave.costs import attempt_cost
 from citeweave.db import transaction
 from citeweave.domain import QueryRunRow
@@ -52,6 +54,8 @@ def runtime_config(profile=DEFAULT_PROFILE):
         provider="deepseek",
         model=config.deepseek_model,
         query_deadline_seconds=config.query_deadline_seconds,
+        max_active_queries=config.max_active_queries,
+        runtime_policy="runtime-deadlines-v1",
         provider_attempts=config.provider_attempts,
         model_attempts=config.model_attempts,
         retry_backoff_seconds=config.retry_backoff_seconds,
@@ -65,14 +69,24 @@ def stamp():
 
 
 class RunTrace:
-    def __init__(self, run_id):
+    def __init__(self, run_id, owner=None, fence=None):
         self.run_id, self.stages, self.calls = run_id, [], []
+        self.owner, self.fence = owner, fence
         self.lock = threading.RLock()
         self.cancelled = threading.Event()
 
+    def remaining(self):
+        from citeweave.query_runtime import remaining
+
+        if self.cancelled.is_set():
+            raise RuntimeError("query_cancelled")
+        return remaining(self.run_id, self.owner, self.fence)
+
     def persist(self):
         with self.lock, transaction() as db:
-            row = db.get(QueryRunRow, self.run_id)
+            row = db.scalar(select(QueryRunRow).where(QueryRunRow.id == self.run_id).with_for_update())
+            if row.owner != self.owner or row.fence != self.fence:
+                return
             row.stages, row.calls = list(self.stages), list(self.calls)
             provider_calls = [call for call in self.calls if call["upstream"] == "deepseek"]
             if provider_calls:
@@ -126,3 +140,15 @@ def stage(name, **fields):
 def record_call(value):
     if trace := current_trace.get():
         trace.call(value)
+
+
+def network_timeout(limit):
+    """Check PG ownership before I/O; each adapter receives the remaining budget."""
+    if trace := current_trace.get():
+        return min(limit, trace.remaining())
+    if guard := ingestion_guard.get():
+        return min(limit, guard())
+    return limit
+
+
+ingestion_guard = ContextVar("ingestion_guard", default=None)

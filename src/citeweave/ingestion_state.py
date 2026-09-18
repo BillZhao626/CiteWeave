@@ -13,7 +13,6 @@ from citeweave.domain import (
     IngestionJobRow,
     KnowledgeBaseRow,
     OutboxRow,
-    QueryRunRow,
     VersionRow,
 )
 from citeweave.pipeline import ACTIVE, transition_allowed
@@ -43,7 +42,13 @@ def event(job, status, stamp, code=None):
 
 def owned(db, job_id, fence):
     job = db.scalar(select(IngestionJobRow).where(IngestionJobRow.id == job_id).with_for_update())
-    if not job or job.fence != fence or job.status not in ACTIVE or job.lease_until <= now(db):
+    if (
+        not job
+        or job.fence != fence
+        or job.status not in ACTIVE
+        or job.lease_until <= now(db)
+        or (job.absolute_deadline and job.absolute_deadline <= now(db))
+    ):
         raise StaleAttempt()
     return job
 
@@ -53,6 +58,11 @@ def claim(job_id: UUID, owner: str):
         job = db.scalar(select(IngestionJobRow).where(IngestionJobRow.id == job_id).with_for_update())
         stamp = now(db)
         if not job or job.status not in ("PENDING", "RETRY_WAIT") or job.available_at > stamp:
+            return None
+        if job.absolute_deadline and job.absolute_deadline <= stamp:
+            fail_locked(
+                db, job, "ingestion_deadline_exhausted", "Ingestion deadline exhausted", permanent=True
+            )
             return None
         if job.attempt >= job.max_attempts:
             raise RuntimeError("retry_invariant_broken")
@@ -75,6 +85,9 @@ def claim(job_id: UUID, owner: str):
             "workspace_id": workspace,
             "blob_key": version.blob_key,
             "kind": job.kind,
+            "remaining_seconds": (job.absolute_deadline - stamp).total_seconds()
+            if job.absolute_deadline
+            else settings().ingestion_deadline_seconds,
         }
 
 
@@ -183,14 +196,21 @@ def reconcile(send):
     """Periodic daemon call. Duplicate send after commit ambiguity is intentional and safe."""
     with transaction() as db:
         stamp = now(db)
-        abandoned = db.scalars(
-            select(QueryRunRow)
-            .where(QueryRunRow.status == "RUNNING", QueryRunRow.created_at < stamp - timedelta(seconds=120))
+        from citeweave.query_runtime import expire_queries
+
+        expire_queries(db, stamp)
+        exhausted = db.scalars(
+            select(IngestionJobRow)
+            .where(
+                IngestionJobRow.status.in_([*ACTIVE, "PENDING", "RETRY_WAIT"]),
+                IngestionJobRow.absolute_deadline <= stamp,
+            )
             .with_for_update(skip_locked=True)
         ).all()
-        for run in abandoned:
-            run.status, run.error_code = "FAILED", "api_interrupted"
-            run.completed_at, run.error_category = stamp, "unknown_outcome"
+        for job in exhausted:
+            fail_locked(
+                db, job, "ingestion_deadline_exhausted", "Ingestion deadline exhausted", permanent=True
+            )
         expired = db.scalars(
             select(IngestionJobRow)
             .where(IngestionJobRow.status.in_(list(ACTIVE)), IngestionJobRow.lease_until < stamp)
@@ -209,8 +229,15 @@ def reconcile(send):
             .limit(100)
             .with_for_update(skip_locked=True)
         ).all()
+        dispatch = []
         for job, outbox in rows:
             if outbox.published_at and outbox.published_at > stamp - timedelta(seconds=15):
                 continue
-            send(str(job.id))
-            outbox.published_at = stamp
+            dispatch.append((job.id, job.fence))
+    # Never hold a DB transaction across broker I/O. Commit ambiguity may resend.
+    for job_id, fence in dispatch:
+        send(str(job_id))
+        with transaction() as db:
+            job = db.scalar(select(IngestionJobRow).where(IngestionJobRow.id == job_id).with_for_update())
+            if job.fence == fence and job.status in {"PENDING", "RETRY_WAIT"}:
+                db.get(OutboxRow, job_id).published_at = now(db)

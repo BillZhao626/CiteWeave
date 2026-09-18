@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from datetime import timedelta
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
@@ -111,6 +112,8 @@ def upload(workspace, kb_id, data: bytes, filename: str, license: str, key: str,
             document_version_id=row.id,
             max_attempts=settings().max_attempts,
             pipeline_version=PIPELINE_VERSION,
+            absolute_deadline=db.scalar(select(func.clock_timestamp()))
+            + timedelta(seconds=settings().ingestion_deadline_seconds),
         )
         db.add(job)
         db.flush()

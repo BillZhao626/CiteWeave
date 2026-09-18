@@ -1,10 +1,11 @@
 """Conservative index ownership, fenced rebuild, explicit release switching and audited GC."""
 
 import re
+from datetime import timedelta
 from uuid import uuid4
 
 from fastapi import HTTPException
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
 
 from citeweave.catalog import authorized_kb
 from citeweave.db import transaction
@@ -255,6 +256,8 @@ def rebuild(workspace, version_id, key):
             kind="rebuild",
             max_attempts=settings().max_attempts,
             pipeline_version=PIPELINE_VERSION,
+            absolute_deadline=db.scalar(select(func.clock_timestamp()))
+            + timedelta(seconds=settings().ingestion_deadline_seconds),
         )
         db.add(job)
         db.flush()

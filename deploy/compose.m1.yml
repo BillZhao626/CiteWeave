@@ -16,7 +16,8 @@ services:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       CW_DEEPSEEK_MODEL: ${CW_DEEPSEEK_MODEL:-deepseek-flash}
       CW_MONTHLY_BUDGET_YUAN: ${CW_MONTHLY_BUDGET_YUAN:-50}
-      CW_QUERY_DEADLINE_SECONDS: ${CW_QUERY_DEADLINE_SECONDS:-45}
+      CW_QUERY_DEADLINE_SECONDS: ${CW_QUERY_DEADLINE_SECONDS:-60}
+      CW_MAX_ACTIVE_QUERIES: ${CW_MAX_ACTIVE_QUERIES:-1}
       CW_PROVIDER_ATTEMPTS: ${CW_PROVIDER_ATTEMPTS:-2}
       CW_MODEL_ATTEMPTS: ${CW_MODEL_ATTEMPTS:-2}
       CW_RETRY_BACKOFF_SECONDS: ${CW_RETRY_BACKOFF_SECONDS:-0.5}
@@ -46,7 +47,8 @@ services:
       CW_DEEPSEEK_MODEL: ${CW_DEEPSEEK_MODEL:-deepseek-flash}
       CW_MONTHLY_BUDGET_YUAN: ${CW_MONTHLY_BUDGET_YUAN:-50}
       CW_FAULT_ROOT: /app/faults
-      CW_QUERY_DEADLINE_SECONDS: ${CW_QUERY_DEADLINE_SECONDS:-45}
+      CW_QUERY_DEADLINE_SECONDS: ${CW_QUERY_DEADLINE_SECONDS:-60}
+      CW_MAX_ACTIVE_QUERIES: ${CW_MAX_ACTIVE_QUERIES:-1}
       CW_PROVIDER_ATTEMPTS: ${CW_PROVIDER_ATTEMPTS:-2}
       CW_MODEL_ATTEMPTS: ${CW_MODEL_ATTEMPTS:-2}
       CW_RETRY_BACKOFF_SECONDS: ${CW_RETRY_BACKOFF_SECONDS:-0.5}
@@ -57,6 +59,6 @@ services:
     mem_limit: 512m
     depends_on:
       api: {condition: service_healthy}
-      broker: {condition: service_started}
+      broker: {condition: service_healthy}
       qdrant: {condition: service_started}
     restart: unless-stopped

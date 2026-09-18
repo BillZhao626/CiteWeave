@@ -141,6 +141,67 @@ class IndexRow(Stamp, Base):
     job_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw1_ingestion_jobs.id"))
     fence: Mapped[int] = mapped_column(default=0)
     state: Mapped[str] = mapped_column(String(24), default="BUILDING")
+    unit_kind: Mapped[str] = mapped_column(String(24), default="legacy_span", server_default="legacy_span")
+    artifact_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw3_structure_artifacts.id"))
+    index_profile_hash: Mapped[str | None] = mapped_column(String(64))
+    embedding_identity: Mapped[dict | None] = mapped_column(JSONB)
+    bm25: Mapped[dict | None] = mapped_column(JSONB)
+    bm25_hash: Mapped[str | None] = mapped_column(String(64))
+
+
+class StructureArtifactRow(Base):
+    __tablename__ = "cw3_structure_artifacts"
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    version_id: Mapped[UUID] = mapped_column(ForeignKey("cw1_document_versions.id"), index=True)
+    parser_revision: Mapped[str] = mapped_column(String(80))
+    profile_hash: Mapped[str] = mapped_column(String(64))
+    profile: Mapped[dict] = mapped_column(JSONB)
+    canonical_sha: Mapped[str] = mapped_column(String(64))
+    tree_hash: Mapped[str] = mapped_column(String(64))
+    membership_hash: Mapped[str] = mapped_column(String(64))
+    tokenizers: Mapped[dict] = mapped_column(JSONB)
+    state: Mapped[str] = mapped_column(String(24), default="DRAFT")
+
+
+class StructureNodeRow(Base):
+    __tablename__ = "cw3_structure_nodes"
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    artifact_id: Mapped[UUID] = mapped_column(ForeignKey("cw3_structure_artifacts.id"), index=True)
+    parent_node_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw3_structure_nodes.id"))
+    kind: Mapped[str] = mapped_column(String(24))
+    number: Mapped[str | None] = mapped_column(String(80))
+    title: Mapped[str] = mapped_column(Text)
+    heading_ids: Mapped[list] = mapped_column(JSONB)
+    content_ids: Mapped[list] = mapped_column(JSONB)
+    reading_order: Mapped[int] = mapped_column(Integer)
+    page_start: Mapped[int] = mapped_column(Integer)
+    page_end: Mapped[int] = mapped_column(Integer)
+    confidence: Mapped[str] = mapped_column(String(24))
+    reasons: Mapped[list] = mapped_column(JSONB)
+    details: Mapped[dict] = mapped_column(JSONB)
+
+
+class RetrievalChildRow(Base):
+    __tablename__ = "cw3_retrieval_children"
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    version_id: Mapped[UUID] = mapped_column(ForeignKey("cw1_document_versions.id"), index=True)
+    artifact_id: Mapped[UUID] = mapped_column(ForeignKey("cw3_structure_artifacts.id"), index=True)
+    parent_node_id: Mapped[UUID] = mapped_column(ForeignKey("cw3_structure_nodes.id"), index=True)
+    ordinal: Mapped[int] = mapped_column(Integer)
+    retrieval_text: Mapped[str] = mapped_column(Text)
+    text_hash: Mapped[str] = mapped_column(String(64))
+    membership_hash: Mapped[str] = mapped_column(String(64))
+    tokenizers: Mapped[dict] = mapped_column(JSONB)
+    token_counts: Mapped[dict] = mapped_column(JSONB)
+    details: Mapped[dict] = mapped_column(JSONB)
+
+
+class ChildSpanRow(Base):
+    __tablename__ = "cw3_child_spans"
+    child_id: Mapped[UUID] = mapped_column(ForeignKey("cw3_retrieval_children.id"), primary_key=True)
+    evidence_id: Mapped[UUID] = mapped_column(ForeignKey("cw1_chunks.id"), primary_key=True)
+    version_id: Mapped[UUID] = mapped_column(ForeignKey("cw1_document_versions.id"))
+    position: Mapped[int] = mapped_column(Integer)
 
 
 class OperationRow(Stamp, Base):

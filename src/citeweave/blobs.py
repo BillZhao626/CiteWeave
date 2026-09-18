@@ -53,6 +53,34 @@ class LocalBlobStore:
             raise ValueError("blob_integrity_mismatch")
         return data
 
+    def put_stream(self, parts) -> str:
+        """Content-address a bounded iterator without duplicating the canonical document in RAM."""
+        fd, temporary = tempfile.mkstemp(dir=self.root)
+        hasher = hashlib.sha256()
+        try:
+            with os.fdopen(fd, "wb") as stream:
+                for part in parts:
+                    hasher.update(part)
+                    stream.write(part)
+                stream.flush()
+                os.fsync(stream.fileno())
+            key = hasher.hexdigest()
+            destination = self.path(key)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            if destination.exists():
+                check = hashlib.sha256()
+                with destination.open("rb") as source:
+                    for block in iter(lambda: source.read(1024 * 1024), b""):
+                        check.update(block)
+                if check.hexdigest() != key:
+                    raise ValueError("blob_integrity_mismatch")
+            else:
+                os.replace(temporary, destination)
+            return key
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
     def exists(self, key: str) -> bool:
         return self.path(key).is_file()
 

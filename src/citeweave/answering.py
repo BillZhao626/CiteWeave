@@ -127,6 +127,8 @@ def begin_query(workspace, body, key, captured_bindings=None):
                 else version.index_collection
             )
             index = db.get(IndexRow, name)
+            if index and index.unit_kind != "legacy_span":
+                raise HTTPException(409, "structural_query_not_enabled")
             if index and (
                 index.state not in {"PUBLISHED", "SUPERSEDED", "EXPERIMENT_READY"}
                 or index.version_id != version_id

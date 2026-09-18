@@ -72,6 +72,7 @@ def resolve_experiment_bindings(db, workspace, version_ids, model, captured=None
             or row.workspace_id != workspace
             or row.version_id != version_id
             or row.state != "EXPERIMENT_READY"
+            or row.unit_kind != "legacy_span"
         ):
             raise HTTPException(409, "embedding_index_not_ready")
         result[str(version_id)] = name

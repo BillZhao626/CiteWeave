@@ -72,3 +72,11 @@ Test 的 3 道不可比来自 Judge 引用支持校验失败，保留原始失�
 原创业务代码、文档和原创示例使用 [MIT](LICENSE)；依赖、模型和标准摘录保留各自权利。初期规划曾进行旧项目评审，因此不声称严格 clean-room 或未经核验的“100% 无权属争议”。后续实现使用本项目新代码/规格与公开资料，不混入旧单位源码、内部资料或凭证。
 
 原始第三方 PDF、`.env`、运行数据、模型缓存和私有审计不进入发布候选。使用经过扫描的独立源码包创建公开仓库，不要上传整个工作目录。298 个已安装组件的许可台账与 CycloneDX SBOM、活跃凭证检查及 Gitleaks 扫描分别记录；它们不是完整法律审计或漏洞认证。API 费用为估算，实际扣费 unavailable。当前未创建或推送远程仓库。
+
+## Opt-in structural PDF ingestion
+
+Uploads may explicitly select `ingestion_profile=general-text-pdf-v1` or `telecom-protocol-pdf-v1`. The default remains the legacy profile. New profiles persist immutable structure artifacts, numbered sections/clauses, structural parents, multi-span retrieval children and typed E5/BM25 index builds through the existing fenced ingestion job. Limits are 32 MiB, 600 pages, 100,000 citation atoms, 20,000 children and a 7,200-second durable ingestion budget. Unsupported glyphs/layouts fail explicitly.
+
+Authorized inspection is available at `/v1/versions/{version_id}/structure`, `/structure/nodes` and `/structure/children` (paged). Structural Ask is not enabled in this batch; legacy readers explicitly reject structural-child indexes. Existing citations and the legacy parser keep their original identity. Rebuilds read frozen structure rather than reparse a PDF.
+
+Fetch the independently acquired official sources with `python scripts/fetch_public_telecom.py`; see `docs/data/public_telecom_sources.md`. Download success does not imply parser acceptance or a completed engineering gate.

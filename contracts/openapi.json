@@ -302,6 +302,17 @@
             }
           },
           {
+            "name": "ingestion_profile",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(pdf-glyph160-e5small-bm25-rrf60-bgev2-v1|general-text-pdf-v1|telecom-protocol-pdf-v1)$",
+              "default": "pdf-glyph160-e5small-bm25-rrf60-bgev2-v1",
+              "title": "Ingestion Profile"
+            }
+          },
+          {
             "name": "idempotency-key",
             "in": "header",
             "required": true,
@@ -1724,6 +1735,263 @@
           }
         ]
       }
+    },
+    "/v1/versions/{version_id}/structure": {
+      "get": {
+        "summary": "Artifact",
+        "operationId": "artifact_v1_versions__version_id__structure_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          },
+          {
+            "name": "artifact_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Artifact Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/versions/{version_id}/structure/nodes": {
+      "get": {
+        "summary": "Nodes",
+        "operationId": "nodes_v1_versions__version_id__structure_nodes_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          },
+          {
+            "name": "artifact_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Artifact Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NodeView"
+                  },
+                  "title": "Response Nodes V1 Versions  Version Id  Structure Nodes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/versions/{version_id}/structure/children": {
+      "get": {
+        "summary": "Children",
+        "operationId": "children_v1_versions__version_id__structure_children_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          },
+          {
+            "name": "artifact_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Artifact Id"
+            }
+          },
+          {
+            "name": "parent_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parent Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChildView"
+                  },
+                  "title": "Response Children V1 Versions  Version Id  Structure Children Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1790,6 +2058,62 @@
         ],
         "title": "Answer"
       },
+      "ArtifactView": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "version_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Version Id"
+          },
+          "parser_revision": {
+            "type": "string",
+            "title": "Parser Revision"
+          },
+          "profile_hash": {
+            "type": "string",
+            "title": "Profile Hash"
+          },
+          "canonical_sha": {
+            "type": "string",
+            "title": "Canonical Sha"
+          },
+          "tree_hash": {
+            "type": "string",
+            "title": "Tree Hash"
+          },
+          "membership_hash": {
+            "type": "string",
+            "title": "Membership Hash"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "tokenizers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Tokenizers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "version_id",
+          "parser_revision",
+          "profile_hash",
+          "canonical_sha",
+          "tree_hash",
+          "membership_hash",
+          "state",
+          "tokenizers"
+        ],
+        "title": "ArtifactView"
+      },
       "Box": {
         "properties": {
           "page_index": {
@@ -1832,6 +2156,85 @@
           "bottom"
         ],
         "title": "Box"
+      },
+      "ChildView": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "version_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Version Id"
+          },
+          "artifact_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Artifact Id"
+          },
+          "parent_node_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Parent Node Id"
+          },
+          "ordinal": {
+            "type": "integer",
+            "title": "Ordinal"
+          },
+          "retrieval_text": {
+            "type": "string",
+            "title": "Retrieval Text"
+          },
+          "text_hash": {
+            "type": "string",
+            "title": "Text Hash"
+          },
+          "membership_hash": {
+            "type": "string",
+            "title": "Membership Hash"
+          },
+          "tokenizers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Tokenizers"
+          },
+          "token_counts": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Token Counts"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          },
+          "span_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Span Ids",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "version_id",
+          "artifact_id",
+          "parent_node_id",
+          "ordinal",
+          "retrieval_text",
+          "text_hash",
+          "membership_hash",
+          "tokenizers",
+          "token_counts",
+          "details"
+        ],
+        "title": "ChildView"
       },
       "Citation": {
         "properties": {
@@ -2692,6 +3095,113 @@
           "token"
         ],
         "title": "Login"
+      },
+      "NodeView": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "artifact_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Artifact Id"
+          },
+          "parent_node_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Node Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "heading_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Heading Ids"
+          },
+          "content_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Content Ids"
+          },
+          "reading_order": {
+            "type": "integer",
+            "title": "Reading Order"
+          },
+          "page_start": {
+            "type": "integer",
+            "title": "Page Start"
+          },
+          "page_end": {
+            "type": "integer",
+            "title": "Page End"
+          },
+          "confidence": {
+            "type": "string",
+            "title": "Confidence"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "artifact_id",
+          "parent_node_id",
+          "kind",
+          "number",
+          "title",
+          "heading_ids",
+          "content_ids",
+          "reading_order",
+          "page_start",
+          "page_end",
+          "confidence",
+          "reasons",
+          "details"
+        ],
+        "title": "NodeView"
       },
       "Operation": {
         "properties": {

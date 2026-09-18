@@ -12,8 +12,9 @@ from sqlalchemy.dialects.postgresql import insert
 from citeweave import schemas
 from citeweave.blobs import LocalBlobStore
 from citeweave.db import transaction
+from citeweave.document_profiles import document_profile, structural
 from citeweave.domain import DocumentRow, IngestionJobRow, KnowledgeBaseRow, OutboxRow, VersionRow
-from citeweave.pipeline import PIPELINE_VERSION, PROFILE
+from citeweave.pipeline import PIPELINE_VERSION
 from citeweave.settings import settings
 
 
@@ -50,10 +51,24 @@ def create_kb(workspace: UUID, body: schemas.KnowledgeBaseCreate, key: str):
         return schemas.KnowledgeBase.model_validate(row), identity is not None
 
 
-def upload(workspace, kb_id, data: bytes, filename: str, license: str, key: str, document_id: UUID | None):
-    if not data.startswith(b"%PDF-") or not 0 < len(data) <= 10 * 1024 * 1024:
-        raise HTTPException(422, "pdf_required_max_10_mib")
-    digest = fingerprint([hashlib.sha256(data).hexdigest(), filename, license, str(document_id)])
+def upload(
+    workspace,
+    kb_id,
+    data: bytes,
+    filename: str,
+    license: str,
+    key: str,
+    document_id: UUID | None,
+    ingestion_profile: str = PIPELINE_VERSION,
+):
+    profile = document_profile(ingestion_profile)
+    target = structural(profile)
+    if not data.startswith(b"%PDF-") or not 0 < len(data) <= (32 if target else 10) * 1024 * 1024:
+        raise HTTPException(422, "pdf_required_max_32_mib" if target else "pdf_required_max_10_mib")
+    parts = [hashlib.sha256(data).hexdigest(), filename, license, str(document_id)]
+    if target:
+        parts.append(profile)
+    digest = fingerprint(parts)
     with transaction() as db:
         authorized_kb(db, kb_id, workspace, lock=True)
         row = db.scalar(select(VersionRow).where(VersionRow.kb_id == kb_id, VersionRow.key == key))
@@ -101,7 +116,7 @@ def upload(workspace, kb_id, data: bytes, filename: str, license: str, key: str,
             license=license,
             source_sha256=blob_key,
             blob_key=blob_key,
-            profile=PROFILE,
+            profile=profile,
             key=key,
             fingerprint=digest,
         )
@@ -111,9 +126,13 @@ def upload(workspace, kb_id, data: bytes, filename: str, license: str, key: str,
             id=uuid4(),
             document_version_id=row.id,
             max_attempts=settings().max_attempts,
-            pipeline_version=PIPELINE_VERSION,
+            pipeline_version=profile["pipeline"],
             absolute_deadline=db.scalar(select(func.clock_timestamp()))
-            + timedelta(seconds=settings().ingestion_deadline_seconds),
+            + timedelta(
+                seconds=profile["limits"]["deadline_seconds"]
+                if target
+                else settings().ingestion_deadline_seconds
+            ),
         )
         db.add(job)
         db.flush()

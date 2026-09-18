@@ -11,6 +11,7 @@ from sqlalchemy import select
 
 from citeweave.blobs import LocalBlobStore
 from citeweave.db import transaction
+from citeweave.document_profiles import structural
 from citeweave.domain import ChunkRow, IndexRow, OperationRow
 from citeweave.embeddings import embedding_identity
 from citeweave.index import QdrantIndex
@@ -50,6 +51,8 @@ def build(version_id, model_key, key):
         version = authorized_version(db, workspace, version_id)
         if version.status != "READY":
             raise ValueError("source_version_not_ready")
+        if structural(version.profile):
+            raise ValueError("structural_experiment_index_not_enabled")
         row, _ = operation(db, workspace, key, "embedding_index", str(version_id))
         if row.detail and row.detail["embedding"] != model:
             raise ValueError("embedding_index_idempotency_conflict")

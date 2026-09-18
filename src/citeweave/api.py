@@ -179,6 +179,10 @@ def create_app(
         filename: str = Query(min_length=1, max_length=200),
         license: str = Query(pattern="^(original|CC0-1.0|CC-BY-4.0|permission-held)$"),
         document_id: UUID | None = None,
+        ingestion_profile: str = Query(
+            default="pdf-glyph160-e5small-bm25-rrf60-bgev2-v1",
+            pattern="^(pdf-glyph160-e5small-bm25-rrf60-bgev2-v1|general-text-pdf-v1|telecom-protocol-pdf-v1)$",
+        ),
         idempotency_key: str = Header(min_length=1, max_length=128),
         workspace=Depends(principal),
     ):
@@ -187,12 +191,21 @@ def create_app(
         data = bytearray()
         async for part in request.stream():
             data.extend(part)
-            if len(data) > 10 * 1024 * 1024:
-                raise HTTPException(413, "pdf_max_10_mib")
+            limit = 10 if ingestion_profile == "pdf-glyph160-e5small-bm25-rrf60-bgev2-v1" else 32
+            if len(data) > limit * 1024 * 1024:
+                raise HTTPException(413, f"pdf_max_{limit}_mib")
         from starlette.concurrency import run_in_threadpool
 
         return await run_in_threadpool(
-            catalog.upload, workspace, kb_id, bytes(data), filename, license, idempotency_key, document_id
+            catalog.upload,
+            workspace,
+            kb_id,
+            bytes(data),
+            filename,
+            license,
+            idempotency_key,
+            document_id,
+            ingestion_profile,
         )
 
     @app.get("/v1/knowledge-bases/{kb_id}/documents", response_model=list[schemas.Document])
@@ -276,6 +289,9 @@ def create_app(
     from citeweave.m2_api import mount
 
     mount(app, principal)
+    from citeweave.structure_views import mount as mount_structure
+
+    mount_structure(app, principal)
 
     if lab_root:
         from citeweave.lab import install_lab

@@ -143,7 +143,7 @@ def protected_reasons(db, row):
     if job and job.status in LIVE:
         # Also protects queued/retrying jobs; do not race future publication or recovery.
         reasons.append("running_or_recoverable_attempt")
-    for evaluation in db.scalars(select(EvalRunRow).where(EvalRunRow.status.in_(["PENDING", "RUNNING"]))):
+    for evaluation in db.scalars(select(EvalRunRow)):
         if row.name in evaluation.runtime_config.get("index_bindings", {}).values():
             reasons.append("evaluation_snapshot_reference")
             break
@@ -255,9 +255,13 @@ def rebuild(workspace, version_id, key):
             document_version_id=version.id,
             kind="rebuild",
             max_attempts=settings().max_attempts,
-            pipeline_version=PIPELINE_VERSION,
+            pipeline_version=version.profile.get("pipeline", PIPELINE_VERSION),
             absolute_deadline=db.scalar(select(func.clock_timestamp()))
-            + timedelta(seconds=settings().ingestion_deadline_seconds),
+            + timedelta(
+                seconds=version.profile.get("limits", {}).get(
+                    "deadline_seconds", settings().ingestion_deadline_seconds
+                )
+            ),
         )
         db.add(job)
         db.flush()
@@ -294,6 +298,23 @@ def rollback(workspace, document_id, target_version, expected_active, key):
         ):
             raise HTTPException(409, "document_ingestion_running")
         index_row = db.get(IndexRow, version.index_collection)
+        if version.profile.get("unit_kind") == "structural_child":
+            from citeweave.document_profiles import content_hash
+            from citeweave.domain import StructureArtifactRow
+
+            artifact = (
+                db.get(StructureArtifactRow, index_row.artifact_id)
+                if index_row and index_row.artifact_id
+                else None
+            )
+            if (
+                not artifact
+                or artifact.state != "PUBLISHED"
+                or artifact.version_id != version.id
+                or index_row.unit_kind != "structural_child"
+                or index_row.index_profile_hash != content_hash(version.profile)
+            ):
+                raise HTTPException(409, "structure_binding_unavailable")
         if index_row and index_row.state == "DELETED":
             raise HTTPException(409, "index_unavailable_rebuild_required")
         if not QdrantIndex().client.collection_exists(version.index_collection):

@@ -119,8 +119,11 @@ class ModelGateway:
         finally:
             self.circuit.change("success" if succeeded else "abandon", permit)
 
-    def embed(self, texts, query=False):
-        response = self.call("/embed", {"texts": texts, "query": query, "embedding": self.embedding})
+    def embed(self, texts, query=False, contract=None):
+        body = {"texts": texts, "query": query, "embedding": self.embedding}
+        if contract is not None:
+            body["contract"] = contract
+        response = self.call("/embed", body)
         if response.get("embedding") != self.embedding:
             raise ValueError("embedding_identity_mismatch")
         vectors = response["vectors"]

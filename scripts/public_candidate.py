@@ -23,6 +23,7 @@ DIRECTORIES = {
     "migrations",
     "prompts",
     "evals",
+    "corpus",
 }
 FILES = {
     ".dockerignore",

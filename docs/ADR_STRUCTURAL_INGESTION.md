@@ -1,0 +1,17 @@
+# Version-bound structural ingestion
+
+The opt-in `general-text-pdf-v1` and `telecom-protocol-pdf-v1` profiles create immutable EvidenceSpans first, then a StructureArtifact, numbered nodes, bounded Parents, RetrievalChildren and ordered ChildSpan membership. The default legacy profile and historical evidence identities remain unchanged. The parser consumes source geometry and text only; no query, benchmark answer or rank signal participates.
+
+Explicit numbering plus font cues can establish VERIFIED_RULE hierarchy. Conflicting numbering or missing ancestors lowers confidence; pages without a reliable heading use FALLBACK_PAGE. TOC candidates require corresponding body-heading evidence. Repeated margins are excluded from retrieval with recorded reasons. Only verified structure may carry context across consecutive pages. Literal source offsets and boxes remain authoritative; the separately approved glyph-group policy preserves shared ligature boxes. Unsupported source mappings fail explicitly.
+
+Children contain ordered existing span IDs, not newly invented citation units. Real pinned E5 and BGE tokenizers count full inputs without truncation. Child budgets are 24 atoms, 960 characters, 192 E5 body tokens and 320 BGE body tokens. Parent partitions are mechanical, source-linked nodes limited to 24 children and 4096 E5 tokens. Table rows start and end on child boundaries; oversized rows retain continuation references, and a row that fits a Parent stays together. Physically ruled cells retain source ranges; unresolved layouts do not invent cells.
+
+Migration 0006 expands the existing catalog with four structural tables and typed index bindings. Composite foreign keys prevent cross-version membership and cross-artifact parents. Publication validates hashes, scope, membership and tokenizer contracts. Published structure and index bindings are immutable. Historical rows are neither reinterpreted nor backfilled with invented structure.
+
+The existing lease, heartbeat, deadline, reconciliation and fencing workflow owns ingestion. Each attempt writes a private Qdrant collection. After exact child ID and payload verification, one PostgreSQL transaction publishes spans, structure, index, version and job READY. A partial external collection is not a readable published index. Rebuild loads the frozen artifact and membership; it never reparses the PDF or replaces published span identities.
+
+Target limits are 32 MiB, 600 pages, 100000 atoms, 20000 children and a 7200-second durable deadline. Streaming canonical output and batched tokenization/embedding avoid retaining all vectors. Worker memory is bounded at 2 GiB. The shared Celery hard limit accommodates the target deadline; legacy jobs retain their shorter durable deadline and existing limits. API and worker processes do not load model weights.
+
+Read-only authorized inspection endpoints expose published artifacts, nodes and children. Structural Ask, Parent expansion during answering, structural reranking and experimental atom indexes for these profiles remain disabled pending their separately scoped implementation. Rejecting a mismatched index type prevents legacy readers from interpreting a child as a Citation.
+
+Alternatives rejected: reparsing on rebuild would change citation identities; indexing atoms under a structural label would not implement Parent–Child retrieval units; publishing Qdrant before PostgreSQL READY would expose partial attempts. The expansion-only schema allows older application code to continue using legacy rows.

@@ -69,6 +69,13 @@ def run_ingestion(job_id: str):
     try:
         blobs = LocalBlobStore(settings().blob_root)
         fault_gate(job_id, "PARSING")
+        from citeweave.document_profiles import structural
+
+        if structural(lease["profile"]):
+            from citeweave.structural_ingestion import run_structural_ingestion
+
+            run_structural_ingestion(lease, lost)
+            return
         with tempfile.TemporaryDirectory(prefix="cw-parse-") as temporary:
             path = Path(temporary) / "source.pdf"
             path.write_bytes(blobs.get(lease["blob_key"]))

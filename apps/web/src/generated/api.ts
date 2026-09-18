@@ -502,6 +502,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/versions/{version_id}/structure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Artifact */
+        get: operations["artifact_v1_versions__version_id__structure_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/versions/{version_id}/structure/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Nodes */
+        get: operations["nodes_v1_versions__version_id__structure_nodes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/versions/{version_id}/structure/children": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Children */
+        get: operations["children_v1_versions__version_id__structure_children_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -532,6 +583,35 @@ export interface components {
              */
             actual_cost: "unavailable";
         };
+        /** ArtifactView */
+        ArtifactView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+            /** Parser Revision */
+            parser_revision: string;
+            /** Profile Hash */
+            profile_hash: string;
+            /** Canonical Sha */
+            canonical_sha: string;
+            /** Tree Hash */
+            tree_hash: string;
+            /** Membership Hash */
+            membership_hash: string;
+            /** State */
+            state: string;
+            /** Tokenizers */
+            tokenizers: {
+                [key: string]: unknown;
+            };
+        };
         /** Box */
         Box: {
             /** Page Index */
@@ -544,6 +624,54 @@ export interface components {
             right: number;
             /** Bottom */
             bottom: number;
+        };
+        /** ChildView */
+        ChildView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+            /**
+             * Artifact Id
+             * Format: uuid
+             */
+            artifact_id: string;
+            /**
+             * Parent Node Id
+             * Format: uuid
+             */
+            parent_node_id: string;
+            /** Ordinal */
+            ordinal: number;
+            /** Retrieval Text */
+            retrieval_text: string;
+            /** Text Hash */
+            text_hash: string;
+            /** Membership Hash */
+            membership_hash: string;
+            /** Tokenizers */
+            tokenizers: {
+                [key: string]: unknown;
+            };
+            /** Token Counts */
+            token_counts: {
+                [key: string]: unknown;
+            };
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+            /**
+             * Span Ids
+             * @default []
+             */
+            span_ids: string[];
         };
         /** Citation */
         Citation: {
@@ -897,6 +1025,45 @@ export interface components {
              * Format: password
              */
             token: string;
+        };
+        /** NodeView */
+        NodeView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Artifact Id
+             * Format: uuid
+             */
+            artifact_id: string;
+            /** Parent Node Id */
+            parent_node_id: string | null;
+            /** Kind */
+            kind: string;
+            /** Number */
+            number: string | null;
+            /** Title */
+            title: string;
+            /** Heading Ids */
+            heading_ids: string[];
+            /** Content Ids */
+            content_ids: string[];
+            /** Reading Order */
+            reading_order: number;
+            /** Page Start */
+            page_start: number;
+            /** Page End */
+            page_end: number;
+            /** Confidence */
+            confidence: string;
+            /** Reasons */
+            reasons: string[];
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
         };
         /** Operation */
         Operation: {
@@ -1434,6 +1601,7 @@ export interface operations {
                 filename: string;
                 license: string;
                 document_id?: string | null;
+                ingestion_profile?: string;
             };
             header: {
                 "idempotency-key": string;
@@ -2259,6 +2427,110 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SystemStatus"];
+                };
+            };
+        };
+    };
+    artifact_v1_versions__version_id__structure_get: {
+        parameters: {
+            query?: {
+                artifact_id?: string | null;
+            };
+            header?: never;
+            path: {
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArtifactView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    nodes_v1_versions__version_id__structure_nodes_get: {
+        parameters: {
+            query?: {
+                artifact_id?: string | null;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeView"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    children_v1_versions__version_id__structure_children_get: {
+        parameters: {
+            query?: {
+                artifact_id?: string | null;
+                parent_id?: string | null;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildView"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

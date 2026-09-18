@@ -6,7 +6,7 @@ from uuid import UUID
 from sqlalchemy import and_, or_, select
 
 from citeweave.db import transaction
-from citeweave.domain import ChunkRow, VersionRow
+from citeweave.domain import ChunkRow, IndexRow, VersionRow
 from citeweave.index import QdrantIndex
 from citeweave.model_client import ModelGateway
 from citeweave.parents import expand_parents
@@ -38,6 +38,15 @@ class HybridRetriever:
                     )
                 )
             )
+            for version in versions:
+                name = (
+                    self.index_bindings[str(version.id)] if self.index_bindings else version.index_collection
+                )
+                row = db.get(IndexRow, name)
+                if (row and row.unit_kind != "legacy_span") or version.profile.get(
+                    "unit_kind"
+                ) == "structural_child":
+                    raise ValueError("structural_query_not_enabled")
         if len(versions) != len(version_ids):
             raise ValueError("snapshot_not_ready")
         with stage("query_embedding", input_count=1, output_count=1):

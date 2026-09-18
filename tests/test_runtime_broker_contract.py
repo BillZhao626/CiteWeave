@@ -15,9 +15,9 @@ from citeweave.settings import settings
 
 
 def test_task_routes_and_limits():
-    assert ingest.soft_time_limit == 1800 and ingest.time_limit == 1860
+    assert ingest.soft_time_limit == 7200 and ingest.time_limit == 7260
     assert evaluate_case.soft_time_limit == 180 and evaluate_case.time_limit == 210
-    assert app.conf.broker_transport_options["visibility_timeout"] == 2100
+    assert app.conf.broker_transport_options["visibility_timeout"] == 7500
     assert app.conf.task_routes[ingest.name]["queue"] == "cw-ingestion"
     assert app.conf.task_routes[evaluate_case.name]["queue"] == "cw-evaluation"
     assert app.conf.task_acks_late and app.conf.task_reject_on_worker_lost

@@ -56,7 +56,7 @@ services:
       CW_BREAKER_COOLDOWN_SECONDS: ${CW_BREAKER_COOLDOWN_SECONDS:-20}
     volumes: ["../.runtime/blobs:/app/blobs", "../.runtime/faults:/app/faults"]
     command: ["python", "-m", "citeweave.worker_runtime"]
-    mem_limit: 512m
+    mem_limit: 2g
     depends_on:
       api: {condition: service_healthy}
       broker: {condition: service_healthy}

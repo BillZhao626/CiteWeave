@@ -85,6 +85,10 @@ def claim(job_id: UUID, owner: str):
             "workspace_id": workspace,
             "blob_key": version.blob_key,
             "kind": job.kind,
+            "profile": version.profile,
+            "canonical_key": version.canonical_key,
+            "index_collection": version.index_collection,
+            "page_count": version.page_count,
             "remaining_seconds": (job.absolute_deadline - stamp).total_seconds()
             if job.absolute_deadline
             else settings().ingestion_deadline_seconds,
@@ -129,7 +133,7 @@ def fail(job_id, fence, code, message, permanent=False):
         fail_locked(db, job, code, message, permanent)
 
 
-def publish(job_id, fence, chunks, collection, bm25, canonical_key, page_count):
+def publish(job_id, fence, chunks, collection, bm25, canonical_key, page_count, structure=None):
     from citeweave.lifecycle import governance_lock
 
     with transaction() as db:
@@ -146,6 +150,16 @@ def publish(job_id, fence, chunks, collection, bm25, canonical_key, page_count):
             or index_row.fence != fence
         ):
             raise ValueError("publish_requires_owned_index")
+        from citeweave.document_profiles import structural
+
+        if structural(version.profile) != (structure is not None):
+            raise ValueError("publish_profile_unit_mismatch")
+        if structure is not None:
+            from citeweave.structural_ingestion import publish_structure
+
+            publish_structure(db, version, index_row, job, structure, chunks, bm25, canonical_key, page_count)
+        elif index_row.unit_kind != "legacy_span":
+            raise ValueError("publish_profile_unit_mismatch")
         if job.kind == "rebuild":
             existing = {
                 str(c.id): c for c in db.scalars(select(ChunkRow).where(ChunkRow.version_id == version.id))
@@ -153,7 +167,7 @@ def publish(job_id, fence, chunks, collection, bm25, canonical_key, page_count):
             if (
                 set(existing) != {c["id"] for c in chunks}
                 or version.canonical_key != canonical_key
-                or version.bm25 != bm25
+                or (structure is None and version.bm25 != bm25)
                 or version.page_count != page_count
                 or any(
                     existing[c["id"]].text != c["text"]
@@ -164,7 +178,7 @@ def publish(job_id, fence, chunks, collection, bm25, canonical_key, page_count):
             ):
                 raise ValueError("rebuild_truth_mismatch")
         # Per-attempt collections prevent a stale worker from mutating this published snapshot.
-        for chunk in chunks if job.kind == "ingest" else []:
+        for chunk in chunks if job.kind == "ingest" and structure is None else []:
             db.add(
                 ChunkRow(
                     id=UUID(chunk["id"]),
@@ -178,7 +192,9 @@ def publish(job_id, fence, chunks, collection, bm25, canonical_key, page_count):
             old_index.state = "SUPERSEDED"
         index_row.state = "PUBLISHED"
         version.status, version.index_collection = "READY", collection
-        version.bm25, version.canonical_key = bm25, canonical_key
+        if structure is None:
+            version.bm25 = bm25
+        version.canonical_key = canonical_key
         version.chunk_count, version.page_count = len(chunks), page_count
         document = db.scalar(
             select(DocumentRow).where(DocumentRow.id == version.document_id).with_for_update()

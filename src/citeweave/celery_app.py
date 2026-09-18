@@ -15,8 +15,8 @@ app.conf.update(
     task_ignore_result=True,
     task_serializer="json",
     accept_content=["json"],
-    visibility_timeout=2100,
-    broker_transport_options={"visibility_timeout": 2100, "socket_timeout": 3, "socket_connect_timeout": 3},
+    visibility_timeout=7500,
+    broker_transport_options={"visibility_timeout": 7500, "socket_timeout": 3, "socket_connect_timeout": 3},
     broker_connection_timeout=3,
     broker_connection_retry_on_startup=True,
     broker_connection_max_retries=10,
@@ -24,7 +24,7 @@ app.conf.update(
 )
 
 
-@app.task(name="citeweave.ingest", soft_time_limit=1800, time_limit=1860)
+@app.task(name="citeweave.ingest", soft_time_limit=7200, time_limit=7260)
 def ingest(job_id):
     from citeweave.ingestion import run_ingestion
 

@@ -24,6 +24,7 @@ DIRECTORIES = {
     "prompts",
     "evals",
     "corpus",
+    "benchmarks",
 }
 FILES = {
     ".dockerignore",

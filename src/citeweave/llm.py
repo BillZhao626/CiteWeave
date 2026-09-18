@@ -31,9 +31,11 @@ class DeepSeekProvider:
         self.transport = transport
         self.circuit = circuit or Circuit("deepseek")
         self.attempts = []
+        self.max_attempts = None  # DurableProvider sets one actual send per ledger attempt.
 
     async def stream(self, messages):
         config = settings()
+        attempts = self.max_attempts or config.provider_attempts
         key = config.deepseek_api_key.get_secret_value()
         if not key:
             raise ProviderError("llm_key_missing")
@@ -55,7 +57,7 @@ class DeepSeekProvider:
                 transport=self.transport, timeout=httpx.Timeout(25, connect=5)
             ) as client:
                 uncertain_retry = False
-                for attempt in range(config.provider_attempts):
+                for attempt in range(attempts):
                     start, when = time.perf_counter(), datetime.now(timezone.utc)
                     item = dict(
                         upstream="deepseek",
@@ -92,7 +94,7 @@ class DeepSeekProvider:
                                 )
                                 if (
                                     response.status_code in (429, 500, 502, 503, 504)
-                                    and attempt + 1 < config.provider_attempts
+                                    and attempt + 1 < attempts
                                 ):
                                     uncertain_retry |= response.status_code >= 500
                                     await asyncio.sleep(config.retry_backoff_seconds * (attempt + 1))
@@ -156,7 +158,7 @@ class DeepSeekProvider:
                             estimated_yuan=0,
                             outcome="not_connected",
                         )
-                        if attempt + 1 < config.provider_attempts and not started:
+                        if attempt + 1 < attempts and not started:
                             await asyncio.sleep(config.retry_backoff_seconds * (attempt + 1))
                             continue
                         raise ProviderError("llm_connection_failed") from None

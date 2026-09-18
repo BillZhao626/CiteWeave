@@ -4,11 +4,12 @@ import hashlib
 import json
 
 from citeweave.evaluation.holdout import HOLDOUT_ID, HOLDOUT_SHA256
+from citeweave.evaluation.telecom_dataset import DATASET_ID, validate_dataset
 from citeweave.settings import ROOT
 
 
 def load_dataset(identity="public-standards-v1"):
-    if identity not in {"public-standards-v1", HOLDOUT_ID}:
+    if identity not in {"public-standards-v1", HOLDOUT_ID, DATASET_ID}:
         raise ValueError("unknown_dataset")
     path = ROOT / "evals" / (identity + ".json")
     raw = path.read_bytes()
@@ -17,4 +18,7 @@ def load_dataset(identity="public-standards-v1"):
         raise ValueError("dataset_integrity_mismatch")
     if identity == HOLDOUT_ID and digest != HOLDOUT_SHA256:
         raise ValueError("holdout_integrity_mismatch")
-    return json.loads(raw), digest
+    value = json.loads(raw)
+    if identity == DATASET_ID:
+        validate_dataset(value)
+    return value, digest

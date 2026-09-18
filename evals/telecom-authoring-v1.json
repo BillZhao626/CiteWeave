@@ -1,0 +1,397 @@
+{
+  "label_origin": "AI_source_grounded_not_human_reviewed",
+  "cases": [
+    {
+      "source_id": "rfc9293",
+      "section": "3.7.4",
+      "question": "When does Nagle buffer new TCP user data while earlier data is unacknowledged?",
+      "reference": "It buffers until acknowledgment or enough data for a full-sized segment.",
+      "anchor": "If there is unacknowledged data"
+    },
+    {
+      "source_id": "rfc9293",
+      "section": "3.8.4",
+      "question": "How does RFC 9293 describe an idle TCP connection?",
+      "reference": "No incoming segments for a long interval, with no new or unacknowledged outgoing data.",
+      "anchor": "A TCP connection is said to be"
+    },
+    {
+      "source_id": "rfc9293",
+      "section": "3.8.6.1",
+      "question": "Why does a TCP sender probe a zero receive window?",
+      "reference": "To discover reliably when the receiver reopens its window.",
+      "anchor": "This retransmission is essential"
+    },
+    {
+      "source_id": "rfc9293",
+      "section": "3.7.5",
+      "question": "How is TCP MSS value 65,535 interpreted for IPv6 jumbograms?",
+      "reference": "It represents infinity; Path MTU Discovery determines the actual MSS.",
+      "anchor": "RFC 2675"
+    },
+    {
+      "source_id": "rfc9293",
+      "section": "3.5.3",
+      "question": "What validates an RST received in TCP SYN-SENT?",
+      "reference": "Its ACK field must acknowledge the initial SYN.",
+      "anchor": "In the SYN-SENT state"
+    },
+    {
+      "source_id": "rfc9293",
+      "section": "3.6.1",
+      "question": "May a TCP host continue sending on a half-closed connection?",
+      "reference": "Yes, the direction that remains open can still carry data.",
+      "anchor": "Since the two directions"
+    },
+    {
+      "source_id": "rfc9293",
+      "section": "3.8.1",
+      "question": "Why must TCP determine its retransmission timeout dynamically?",
+      "reference": "Network characteristics and uses of connections vary.",
+      "anchor": "Because of the variability"
+    },
+    {
+      "source_id": "rfc9293",
+      "section": "3.2.2",
+      "question": "Where does RFC 9293 direct implementers for experimental TCP option usage?",
+      "reference": "Section 3.2.2 points to references 30 and 45 for definitions and recommended usage.",
+      "anchor": "Experimental TCP Option values"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "1.2",
+      "question": "At what scopes does QUIC provide reliability and congestion control for HTTP/3?",
+      "reference": "Reliability operates per stream; congestion control covers the connection.",
+      "anchor": "By providing reliability"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "4.5",
+      "question": "Does HTTP/3 implement HTTP Upgrade or status 101?",
+      "reference": "It supports neither the Upgrade mechanism nor 101 Switching Protocols.",
+      "anchor": "HTTP/3 does not support"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "6.2.1",
+      "question": "Which frame must begin each HTTP/3 control stream?",
+      "reference": "SETTINGS must be first; a different first frame is H3_MISSING_SETTINGS.",
+      "anchor": "Each side"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "7.2.1",
+      "question": "What does an HTTP/3 DATA frame carry?",
+      "reference": "Variable-length bytes of HTTP request or response content.",
+      "anchor": "DATA frames (type=0x00)"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "7.2.2",
+      "question": "Which encoding carries the HTTP field section in HEADERS frames?",
+      "reference": "QPACK encodes the field section, carried by frame type 0x01.",
+      "anchor": "The HEADERS frame"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "4.2.1",
+      "question": "What compression tradeoff can a QPACK encoder control?",
+      "reference": "Compression efficiency versus latency from head-of-line blocking.",
+      "anchor": "[QPACK] describes"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "5.4",
+      "question": "What must a client assume if a QUIC connection ends without GOAWAY?",
+      "reference": "Any request sent fully or partly might have been processed.",
+      "anchor": "If a connection terminates"
+    },
+    {
+      "source_id": "rfc9114",
+      "section": "10.10",
+      "question": "Why can access control based only on an HTTP/3 client's original address be unreliable?",
+      "reference": "QUIC can change the client address during a connection.",
+      "anchor": "Since a QUIC client's address"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "3.1",
+      "question": "What is the target of an HTTP request called?",
+      "reference": "A resource.",
+      "anchor": "The target of an HTTP request"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "3.2",
+      "question": "What two components constitute an HTTP representation?",
+      "reference": "Representation metadata and a potentially unbounded stream of representation data.",
+      "anchor": "A representation consists"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "5.1",
+      "question": "Are HTTP field names case-sensitive?",
+      "reference": "No; field names are case-insensitive.",
+      "anchor": "Field names are case-insensitive"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "5.4",
+      "question": "Does HTTP set a universal maximum length for field sections?",
+      "reference": "No predefined limit applies to individual field lines or values, or whole header/trailer sections.",
+      "anchor": "HTTP does not place"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "6.5",
+      "question": "Why should trailer fields be processed separately from header fields?",
+      "reference": "To avoid contradicting semantics already known when the header section finished.",
+      "anchor": "Trailer fields ought"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "7.2",
+      "question": "What information does Host supply to an origin server?",
+      "reference": "The target URI's host and port, allowing distinction among resources for multiple host names.",
+      "anchor": "The \"Host\" header"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "15.5.5",
+      "question": "Does a 404 response establish that the missing representation is permanently gone?",
+      "reference": "No; 404 does not distinguish temporary from permanent absence.",
+      "anchor": "A 404 status code"
+    },
+    {
+      "source_id": "rfc9110",
+      "section": "15.6.5",
+      "question": "In which role does a server return 504 Gateway Timeout?",
+      "reference": "As a gateway or proxy that lacked a timely response from an upstream needed for the request.",
+      "anchor": "The 504"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "1.5.2",
+      "question": "What byte order is used for an MQTT Two Byte Integer?",
+      "reference": "Big-endian: the most significant byte comes first.",
+      "anchor": "Two Byte Integer data values"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "1.5.3",
+      "question": "How many bits does an MQTT Four Byte Integer contain?",
+      "reference": "It is an unsigned 32-bit integer.",
+      "anchor": "Four Byte Integer data values"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "1.5.6",
+      "question": "How is MQTT Binary Data length encoded and bounded?",
+      "reference": "A Two Byte Integer precedes the bytes; the length ranges from zero to 65,535.",
+      "anchor": "Binary Data is represented"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "1.5.7",
+      "question": "What is the order of strings in an MQTT UTF-8 String Pair?",
+      "reference": "The first is the name and the second is its value.",
+      "anchor": "The first string serves"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "2.1.4",
+      "question": "Does MQTT Remaining Length count its own encoding bytes?",
+      "reference": "No; it counts the variable header and payload, excluding its own encoding.",
+      "anchor": "The Remaining Length does not include"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "3.1.2.4",
+      "question": "What session effect follows MQTT CONNECT Clean Start set to 1?",
+      "reference": "Both peers discard any existing session and start a new one; Session Present is zero.",
+      "anchor": "If a CONNECT packet is received with Clean Start"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "3.1.2.9",
+      "question": "Is a Password payload field permitted when the MQTT Password Flag is zero?",
+      "reference": "No, it must be absent.",
+      "anchor": "If the Password Flag is set to 0"
+    },
+    {
+      "source_id": "mqtt-v5.0-os",
+      "section": "3.1.2.11.5",
+      "question": "What is the default MQTT Topic Alias Maximum if the property is absent?",
+      "reference": "Zero.",
+      "anchor": "If the Topic Alias Maximum property is absent"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "3",
+      "question": "What information does an IPv6 router's Control Plane process in RFC 9673 terminology?",
+      "reference": "Management and routing information exchanged with other routers.",
+      "anchor": "The Control Plane processes"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "5.1",
+      "question": "Where must an IPv6 Hop-by-Hop Options header appear?",
+      "reference": "Immediately after the IPv6 header, with at most one occurrence.",
+      "anchor": "Section 4.1 of [RFC8200]"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "5.1.1",
+      "question": "Can local configuration control processing of specific IPv6 Hop-by-Hop options?",
+      "reference": "Yes; configuration may select which specific options are skipped.",
+      "anchor": "This document clarifies"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "5.2",
+      "question": "What robustness should a source using Hop-by-Hop options allow for?",
+      "reference": "Routers may process only some options or forward packets without processing them.",
+      "anchor": "A Source creating packets"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "5.2.1",
+      "question": "What does the IPv6 Router Alert Option request?",
+      "reference": "Additional processing in the router's Control Plane.",
+      "anchor": "The purpose of the Router Alert Option"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "5.2.2",
+      "question": "Who should be able to configure the set of enabled Hop-by-Hop options?",
+      "reference": "The router operator.",
+      "anchor": "The set of enabled options"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "6",
+      "question": "What forwarding-rate design objective applies to new Hop-by-Hop options?",
+      "reference": "They should be simple enough to process at the Full Forwarding Rate.",
+      "anchor": "Any future new IPv6 Hop-by-Hop options"
+    },
+    {
+      "source_id": "rfc9673",
+      "section": "6.1",
+      "question": "Why can a limited domain offer stronger Hop-by-Hop option support than arbitrary Internet paths?",
+      "reference": "Its routers can be configured or updated for required options; some Internet paths drop extension-header packets.",
+      "anchor": "In a limited domain"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "2.1",
+      "question": "How does a TLS 1.3 server respond to an insufficient client key_share when a compatible group exists?",
+      "reference": "It sends HelloRetryRequest so the client restarts with an appropriate share.",
+      "anchor": "the server corrects the mismatch"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "2.3",
+      "question": "What shared secret enables TLS 1.3 clients to send early data in their first flight?",
+      "reference": "A PSK, established externally or through a previous handshake.",
+      "anchor": "When clients and servers share a PSK"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "4.4.1",
+      "question": "When must the TLS server send EncryptedExtensions?",
+      "reference": "Immediately after ServerHello in every handshake.",
+      "anchor": "In all handshakes"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "4.6",
+      "question": "What determines whether a TLS client sends EndOfEarlyData?",
+      "reference": "It sends the message after server Finished only if the server included early_data in EncryptedExtensions.",
+      "anchor": "If the server sent an"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "5.3",
+      "question": "What sequence number is used for the first TLS record under a traffic key?",
+      "reference": "Zero, including after a key change.",
+      "anchor": "Each sequence number is set to zero"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "5.5",
+      "question": "What must TLS implementations do before a traffic key reaches its cryptographic usage limit?",
+      "reference": "Close the connection or update the key.",
+      "anchor": "close the connection or do a key update"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "7.2",
+      "question": "Which TLS handshake message updates application traffic keys after the handshake?",
+      "reference": "KeyUpdate.",
+      "anchor": "Once the handshake is complete"
+    },
+    {
+      "source_id": "rfc9846",
+      "section": "9.1",
+      "question": "Which TLS 1.3 cipher suite is mandatory absent a different application profile?",
+      "reference": "TLS_AES_128_GCM_SHA256.",
+      "anchor": "A TLS-compliant application"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "2.1",
+      "question": "Does protecting a CoAP request with DTLS generally prove when the client sent it?",
+      "reference": "No; security protection alone does not establish request freshness.",
+      "anchor": "A CoAP server receiving a request"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "2.2",
+      "question": "What does the CoAP Echo challenge-response mechanism let the server verify?",
+      "reference": "The freshness of a request against application-specific server requirements.",
+      "anchor": "This document defines the Echo option"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "2.5.1",
+      "question": "What can presenting an Echo value demonstrate about a CoAP request's timing?",
+      "reference": "That it was sent after a particular time or a server event.",
+      "anchor": "The property a client demonstrates"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "2.6",
+      "question": "Which CoAP response is recommended to mitigate amplification from unauthenticated clients?",
+      "reference": "4.01 Unauthorized containing an Echo option.",
+      "anchor": "A CoAP server"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "3.1",
+      "question": "Why must a security protocol supporting CoAP over unreliable transport tolerate out-of-order delivery?",
+      "reference": "CoAP handles lost and reordered messages over transports such as UDP.",
+      "anchor": "In order for a security protocol"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "3.2",
+      "question": "Who sets Request-Tag and what does it distinguish?",
+      "reference": "The client sets a short-lived identifier separating block-wise request operations for a resource.",
+      "anchor": "The Request-Tag is intended"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "3.8",
+      "question": "Why can block-wise response reassembly produce the wrong representation without an attacker?",
+      "reference": "Blocks may belong to different resource states after updates or cache reuse.",
+      "anchor": "a client can construct a wrong representation"
+    },
+    {
+      "source_id": "rfc9175",
+      "section": "4.2",
+      "question": "Do RFC 9175's updated Token-processing rules apply to servers as well as clients?",
+      "reference": "The update concerns clients; server Token processing is unchanged.",
+      "anchor": "The Token processing for servers is not updated"
+    }
+  ]
+}

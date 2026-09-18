@@ -11,7 +11,7 @@ from citeweave.evaluation.attribution import attribute
 from citeweave.evaluation.metrics import mean_defined, ranking_metrics
 
 
-def aggregate(rows, query_costs=None):
+def aggregate(rows, query_costs=None, durable=False):
     results = [r.result for r in rows if r.result]
     value = dict(
         case_count=len(rows),
@@ -35,7 +35,9 @@ def aggregate(rows, query_costs=None):
             str(k): {
                 metric: mean_defined(
                     [
-                        ranking_metrics(
+                        r["assessment"]["retrieval"][stage][str(k)][metric]
+                        if r["assessment"].get("metric_revision") == "source-support-v1"
+                        else ranking_metrics(
                             r["assessment"]["stage_rankings"][stage], set(r["assessment"]["gold_ids"]), k
                         )[metric]
                         for r in results
@@ -55,12 +57,39 @@ def aggregate(rows, query_costs=None):
         value["answer"][key] = mean_defined(
             [
                 (r.judge.get("scores") or {}).get(
-                    key, 0 if r.status == "FAILED" and key != "faithfulness" else None
+                    key, 0 if not durable and r.status == "FAILED" and key != "faithfulness" else None
                 )
                 for r in rows
             ]
         )
     value["judge_status"] = dict(Counter(r.judge.get("status", "PENDING") for r in rows))
+    if durable:
+        scored = [r for r in rows if (r.judge.get("scores") or {}).get("correctness") is not None]
+        value["quality_accounting"] = dict(
+            total_cases=len(rows),
+            semantic_evaluable=len(scored),
+            missing_judgment=len(rows) - len(scored),
+            query_completed=sum(r.result.get("status") == "COMPLETED" for r in rows),
+            end_to_end_correctness=sum((r.judge.get("scores") or {}).get("correctness", 0) or 0 for r in rows)
+            / len(rows)
+            if rows
+            else None,
+            end_to_end_note="Missing judgment contributes no demonstrated correctness; it is not a semantic zero label.",
+            conditional_quality=value["answer"],
+        )
+        for key in ("required_aspect_coverage", "required_source_coverage"):
+            value["evidence"][key] = {
+                phase: mean_defined(
+                    [r["assessment"].get("support_coverage", {}).get(phase, {}).get(key) for r in results]
+                )
+                for phase in ("initial", "final")
+            }
+        for answerable, name in ((True, "answerable_refusal"), (False, "unanswerable_correct_refusal")):
+            eligible = [r for r in results if r.get("answerable") is answerable]
+            value["answer"][name] = dict(
+                count=sum((r.get("answer") or {}).get("text") == "证据不足，无法回答。" for r in eligible),
+                denominator=len(eligible),
+            )
     claims = [c for r in rows for c in (r.judge.get("scores") or {}).get("claims", [])]
     value["semantic_citation"] = dict(
         method="fallible_judge_claim_to_cited_evidence",
@@ -155,7 +184,11 @@ def refresh(eval_id):
                 )
             ).all()
         )
-        row.summary = aggregate(cases, {k: float(v) if v is not None else None for k, v in costs.items()})
+        row.summary = aggregate(
+            cases,
+            {k: float(v) if v is not None else None for k, v in costs.items()},
+            durable=row.runtime_policy == "eval-durable-v1",
+        )
         return row.summary
 
 

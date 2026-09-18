@@ -1,0 +1,7 @@
+{
+  "name": "citeweave-benchmark-drivers",
+  "private": true,
+  "type": "module",
+  "scripts": {"ui": "playwright test ui_e2e.spec.ts"},
+  "devDependencies": {"@playwright/test": "1.63.0"}
+}

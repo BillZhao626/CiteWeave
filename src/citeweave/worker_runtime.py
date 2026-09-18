@@ -37,7 +37,9 @@ def main():
             try:
                 reconcile(lambda job: ingest.apply_async(args=[job], retry=False))
                 reconcile_evaluations(
-                    lambda eval_id, case: evaluate_case.apply_async(args=[eval_id, case], retry=False)
+                    lambda eval_id, case, generation: evaluate_case.apply_async(
+                        args=[eval_id, case, generation], retry=False
+                    )
                 )
             except Exception as exc:
                 logging.error(

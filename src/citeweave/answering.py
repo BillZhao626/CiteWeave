@@ -41,7 +41,7 @@ PROMPT = ROOT / "prompts/answer-v1.txt"
 REFUSAL = "证据不足，无法回答。"
 
 
-def begin_query(workspace, body, key, captured_bindings=None):
+def begin_query(workspace, body, key, captured_bindings=None, captured_snapshot=None):
     fingerprint_body = body.model_dump(mode="json")
     target = body.profile == STRUCTURAL_PROFILE
     if not target:
@@ -90,10 +90,10 @@ def begin_query(workspace, body, key, captured_bindings=None):
             if existing.status == "RUNNING":
                 raise HTTPException(409, "query_running")
             return existing
-        if (
-            db.scalar(select(func.count()).select_from(QueryRunRow).where(QueryRunRow.status == "RUNNING"))
-            >= settings().max_active_queries
-        ):
+        from citeweave.evaluation.lifecycle import occupied_query_slots
+        from citeweave.provider_phases import evaluation_owner
+
+        if occupied_query_slots(db, evaluation_owner.get()) >= settings().max_active_queries:
             raise HTTPException(429, "single_query_capacity", headers={"Retry-After": "2"})
         month = now.astimezone(ZoneInfo("Asia/Shanghai")).replace(
             day=1, hour=0, minute=0, second=0, microsecond=0
@@ -150,9 +150,26 @@ def begin_query(workspace, body, key, captured_bindings=None):
         if target:
             from citeweave.structural_repository import capture
 
-            if captured_bindings is not None:
+            if captured_bindings is not None and captured_snapshot is None:
                 raise HTTPException(409, "structural_evaluation_binding_not_supported")
-            snapshot = capture(db, workspace, body, versions, query_tokens)
+            if captured_snapshot is not None:
+                from citeweave.query_evidence import StructuralSnapshot
+                from citeweave.structural_repository import StructuralRepository
+
+                snapshot = StructuralSnapshot.model_validate(captured_snapshot)
+                if snapshot.workspace_id != str(workspace) or snapshot.kb_id != str(body.kb_id):
+                    raise HTTPException(409, "evaluation_snapshot_scope")
+                if {b.version_id: b.index_name for b in snapshot.bindings} != captured_bindings:
+                    raise HTTPException(409, "evaluation_snapshot_bindings")
+                StructuralRepository(snapshot).builds()
+                snapshot = snapshot.model_copy(
+                    update={
+                        "query_tokens": query_tokens,
+                        "evidence_mode": "compare" if body.evidence_mode == "compare" else "single",
+                    }
+                )
+            else:
+                snapshot = capture(db, workspace, body, versions, query_tokens)
             from uuid import UUID
 
             versions = [UUID(b.version_id) for b in snapshot.bindings]
@@ -194,10 +211,17 @@ def begin_query(workspace, body, key, captured_bindings=None):
             + timedelta(seconds=60 if target else settings().query_deadline_seconds),
             owner=uuid4(),
             fence=1,
-            runtime_policy="runtime-deadlines-v1",
+            runtime_policy="provider-phases-v1",
         )
         db.add(run)
         db.flush()
+        from citeweave.provider_phases import evaluation_owner
+
+        if token := evaluation_owner.get():
+            from citeweave.evaluation.lifecycle import owned
+
+            case, _, _ = owned(db, token)
+            case.query_run_id = run.id
         return run
 
 
@@ -250,6 +274,12 @@ def save_usage(run_id, usage, owner=None, fence=None):
 
 def finish(run_id, answer, owner=None, fence=None):
     with transaction() as db:
+        from citeweave.provider_phases import evaluation_owner
+
+        if token := evaluation_owner.get():
+            from citeweave.evaluation.lifecycle import owned
+
+            owned(db, token)
         row, stamp = check_owned(db, run_id, owner, fence)
         row.result, row.status = answer.model_dump(mode="json"), "COMPLETED"
         row.completed_at = stamp
@@ -269,6 +299,18 @@ def failed(run_id, code, contacted):
             )
             if not contacted or code in {"circuit_open", "llm_key_missing"}:
                 row.estimated_yuan = Decimal(0)
+            if row.runtime_policy == "provider-phases-v1":
+                from citeweave.domain import ProviderPhaseRow
+
+                if db.scalar(
+                    select(ProviderPhaseRow.id)
+                    .where(
+                        ProviderPhaseRow.query_run_id == run_id,
+                        ProviderPhaseRow.state.in_(["DISPATCHED", "UNKNOWN"]),
+                    )
+                    .limit(1)
+                ):
+                    row.estimated_yuan = None
 
 
 def sse(event):
@@ -308,6 +350,10 @@ async def _stream_answer(run, provider=None, retriever=None):
         )
         return
     contacted, completed = False, False
+    if run.runtime_policy == "provider-phases-v1":
+        from citeweave.provider_phases import DurableProvider
+
+        provider = DurableProvider(provider or DeepSeekProvider(), run.id, run.owner, run.fence)
     try:
         budget = await asyncio.to_thread(remaining, run.id, run.owner, run.fence)
         async with asyncio.timeout(budget):

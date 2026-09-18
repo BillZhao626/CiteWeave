@@ -101,6 +101,12 @@ def validate_judgment(raw, result, identity):
 def reserve(eval_id, case_id):
     with transaction() as db:
         db.execute(text("SELECT pg_advisory_xact_lock(17702201)"))
+        from citeweave.provider_phases import evaluation_owner
+
+        if token := evaluation_owner.get():
+            from citeweave.evaluation.lifecycle import owned
+
+            owned(db, token)
         row = db.get(EvalCaseRow, (eval_id, case_id))
         if row.judge or row.judge_reserved_yuan:
             raise ValueError("judge_already_attempted")
@@ -132,7 +138,7 @@ def reserve(eval_id, case_id):
         row.judge_reserved_at = db.scalar(select(func.clock_timestamp()))
 
 
-async def assess_answer(case, result, identity="judge-v1"):
+async def assess_answer(case, result, identity="judge-v1", provider=None):
     if identity not in {"judge-v1", "judge-v2", "judge-v3", "judge-v4"}:
         raise ValueError("unknown_judge_profile")
     prompt = (ROOT / "prompts" / (identity + ".txt")).read_text(encoding="utf-8")
@@ -197,13 +203,13 @@ async def assess_answer(case, result, identity="judge-v1"):
         question=case["question"],
         answerable=case["answerable"],
         reference_answer=case["reference_answer"],
-        reference_passages=[g["quote"] for g in case["gold"]],
+        reference_passages=[g["quote"] for g in case.get("gold", [])],
         answer=answer["text"],
         supplied_evidence=result.get("selected_evidence", []),
     )
     if identity in {"judge-v3", "judge-v4"}:
         data["answer_units"] = answer_units(answer["text"])
-    provider, raw = DeepSeekProvider(), ""
+    provider, raw = provider or DeepSeekProvider(), ""
     status, scores, code = "COMPLETED", None, None
     try:
         async with (

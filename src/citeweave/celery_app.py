@@ -32,7 +32,7 @@ def ingest(job_id):
 
 
 @app.task(name="citeweave.evaluate_case", soft_time_limit=180, time_limit=210)
-def evaluate_case(eval_id, case_id):
+def evaluate_case(eval_id, case_id, generation=None):
     from citeweave.evaluation.service import run_case
 
-    run_case(eval_id, case_id)
+    run_case(eval_id, case_id, generation)

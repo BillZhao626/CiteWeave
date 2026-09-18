@@ -1,0 +1,117 @@
+{
+  "schema_revision": "source-support-v1",
+  "dataset_sha256": "d133f682dd0724c7479aeb0948e846dd148653061b9e3b9fefaf5eda966582a7",
+  "salt": "citeweave-independent-clauses-2026-v1",
+  "splits": {
+    "dev": {
+      "case_ids": [
+        "cw-telecom-001",
+        "cw-telecom-002",
+        "cw-telecom-003",
+        "cw-telecom-004",
+        "cw-telecom-005",
+        "cw-telecom-006",
+        "cw-telecom-007",
+        "cw-telecom-008",
+        "cw-telecom-009",
+        "cw-telecom-010",
+        "cw-telecom-011",
+        "cw-telecom-012",
+        "cw-telecom-013",
+        "cw-telecom-014",
+        "cw-telecom-016",
+        "cw-telecom-017",
+        "cw-telecom-018",
+        "cw-telecom-019",
+        "cw-telecom-020",
+        "cw-telecom-021",
+        "cw-telecom-022",
+        "cw-telecom-024",
+        "cw-telecom-026",
+        "cw-telecom-027",
+        "cw-telecom-028",
+        "cw-telecom-029",
+        "cw-telecom-031",
+        "cw-telecom-032",
+        "cw-telecom-033",
+        "cw-telecom-037",
+        "cw-telecom-038",
+        "cw-telecom-042"
+      ],
+      "sha256": "c9341cadcd5148a71566e87b8cc3ed3fa3311b34c10efd43fe1499b5b1a2ebf8"
+    },
+    "regression": {
+      "case_ids": [
+        "cw-telecom-015",
+        "cw-telecom-023",
+        "cw-telecom-025",
+        "cw-telecom-030",
+        "cw-telecom-034",
+        "cw-telecom-035",
+        "cw-telecom-036",
+        "cw-telecom-039",
+        "cw-telecom-040",
+        "cw-telecom-041",
+        "cw-telecom-043",
+        "cw-telecom-044",
+        "cw-telecom-045",
+        "cw-telecom-046",
+        "cw-telecom-047",
+        "cw-telecom-048",
+        "cw-telecom-049",
+        "cw-telecom-050",
+        "cw-telecom-051",
+        "cw-telecom-052",
+        "cw-telecom-053",
+        "cw-telecom-054",
+        "cw-telecom-055",
+        "cw-telecom-056"
+      ],
+      "sha256": "1910cd9c666ec2918c6f297a76b900a4a91a9afd5409958542349adfd8d27c2f"
+    },
+    "safety": {
+      "case_ids": [
+        "cw-safety-u1",
+        "cw-safety-u2",
+        "cw-safety-u3",
+        "cw-safety-u4",
+        "cw-safety-u5",
+        "cw-safety-u6",
+        "cw-safety-u7",
+        "cw-safety-u8",
+        "cw-safety-injection-1",
+        "cw-safety-injection-2",
+        "cw-safety-injection-3",
+        "cw-safety-injection-4",
+        "cw-safety-boundary-1",
+        "cw-safety-boundary-2",
+        "cw-safety-boundary-3",
+        "cw-safety-boundary-4"
+      ],
+      "sha256": "5a7417089ecc7d5c8389d679d8da6c901192b4577097b12c272ae7c2a9138bba"
+    }
+  },
+  "holdout": {
+    "status": "NOT_YET_SEALED",
+    "target_count": 24,
+    "content_present": false,
+    "reason": "Independent custody and final Stage-D decision are pending; no implementation-visible cases are called sealed."
+  },
+  "visible_types": {
+    "single_fact": 24,
+    "multi_aspect": 16,
+    "comparison": 10,
+    "location": 6,
+    "unanswerable": 8,
+    "injection": 4,
+    "boundary": 4
+  },
+  "deferred_core_types": {
+    "single_fact": 8,
+    "multi_aspect": 8,
+    "comparison": 6,
+    "location": 2
+  },
+  "human_review": "NOT_REVIEWED",
+  "label_origin": "AI_source_grounded_not_human_reviewed"
+}

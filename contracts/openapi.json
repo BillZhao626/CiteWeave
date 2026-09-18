@@ -2394,6 +2394,28 @@
           "split_policy": {
             "type": "string",
             "title": "Split Policy"
+          },
+          "target_case_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Case Count"
+          },
+          "holdout_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holdout Status"
           }
         },
         "additionalProperties": false,
@@ -2523,6 +2545,122 @@
               }
             ],
             "title": "Judge Reserved At"
+          },
+          "execution_attempt": {
+            "type": "integer",
+            "title": "Execution Attempt",
+            "default": 0
+          },
+          "max_attempts": {
+            "type": "integer",
+            "title": "Max Attempts",
+            "default": 3
+          },
+          "dispatch_generation": {
+            "type": "integer",
+            "title": "Dispatch Generation",
+            "default": 0
+          },
+          "dispatch_count": {
+            "type": "integer",
+            "title": "Dispatch Count",
+            "default": 0
+          },
+          "dispatch_failures": {
+            "type": "integer",
+            "title": "Dispatch Failures",
+            "default": 0
+          },
+          "admission_deferrals": {
+            "type": "integer",
+            "title": "Admission Deferrals",
+            "default": 0
+          },
+          "fence": {
+            "type": "integer",
+            "title": "Fence",
+            "default": 0
+          },
+          "next_attempt_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Attempt At"
+          },
+          "absolute_deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Absolute Deadline"
+          },
+          "active_deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Deadline"
+          },
+          "cancel_requested_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancel Requested At"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "last_error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error Code"
+          },
+          "last_error_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error Category"
           }
         },
         "additionalProperties": false,
@@ -2602,6 +2740,40 @@
               }
             ],
             "title": "Completed At"
+          },
+          "runtime_policy": {
+            "type": "string",
+            "title": "Runtime Policy",
+            "default": "legacy-v1"
+          },
+          "total_deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Deadline"
+          },
+          "cancel_requested_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancel Requested At"
+          },
+          "completeness": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Completeness"
           }
         },
         "additionalProperties": false,
@@ -2653,7 +2825,8 @@
             "type": "string",
             "enum": [
               "public-standards-v1",
-              "public-protocols-holdout-v1"
+              "public-protocols-holdout-v1",
+              "citeweave-public-telecom-eval-v1"
             ],
             "title": "Dataset Id",
             "default": "public-standards-v1"
@@ -2663,7 +2836,9 @@
             "enum": [
               "dev",
               "test",
-              "all"
+              "all",
+              "regression",
+              "safety"
             ],
             "title": "Split",
             "default": "dev"

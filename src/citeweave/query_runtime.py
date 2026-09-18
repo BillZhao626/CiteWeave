@@ -9,6 +9,9 @@ from citeweave.domain import QueryRunRow
 
 
 def expire_queries(db, stamp):
+    from citeweave.provider_phases import reconcile_queries
+
+    reconcile_queries(db, stamp)
     rows = db.scalars(
         select(QueryRunRow)
         .where(

@@ -242,6 +242,10 @@ class EvalRunRow(Stamp, Base):
     runtime_config: Mapped[dict] = mapped_column(JSONB)
     summary: Mapped[dict] = mapped_column(JSONB, default=dict)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    runtime_policy: Mapped[str] = mapped_column(String(40), default="eval-durable-v1")
+    total_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cancel_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completeness: Mapped[dict] = mapped_column(JSONB, default=dict)
 
 
 class EvalCaseRow(Stamp, Base):
@@ -258,3 +262,67 @@ class EvalCaseRow(Stamp, Base):
     judge_reserved_yuan: Mapped[Decimal] = mapped_column(Numeric(12, 8), default=Decimal(0))
     judge_estimated_yuan: Mapped[Decimal | None] = mapped_column(Numeric(12, 8))
     judge_reserved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    execution_attempt: Mapped[int] = mapped_column(Integer, default=0)
+    max_attempts: Mapped[int] = mapped_column(Integer, default=3)
+    dispatch_generation: Mapped[int] = mapped_column(Integer, default=0)
+    dispatch_count: Mapped[int] = mapped_column(Integer, default=0)
+    dispatch_failures: Mapped[int] = mapped_column(Integer, default=0)
+    admission_deferrals: Mapped[int] = mapped_column(Integer, default=0)
+    max_admission_deferrals: Mapped[int] = mapped_column(Integer, default=12)
+    fence: Mapped[int] = mapped_column(Integer, default=0)
+    next_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    absolute_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    active_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cancel_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    phase: Mapped[str | None] = mapped_column(String(24))
+    last_error_code: Mapped[str | None] = mapped_column(String(80))
+    last_error_category: Mapped[str | None] = mapped_column(String(40))
+
+
+class EvalOutboxRow(Stamp, Base):
+    __tablename__ = "cw4_eval_outbox"
+    eval_run_id: Mapped[UUID] = mapped_column(ForeignKey("cw2_eval_runs.id"), primary_key=True)
+    case_id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    dispatch_generation: Mapped[int] = mapped_column(Integer, primary_key=True)
+    state: Mapped[str] = mapped_column(String(24), default="PENDING")
+    next_send_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    send_count: Mapped[int] = mapped_column(Integer, default=0)
+    publish_fence: Mapped[int] = mapped_column(Integer, default=0)
+    publish_lease: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    task_id: Mapped[str | None] = mapped_column(String(80))
+
+
+class ProviderPhaseRow(Stamp, Base):
+    __tablename__ = "cw4_provider_phases"
+    __table_args__ = (UniqueConstraint("logical_key", "phase_attempt"),)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    eval_run_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw2_eval_runs.id"))
+    case_id: Mapped[str | None] = mapped_column(String(80))
+    query_run_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw1_query_runs.id"))
+    logical_key: Mapped[str] = mapped_column(String(200))
+    phase: Mapped[str] = mapped_column(String(24))
+    phase_attempt: Mapped[int] = mapped_column(Integer)
+    state: Mapped[str] = mapped_column(String(24), default="PREPARED")
+    owner: Mapped[UUID] = mapped_column()
+    fence: Mapped[int] = mapped_column(Integer)
+    reserved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    reserved_yuan: Mapped[Decimal] = mapped_column(Numeric(12, 8))
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    request_id: Mapped[str | None] = mapped_column(String(200))
+    usage: Mapped[dict | None] = mapped_column(JSONB)
+    estimated_yuan: Mapped[Decimal | None] = mapped_column(Numeric(12, 8))
+    result_hash: Mapped[str | None] = mapped_column(String(64))
+    result: Mapped[list | None] = mapped_column(JSONB)
+    error_code: Mapped[str | None] = mapped_column(String(80))
+    outcome: Mapped[str] = mapped_column(String(24), default="not_dispatched")
+
+
+class ProviderEventRow(Base):
+    __tablename__ = "cw4_provider_events"
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    phase_id: Mapped[UUID] = mapped_column(ForeignKey("cw4_provider_phases.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    kind: Mapped[str] = mapped_column(String(40))
+    detail: Mapped[dict] = mapped_column(JSONB, default=dict)

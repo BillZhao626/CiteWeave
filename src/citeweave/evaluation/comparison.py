@@ -10,6 +10,8 @@ DIMENSIONS = ("correctness", "completeness", "faithfulness", "relevancy", "refus
 def compare(baseline, candidate, old_cases, new_cases):
     if (baseline.dataset_hash, baseline.split) != (candidate.dataset_hash, candidate.split):
         raise ValueError("comparison_dataset_or_split_mismatch")
+    if getattr(baseline, "runtime_policy", None) != getattr(candidate, "runtime_policy", None):
+        raise ValueError("comparison_runtime_policy_mismatch")
     if baseline.runtime_config["judge_prompt_sha256"] != candidate.runtime_config["judge_prompt_sha256"]:
         raise ValueError("comparison_judge_mismatch")
     old, new = {c.case_id: c for c in old_cases}, {c.case_id: c for c in new_cases}

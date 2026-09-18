@@ -742,6 +742,10 @@ export interface components {
             splits: string[];
             /** Split Policy */
             split_policy: string;
+            /** Target Case Count */
+            target_case_count?: number | null;
+            /** Holdout Status */
+            holdout_status?: string | null;
         };
         /** Document */
         Document: {
@@ -793,6 +797,55 @@ export interface components {
             judge_estimated_yuan: number | null;
             /** Judge Reserved At */
             judge_reserved_at: string | null;
+            /**
+             * Execution Attempt
+             * @default 0
+             */
+            execution_attempt: number;
+            /**
+             * Max Attempts
+             * @default 3
+             */
+            max_attempts: number;
+            /**
+             * Dispatch Generation
+             * @default 0
+             */
+            dispatch_generation: number;
+            /**
+             * Dispatch Count
+             * @default 0
+             */
+            dispatch_count: number;
+            /**
+             * Dispatch Failures
+             * @default 0
+             */
+            dispatch_failures: number;
+            /**
+             * Admission Deferrals
+             * @default 0
+             */
+            admission_deferrals: number;
+            /**
+             * Fence
+             * @default 0
+             */
+            fence: number;
+            /** Next Attempt At */
+            next_attempt_at?: string | null;
+            /** Absolute Deadline */
+            absolute_deadline?: string | null;
+            /** Active Deadline */
+            active_deadline?: string | null;
+            /** Cancel Requested At */
+            cancel_requested_at?: string | null;
+            /** Phase */
+            phase?: string | null;
+            /** Last Error Code */
+            last_error_code?: string | null;
+            /** Last Error Category */
+            last_error_category?: string | null;
         };
         /** Evaluation */
         Evaluation: {
@@ -833,6 +886,19 @@ export interface components {
             created_at: string;
             /** Completed At */
             completed_at: string | null;
+            /**
+             * Runtime Policy
+             * @default legacy-v1
+             */
+            runtime_policy: string;
+            /** Total Deadline */
+            total_deadline?: string | null;
+            /** Cancel Requested At */
+            cancel_requested_at?: string | null;
+            /** Completeness */
+            completeness?: {
+                [key: string]: unknown;
+            };
         };
         /** EvaluationArtifact */
         EvaluationArtifact: {
@@ -852,13 +918,13 @@ export interface components {
              * @default public-standards-v1
              * @enum {string}
              */
-            dataset_id: "public-standards-v1" | "public-protocols-holdout-v1";
+            dataset_id: "public-standards-v1" | "public-protocols-holdout-v1" | "citeweave-public-telecom-eval-v1";
             /**
              * Split
              * @default dev
              * @enum {string}
              */
-            split: "dev" | "test" | "all";
+            split: "dev" | "test" | "all" | "regression" | "safety";
             /**
              * Profile
              * @default m3-context

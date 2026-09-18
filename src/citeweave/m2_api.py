@@ -59,8 +59,10 @@ class Rollback(schemas.Contract):
 
 class EvaluationCreate(schemas.Contract):
     kb_id: UUID
-    dataset_id: Literal["public-standards-v1", "public-protocols-holdout-v1"] = "public-standards-v1"
-    split: Literal["dev", "test", "all"] = "dev"
+    dataset_id: Literal[
+        "public-standards-v1", "public-protocols-holdout-v1", "citeweave-public-telecom-eval-v1"
+    ] = "public-standards-v1"
+    split: Literal["dev", "test", "all", "regression", "safety"] = "dev"
     profile: QueryProfile = "m3-context"
     judge_profile: Literal["judge-v1", "judge-v2", "judge-v3", "judge-v4"] = "judge-v4"
     replay_source: UUID | None = None
@@ -78,6 +80,10 @@ class Evaluation(schemas.Contract):
     summary: dict
     created_at: schemas.datetime
     completed_at: schemas.datetime | None
+    runtime_policy: str = "legacy-v1"
+    total_deadline: schemas.datetime | None = None
+    cancel_requested_at: schemas.datetime | None = None
+    completeness: dict = Field(default_factory=dict)
 
 
 class EvalCase(schemas.Contract):
@@ -91,6 +97,20 @@ class EvalCase(schemas.Contract):
     judge_reserved_yuan: float
     judge_estimated_yuan: float | None
     judge_reserved_at: schemas.datetime | None
+    execution_attempt: int = 0
+    max_attempts: int = 3
+    dispatch_generation: int = 0
+    dispatch_count: int = 0
+    dispatch_failures: int = 0
+    admission_deferrals: int = 0
+    fence: int = 0
+    next_attempt_at: schemas.datetime | None = None
+    absolute_deadline: schemas.datetime | None = None
+    active_deadline: schemas.datetime | None = None
+    cancel_requested_at: schemas.datetime | None = None
+    phase: str | None = None
+    last_error_code: str | None = None
+    last_error_category: str | None = None
 
 
 class HumanReview(schemas.Contract):
@@ -117,6 +137,8 @@ class DatasetSummary(schemas.Contract):
     case_count: int
     splits: list[str]
     split_policy: str
+    target_case_count: int | None = None
+    holdout_status: str | None = None
 
 
 class EvaluationArtifact(schemas.Contract):
@@ -284,17 +306,23 @@ def mount(app, principal):
 
     @app.get("/v1/evaluation-datasets", response_model=list[DatasetSummary])
     def datasets(workspace=Depends(principal)):
-        dataset, digest = load_dataset()
-        return [
-            dict(
-                dataset_id=dataset["dataset_id"],
-                sha256=digest,
-                sources=dataset["sources"],
-                case_count=len(dataset["cases"]),
-                splits=["dev", "test", "all"],
-                split_policy=dataset["split_policy"],
+        result = []
+        for identity in ("public-standards-v1", "citeweave-public-telecom-eval-v1"):
+            dataset, digest = load_dataset(identity)
+            target = identity == "citeweave-public-telecom-eval-v1"
+            result.append(
+                dict(
+                    dataset_id=dataset["dataset_id"],
+                    sha256=digest,
+                    sources=dataset["sources"],
+                    case_count=len(dataset["cases"]),
+                    splits=["dev", "regression", "safety"] if target else ["dev", "test", "all"],
+                    split_policy=dataset["split_policy"],
+                    target_case_count=96 if target else None,
+                    holdout_status="NOT_YET_SEALED" if target else None,
+                )
             )
-        ]
+        return result
 
     @app.post("/v1/evaluations", response_model=Evaluation, status_code=202)
     def create_evaluation(

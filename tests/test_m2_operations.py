@@ -4,13 +4,12 @@ import asyncio
 import os
 from contextlib import aclosing
 from dataclasses import asdict
-from datetime import timedelta
 from decimal import Decimal
 from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import func, select
+from sqlalchemy import select
 
 from citeweave import answering, catalog, schemas
 from citeweave.api import create_app
@@ -115,43 +114,26 @@ def test_eval_api_frozen_scope_auth_pagination_idempotency_and_cancel():
         assert len(cases) == 24 and all(c["status"] == "CANCELLED" for c in cases)
 
 
-def test_eval_expired_lease_requeues_and_reserved_judge_never_reissued(monkeypatch):
+def test_historical_terminal_evaluation_never_reopens_or_reissues_reserved_judge():
     workspace, kb = corpus_metadata()
-    evaluation = service.create(workspace, kb.id, "public-standards-v1", "dev", "recovery")
-    # Ingestion priority is tested separately by the M1 scheduler; isolate this queue from earlier fixtures.
-    monkeypatch.setattr(service, "LIVE", [])
-    sent = []
-    service.reconcile(lambda *args: sent.append(args))
-    service.reconcile(lambda *args: sent.append(args))
-    assert len(sent) == 1
-    case_id = sent[0][1]
+    evaluation = service.create(workspace, kb.id, "public-standards-v1", "dev", "legacy-terminal")
     with transaction() as db:
-        case = db.get(EvalCaseRow, (evaluation.id, case_id))
-        stale_owner = uuid4()
-        case.owner, case.status = stale_owner, "RUNNING"
-        case.lease_until = db.scalar(select(func.clock_timestamp())) - timedelta(seconds=1)
-    service.reconcile(lambda *args: sent.append(args))
-    assert sent == [sent[0], sent[0]]
-    with pytest.raises(ValueError, match="evaluation_lease_lost"):
-        service.save_owned(evaluation.id, case_id, stale_owner, status="COMPLETED")
-    with transaction() as db:
-        case = db.get(EvalCaseRow, (evaluation.id, case_id))
-        case.result = {"status": "COMPLETED", "answer": {"text": "saved fixture"}}
+        case = db.scalar(select(EvalCaseRow).where(EvalCaseRow.eval_run_id == evaluation.id))
+        case_id = case.case_id
+        case.status = "COMPLETED"
+        case.result = {"status": "COMPLETED", "answer": {"text": "saved original fixture"}}
+        case.judge = {"status": "FAILED", "error_code": "judge_unknown_after_interruption"}
         case.judge_reserved_yuan = Decimal("0.10")
-    monkeypatch.setattr(service, "refresh", lambda _: None)
-
-    async def forbidden(*args):
-        raise AssertionError("A judge with uncertain prior outcome must not be contacted twice")
-
-    monkeypatch.setattr(service, "assess_answer", forbidden)
-    service.run_case(str(evaluation.id), case_id)
-    service.run_case(str(evaluation.id), case_id)  # Duplicate broker delivery is harmless.
+        expected = (case.result, case.judge)
+    service.run_case(str(evaluation.id), case_id)  # pre-generation historical message
+    service.run_case(str(evaluation.id), case_id, 0)
+    service.reconcile(lambda *args: None)
     with transaction() as db:
         row = db.get(EvalCaseRow, (evaluation.id, case_id))
         assert row.status == "COMPLETED"
-        assert row.judge["error_code"] == "judge_unknown_after_interruption"
+        assert (row.result, row.judge) == expected
+        assert row.execution_attempt == 0
         assert row.judge_estimated_yuan is None
-        assert row.query_run_id is None  # Saved query result was reused, no new query reservation.
     service.cancel(workspace, evaluation.id)
 
 
@@ -220,5 +202,11 @@ def test_query_consumer_close_persists_cancel_and_failed_attempt_cost(monkeypatc
         row = db.get(QueryRunRow, run.id)
         assert row.status == "FAILED" and row.error_code == "client_cancelled"
         assert row.result is None and row.usage["completion_tokens"] == 1
-        assert row.estimated_yuan == Decimal("0.01234") and row.completed_at
+        assert row.estimated_yuan is None and row.completed_at  # incomplete paid outcome retains reservation
+        assert row.calls[0]["estimated_yuan"] == 0.01234  # visible partial accounting is retained
         assert row.calls[0]["status"] == "CANCELLED"
+        from citeweave.domain import ProviderPhaseRow
+
+        phase = db.scalar(select(ProviderPhaseRow).where(ProviderPhaseRow.query_run_id == run.id))
+        assert phase.state == "UNKNOWN" and phase.reserved_yuan == Decimal("0.10")
+        assert phase.usage["completion_tokens"] == 1

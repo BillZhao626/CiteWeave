@@ -1,0 +1,46 @@
+name: citeweave-m0
+services:
+  postgres:
+    image: postgres:18.1-alpine@sha256:aa6eb304ddb6dd26df23d05db4e5cb05af8951cda3e0dc57731b771e0ef4ab29
+    environment:
+      POSTGRES_USER: citeweave
+      POSTGRES_DB: citeweave
+      POSTGRES_PASSWORD: ${CW_DB_PASSWORD:?Run experiments/bootstrap.py first}
+    ports: ["127.0.0.1:15432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql"]
+    mem_limit: 320m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U citeweave -d citeweave"]
+      interval: 3s
+      retries: 20
+  broker:
+    image: valkey/valkey:8.1.5-alpine@sha256:918228e4ff7da6b3a4213cb18067f6e09d9f0503d0a08868699ba227cff71861
+    command: ["valkey-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction", "--maxmemory", "128mb"]
+    ports: ["127.0.0.1:16379:6379"]
+    volumes: ["brokerdata:/data"]
+    mem_limit: 192m
+  qdrant:
+    image: qdrant/qdrant:v1.16.3@sha256:0425e3e03e7fd9b3dc95c4214546afe19de2eb2e28ca621441a56663ac6e1f46
+    ports: ["127.0.0.1:16333:6333"]
+    volumes: ["qdrantdata:/qdrant/storage"]
+    mem_limit: 512m
+  worker:
+    profiles: ["jobs"]
+    build:
+      context: ..
+      dockerfile: deploy/worker.Dockerfile
+    environment:
+      CW_DATABASE_URL: postgresql://citeweave:${CW_DB_PASSWORD}@postgres:5432/citeweave
+      CW_BROKER_URL: redis://broker:6379/0
+      CW_VISIBILITY_TIMEOUT: "5"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      broker:
+        condition: service_started
+    command: ["celery", "-A", "citeweave.tasks:app", "worker", "--loglevel=WARNING", "--concurrency=1", "--hostname=cw-%h"]
+    mem_limit: 320m
+volumes:
+  pgdata:
+  brokerdata:
+  qdrantdata:

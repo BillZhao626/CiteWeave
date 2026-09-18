@@ -1,0 +1,23 @@
+{
+  "eval_run_id": "106987aa-0141-48de-9291-b1492c147b75",
+  "reviewer": "project_owner",
+  "source": "explicit_user_chat_review_2026-09-15",
+  "method": "是否覆盖参考答案 + 是否符合证据边界；人工阅读提供的原文参考和实际答案摘要，非全量 PDF 独立复标。",
+  "cases": [
+    {
+      "case_id": "cw-public-001",
+      "verdict": "incorrect_or_unjustified_refusal",
+      "reason": "参考原文明确支持结论：MUST、REQUIRED、SHALL 都表示规范的绝对要求。系统回答证据不足，属于本应作答却拒答。"
+    },
+    {
+      "case_id": "cw-public-008",
+      "verdict": "partial",
+      "reason": "面向一般公众这一结论正确且与 E1 一致，但缺少设施位于云提供商场地这一问点。更像检索/证据覆盖不足导致部分回答，而非事实错误。"
+    },
+    {
+      "case_id": "cw-public-027",
+      "verdict": "correct_complete",
+      "reason": "三份文档均未提供 2026 年 DeepSeek 输出 token 价格；拒答正确，没有超出文档证据编造信息。"
+    }
+  ]
+}

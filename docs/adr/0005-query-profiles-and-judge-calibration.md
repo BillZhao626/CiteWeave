@@ -1,0 +1,19 @@
+# ADR 0005: query profiles and independent Judge revisions
+
+Status: accepted. M3 selected `m3-context` plus `answer-v1` and `judge-v4`, frozen after Dev repeat and all regression gates. M2 remains explicitly selectable.
+
+M2 Dev traces show repeated identical page headers consuming 11–17 of 20 RRF candidate slots in several cases. Other reviewed cases miss continuations of adjacent PDF lines. These are distinct mechanisms: first test same-version exact text deduplication before the existing candidate cutoff, retaining immutable span IDs. Avoid changing embedding, reranker, chunking and final budget simultaneously.
+
+Store an allowlisted query profile and resolved configuration/hash in QueryRun and EvalRun JSON snapshots. Include profile in query/evaluation idempotency; preserve legacy M2 request fingerprints. No database migration is needed because durable metadata already exists. Unknown profiles are rejected. Inspector shows original RRF rank, duplicate identity and actual reranker input independently.
+
+The submitted 24 Dev references agree with Judge v1 on 21 labels. Disagreements show incidental reference facts counted as required, and partial correct information conflated with wholly incorrect answers. Judge v2 defines question-scoped completeness, separates reference correctness from actual supplied support, and evaluates main claims against their attached citations. No case IDs or human labels enter the rubric. Judge claim extraction remains fallible; deterministic validation only checks answer substrings and known citation labels, not semantic entailment.
+
+Rubric calibration creates a separate durable EvalRun reusing completed source query results and IDs. It reserves/persists each Judge call using the existing budget/recovery workflow. Source judgments are never overwritten; unknown interrupted calls remain reserved and are not reissued. Historical source query cost/latency are attributable context, not incremental replay charges. Both original and revised rubric results must be published. Calibration uses Dev; formal Test replay/comparison waits for candidate freeze.
+
+The initial v2 rubric above was an experiment, not the selected version. v2/v3 were rejected after validation failures and persistent reference/refusal bias. v4 maps original sentence units to their own attached labels and validates complete unit coverage. Exact whole-answer refusal is scored deterministically using frozen corpus answerability; other answers use a fallible LLM. Baseline Dev agreement 24/24 consists of 20 deterministic refusals and only four LLM-assessed factual answers. It is not 100% LLM accuracy.
+
+C1 deduplication freed repeated slots but did not improve gold coverage and was rejected. C2 adds bounded same-page, same-version geometric neighbors to the existing six seeds: radius 3, maximum 30 original spans/3200 codepoints, vertical distance .06 and left distance .15 in normalized page coordinates. Original span IDs and PDF boxes remain intact. Final ordering follows source reading order. Dev coverage increased from .2383 to .5358 in two runs; paired answer correctness improved in both. C3 changed only the generation prompt and regressed completeness/citation acceptance, so it was rejected. No indexing/model changes were selected.
+
+Formal Test was run only after `m3-quality-freeze.json` captured source/lock/prompt hashes and passing gates. It confirms final coverage .2227 to .5083, with 9 correctness wins/12 ties/0 losses/3 unavailable pairs. No subsequent Test-driven tuning is permitted. Increased context costs latency and API tokens; see M3_BENCHMARK.md for denominators and failed Judge cases.
+
+Alternatives rejected: global mutable prompt files (unreproducible), new tracing infrastructure (existing records suffice), model replacement before finding the cutoff mechanism, treating finite-gold overlap as semantic support, or silently correcting human labels to match a model.

@@ -1,0 +1,5377 @@
+{
+  "eval_run_id": "a32e838b-b5c2-4a6c-b8e7-7aabf2e8f944",
+  "dataset_hash": "3769061016dc8b6ec0009a03e6510fa0722e437a60f10e5011799f1a32c16476",
+  "source_artifact_sha256": "c47e2706a4332b2d1a20954575dc1ae1dfbe26f1f64db2bcbc29ad23a99af517",
+  "status": "awaiting_human_review",
+  "scope": "all_24_dev_only",
+  "cases": [
+    {
+      "case_id": "cw-public-001",
+      "split": "dev",
+      "question": "RFC 2119 中 MUST、REQUIRED 和 SHALL 表达什么要求？",
+      "question_type": "direct",
+      "reference_answer": "They indicate an absolute requirement of the specification.",
+      "reference_answer_zh_assistance": "表示规范的绝对要求。",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-21",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-22",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute requirement of the specification."
+        }
+      ],
+      "query_run_id": "35cf485e-ce99-4d2c-9034-17fab93117d6",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the",
+          "label": "E1"
+        },
+        {
+          "text": "      RFC 2119.",
+          "label": "E2"
+        },
+        {
+          "text": "      The key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL",
+          "label": "E3"
+        },
+        {
+          "text": "   document are to be interpreted as described in RFC 2119 [RFC2119]. ",
+          "label": "E4"
+        },
+        {
+          "text": "   The key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL NOT\", ",
+          "label": "E5"
+        },
+        {
+          "text": "RFC 2119                     RFC Key Words                    March 1997",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-003",
+      "split": "dev",
+      "question": "RFC 2119 中 MAY / OPTIONAL 是否允许供应商选择不实现某项功能？",
+      "question_type": "direct",
+      "reference_answer": "Yes. The item is truly optional; vendors may include it or omit it.",
+      "reference_answer_zh_assistance": "允许。该项是真正可选的，供应商可以实现，也可以不实现。",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-1",
+          "start_offset": 0,
+          "end_offset": 69,
+          "quote": "5. MAY   This word, or the adjective \"OPTIONAL\", mean that an item is"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-2",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "truly optional.  One vendor may choose to include the item because a"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-3",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "particular marketplace requires it or because the vendor feels that"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-4",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "it enhances the product while another vendor may omit the same item."
+        }
+      ],
+      "query_run_id": "aa0430f6-b25a-4779-833f-4d16271526a3",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "   truly optional.  One vendor may choose to include the item because a",
+          "label": "E1"
+        },
+        {
+          "text": "      RFC 2119.",
+          "label": "E2"
+        },
+        {
+          "text": "   may exist valid reasons in particular circumstances to ignore a",
+          "label": "E3"
+        },
+        {
+          "text": "   it enhances the product while another vendor may omit the same item.",
+          "label": "E4"
+        },
+        {
+          "text": "   \"SHOULD\", \"SHOULD NOT\", \"RECOMMENDED\", \"MAY\", and \"OPTIONAL\" in this ",
+          "label": "E5"
+        },
+        {
+          "text": "   document are to be interpreted as described in RFC 2119 [RFC2119]. ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-005",
+      "split": "dev",
+      "question": "RFC 3339 中 Z 后缀表示什么时区偏移？",
+      "question_type": "direct",
+      "reference_answer": "A UTC offset of 00:00, also called Zulu.",
+      "reference_answer_zh_assistance": "表示 UTC 偏移 00:00，也称 Zulu。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-40",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "Z           A suffix which, when applied to a time, denotes a UTC"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-41",
+          "start_offset": 18,
+          "end_offset": 68,
+          "quote": "offset of 00:00; often spoken \"Zulu\" from the ICAO"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-42",
+          "start_offset": 18,
+          "end_offset": 69,
+          "quote": "phonetic alphabet representation of the letter \"Z\"."
+        }
+      ],
+      "query_run_id": "501d0e20-6987-4ce1-a9d3-f993747dca8c",
+      "answer_text": "在 RFC 3339 中，Z 后缀表示 UTC 时区，等价于偏移 \"+00:00\" [E1][E2]。",
+      "selected_evidence": [
+        {
+          "text": "      Z           A suffix which, when applied to a time, denotes a UTC ",
+          "label": "E1"
+        },
+        {
+          "text": "   semantically from an offset of \"Z\" or \"+00:00\", which imply that UTC ",
+          "label": "E2"
+        },
+        {
+          "text": "   time-zone         = \"Z\" / time-numoffset ",
+          "label": "E3"
+        },
+        {
+          "text": "   time-offset     = \"Z\" / time-numoffset ",
+          "label": "E4"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E5"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E6"
+        }
+      ],
+      "citations": [
+        {
+          "span": {
+            "id": "e5b4308a-a326-576b-b456-4b694bfe8037",
+            "boxes": [
+              {
+                "top": 0.6238472399049887,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.45370946554621866,
+                "right": 0.4637531630252103,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.46379333781512627,
+                "right": 0.47383703529411786,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4738772100840339,
+                "right": 0.48392090756302547,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.48396108235294155,
+                "right": 0.49400477983193314,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4940449546218491,
+                "right": 0.5040886521008408,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5041288268907567,
+                "right": 0.5141725243697484,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5142126991596643,
+                "right": 0.5242563966386559,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.524296571428572,
+                "right": 0.5343402689075636,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5343804436974796,
+                "right": 0.5444241411764712,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5444643159663871,
+                "right": 0.5545080134453788,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5545481882352948,
+                "right": 0.5645918857142864,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5646320605042024,
+                "right": 0.574675757983194,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5747159327731101,
+                "right": 0.5847596302521016,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5847998050420176,
+                "right": 0.5948435025210093,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5948836773109253,
+                "right": 0.6049273747899169,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6049675495798329,
+                "right": 0.6150112470588245,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6150514218487405,
+                "right": 0.6250951193277321,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.625135294117648,
+                "right": 0.6351789915966397,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6352191663865557,
+                "right": 0.6452628638655473,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6453030386554633,
+                "right": 0.6553467361344549,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.655386910924371,
+                "right": 0.6654306084033625,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6654707831932785,
+                "right": 0.6755144806722702,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6755546554621861,
+                "right": 0.6855983529411777,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6856385277310937,
+                "right": 0.6956822252100853,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6957224000000014,
+                "right": 0.705766097478993,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7058062722689089,
+                "right": 0.7158499697479006,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7158901445378165,
+                "right": 0.7259338420168081,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7259740168067241,
+                "right": 0.7360177142857157,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7360578890756319,
+                "right": 0.7461015865546234,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7461417613445394,
+                "right": 0.756185458823531,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.756225633613447,
+                "right": 0.7662693310924386,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7663095058823546,
+                "right": 0.7763532033613462,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7763933781512623,
+                "right": 0.7864370756302539,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7864772504201698,
+                "right": 0.7965209478991615,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7965611226890774,
+                "right": 0.806604820168069,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.806644994957985,
+                "right": 0.8166886924369766,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.8167288672268928,
+                "right": 0.8267725647058843,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.8268127394958003,
+                "right": 0.836856436974792,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.8368966117647079,
+                "right": 0.8469403092436995,
+                "bottom": 0.6356762185273165,
+                "page_index": 2
+              }
+            ],
+            "quote": "      Z           A suffix which, when applied to a time, denotes a UTC ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-2-line-40",
+            "end_offset": 72,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "5d2a830b13b12f0aa2665f3b7bab78a20fae64afb5f0142e9cdcd4ae85a55fc0",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "5d2a830b13b12f0aa2665f3b7bab78a20fae64afb5f0142e9cdcd4ae85a55fc0"
+          },
+          "label": "E1",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "e5b4308a-a326-576b-b456-4b694bfe8037",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        },
+        {
+          "span": {
+            "id": "92abdaa3-37b9-507b-a22e-2efe204d8a92",
+            "boxes": [
+              {
+                "top": 0.24717589073634236,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.45370946554621866,
+                "right": 0.4637531630252103,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.46379333781512627,
+                "right": 0.47383703529411786,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4738772100840339,
+                "right": 0.48392090756302547,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.48396108235294155,
+                "right": 0.49400477983193314,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4940449546218491,
+                "right": 0.5040886521008408,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5041288268907567,
+                "right": 0.5141725243697484,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5142126991596643,
+                "right": 0.5242563966386559,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.524296571428572,
+                "right": 0.5343402689075636,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5343804436974796,
+                "right": 0.5444241411764712,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5444643159663871,
+                "right": 0.5545080134453788,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5545481882352948,
+                "right": 0.5645918857142864,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5646320605042024,
+                "right": 0.574675757983194,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5747159327731101,
+                "right": 0.5847596302521016,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5847998050420176,
+                "right": 0.5948435025210093,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5948836773109253,
+                "right": 0.6049273747899169,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6049675495798329,
+                "right": 0.6150112470588245,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6150514218487405,
+                "right": 0.6250951193277321,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.625135294117648,
+                "right": 0.6351789915966397,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6352191663865557,
+                "right": 0.6452628638655473,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6453030386554633,
+                "right": 0.6553467361344549,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.655386910924371,
+                "right": 0.6654306084033625,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6654707831932785,
+                "right": 0.6755144806722702,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6755546554621861,
+                "right": 0.6855983529411777,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6856385277310937,
+                "right": 0.6956822252100853,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6957224000000014,
+                "right": 0.705766097478993,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7058062722689089,
+                "right": 0.7158499697479006,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7158901445378165,
+                "right": 0.7259338420168081,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7259740168067241,
+                "right": 0.7360177142857157,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7360578890756319,
+                "right": 0.7461015865546234,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7461417613445394,
+                "right": 0.756185458823531,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.756225633613447,
+                "right": 0.7662693310924386,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7663095058823546,
+                "right": 0.7763532033613462,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7763933781512623,
+                "right": 0.7864370756302539,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7864772504201698,
+                "right": 0.7965209478991615,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7965611226890774,
+                "right": 0.806604820168069,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.806644994957985,
+                "right": 0.8166886924369766,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.8167288672268928,
+                "right": 0.8267725647058843,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.8268127394958003,
+                "right": 0.836856436974792,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.8368966117647079,
+                "right": 0.8469403092436995,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              }
+            ],
+            "quote": "   semantically from an offset of \"Z\" or \"+00:00\", which imply that UTC ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-4-line-12",
+            "end_offset": 72,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "d732c90d8d2dc19e90c012b6deda059fa252d39ab35b668e5c507afcf90ff208",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "d732c90d8d2dc19e90c012b6deda059fa252d39ab35b668e5c507afcf90ff208"
+          },
+          "label": "E2",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "92abdaa3-37b9-507b-a22e-2efe204d8a92",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        }
+      ],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-007",
+      "split": "dev",
+      "question": "NIST 的按需自助服务是否需要与服务提供商人员逐次交互？",
+      "question_type": "direct",
+      "reference_answer": "No. Consumers provision capabilities unilaterally and automatically without human interaction with each provider.",
+      "reference_answer_zh_assistance": "不需要。消费者可单方面自动配置能力，无须每次与服务提供商人员交互。",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-8",
+          "start_offset": 0,
+          "end_offset": 93,
+          "quote": "On-demand self-service. A consumer can unilaterally provision computing capabilities, such as"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-9",
+          "start_offset": 0,
+          "end_offset": 80,
+          "quote": "server time and network storage, as needed automatically without requiring human"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-10",
+          "start_offset": 0,
+          "end_offset": 39,
+          "quote": "interaction with each service provider."
+        }
+      ],
+      "query_run_id": "dc349e34-3747-4039-8da6-2ca5c58d25a0",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "interaction with each service provider.  ",
+          "label": "E1"
+        },
+        {
+          "text": "   actually required for interoperation or to limit behavior which has",
+          "label": "E2"
+        },
+        {
+          "text": "server time and network storage, as needed automatically without requiring human ",
+          "label": "E3"
+        },
+        {
+          "text": "NIST is responsible for developing standards and guidelines, including minimum requirements, for ",
+          "label": "E4"
+        },
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E5"
+        },
+        {
+          "text": "(NIST) would like to thank the many experts in industry and government who contributed their thoughts ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-009",
+      "split": "dev",
+      "question": "RFC 3339 要求 Internet 协议生成年份时使用几位数字？",
+      "question_type": "direct",
+      "reference_answer": "Four-digit years are mandatory.",
+      "reference_answer_zh_assistance": "必须使用四位年份。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-60",
+          "start_offset": 6,
+          "end_offset": 68,
+          "quote": "o  Internet Protocols MUST generate four digit years in dates."
+        }
+      ],
+      "query_run_id": "8fb7fb58-8f6f-411a-84e2-e2f2a81bcac7",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E1"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E2"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E3"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E4"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E5"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-011",
+      "split": "dev",
+      "question": "RFC 3339 的 UTC 已知而本地偏移未知时，使用哪一种 offset 表示？",
+      "question_type": "direct",
+      "reference_answer": "Use -00:00; it differs semantically from Z or +00:00.",
+      "reference_answer_zh_assistance": "使用 -00:00；其语义与 Z 或 +00:00 不同。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-10",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "If the time in UTC is known, but the offset to local time is unknown,"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-11",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "this can be represented with an offset of \"-00:00\".  This differs"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-12",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "semantically from an offset of \"Z\" or \"+00:00\", which imply that UTC"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-13",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "is the preferred reference point for the specified time.  RFC2822"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-14",
+          "start_offset": 3,
+          "end_offset": 59,
+          "quote": "[IMAIL-UPDATE] describes a similar convention for email."
+        }
+      ],
+      "query_run_id": "59b8336f-ec95-47f5-ba36-74d9440e43de",
+      "answer_text": "根据证据，RFC 3339 在 UTC 已知而本地偏移未知时，设有“Unknown Local Offset Convention”（未知本地偏移约定）[E4][E5]，并说明这与偏移 \"Z\" 或 \"+00:00\" 在语义上有区别，后者表示 UTC [E3]。但给出的证据未明确写出该约定所使用的具体 offset 字符，因此具体表示无法确定。",
+      "selected_evidence": [
+        {
+          "text": "   If the time in UTC is known, but the offset to local time is unknown, ",
+          "label": "E1"
+        },
+        {
+          "text": "   local time, are unaware of the corresponding UTC offset, and depend ",
+          "label": "E2"
+        },
+        {
+          "text": "   semantically from an offset of \"Z\" or \"+00:00\", which imply that UTC ",
+          "label": "E3"
+        },
+        {
+          "text": "4.3. Unknown Local Offset Convention ",
+          "label": "E4"
+        },
+        {
+          "text": "   4.3. Unknown Local Offset Convention ....................... 5 ",
+          "label": "E5"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E6"
+        }
+      ],
+      "citations": [
+        {
+          "span": {
+            "id": "6b308baf-97db-5633-9363-ae72314ccdd4",
+            "boxes": [
+              {
+                "top": 0.19330435629453702,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.45370946554621866,
+                "right": 0.4637531630252103,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.46379333781512627,
+                "right": 0.47383703529411786,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.4738772100840339,
+                "right": 0.48392090756302547,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              },
+              {
+                "top": 0.19330435629453702,
+                "left": 0.48396108235294155,
+                "right": 0.49400477983193314,
+                "bottom": 0.20513333491686486,
+                "page_index": 4
+              }
+            ],
+            "quote": "4.3. Unknown Local Offset Convention ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-4-line-8",
+            "end_offset": 37,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "f56683b74076de4befbea5426f59be8a89210fb2c38cebadc15cc6278d8bfd40",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "f56683b74076de4befbea5426f59be8a89210fb2c38cebadc15cc6278d8bfd40"
+          },
+          "label": "E4",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "6b308baf-97db-5633-9363-ae72314ccdd4",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        },
+        {
+          "span": {
+            "id": "71f40453-0cdb-5006-970f-c626cda7ed59",
+            "boxes": [
+              {
+                "top": 0.6238472399049887,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.45370946554621866,
+                "right": 0.4637531630252103,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.46379333781512627,
+                "right": 0.47383703529411786,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4738772100840339,
+                "right": 0.48392090756302547,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.48396108235294155,
+                "right": 0.49400477983193314,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.4940449546218491,
+                "right": 0.5040886521008408,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5041288268907567,
+                "right": 0.5141725243697484,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5142126991596643,
+                "right": 0.5242563966386559,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.524296571428572,
+                "right": 0.5343402689075636,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5343804436974796,
+                "right": 0.5444241411764712,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5444643159663871,
+                "right": 0.5545080134453788,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5545481882352948,
+                "right": 0.5645918857142864,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5646320605042024,
+                "right": 0.574675757983194,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5747159327731101,
+                "right": 0.5847596302521016,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5847998050420176,
+                "right": 0.5948435025210093,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.5948836773109253,
+                "right": 0.6049273747899169,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6049675495798329,
+                "right": 0.6150112470588245,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6150514218487405,
+                "right": 0.6250951193277321,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.625135294117648,
+                "right": 0.6351789915966397,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6352191663865557,
+                "right": 0.6452628638655473,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6453030386554633,
+                "right": 0.6553467361344549,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.655386910924371,
+                "right": 0.6654306084033625,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6654707831932785,
+                "right": 0.6755144806722702,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6755546554621861,
+                "right": 0.6855983529411777,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6856385277310937,
+                "right": 0.6956822252100853,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.6957224000000014,
+                "right": 0.705766097478993,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7058062722689089,
+                "right": 0.7158499697479006,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7158901445378165,
+                "right": 0.7259338420168081,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7259740168067241,
+                "right": 0.7360177142857157,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7360578890756319,
+                "right": 0.7461015865546234,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7461417613445394,
+                "right": 0.756185458823531,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.756225633613447,
+                "right": 0.7662693310924386,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7663095058823546,
+                "right": 0.7763532033613462,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              },
+              {
+                "top": 0.6238472399049887,
+                "left": 0.7763933781512623,
+                "right": 0.7864370756302539,
+                "bottom": 0.6356762185273165,
+                "page_index": 0
+              }
+            ],
+            "quote": "   4.3. Unknown Local Offset Convention ....................... 5 ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-0-line-40",
+            "end_offset": 66,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "c749e4799ec989735c3bb8da9f1df18c1d35e2af74d7a5222dc5b40d069deef5",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "c749e4799ec989735c3bb8da9f1df18c1d35e2af74d7a5222dc5b40d069deef5"
+          },
+          "label": "E5",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "71f40453-0cdb-5006-970f-c626cda7ed59",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        },
+        {
+          "span": {
+            "id": "92abdaa3-37b9-507b-a22e-2efe204d8a92",
+            "boxes": [
+              {
+                "top": 0.24717589073634236,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.45370946554621866,
+                "right": 0.4637531630252103,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.46379333781512627,
+                "right": 0.47383703529411786,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4738772100840339,
+                "right": 0.48392090756302547,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.48396108235294155,
+                "right": 0.49400477983193314,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.4940449546218491,
+                "right": 0.5040886521008408,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5041288268907567,
+                "right": 0.5141725243697484,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5142126991596643,
+                "right": 0.5242563966386559,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.524296571428572,
+                "right": 0.5343402689075636,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5343804436974796,
+                "right": 0.5444241411764712,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5444643159663871,
+                "right": 0.5545080134453788,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5545481882352948,
+                "right": 0.5645918857142864,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5646320605042024,
+                "right": 0.574675757983194,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5747159327731101,
+                "right": 0.5847596302521016,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5847998050420176,
+                "right": 0.5948435025210093,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.5948836773109253,
+                "right": 0.6049273747899169,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6049675495798329,
+                "right": 0.6150112470588245,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6150514218487405,
+                "right": 0.6250951193277321,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.625135294117648,
+                "right": 0.6351789915966397,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6352191663865557,
+                "right": 0.6452628638655473,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6453030386554633,
+                "right": 0.6553467361344549,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.655386910924371,
+                "right": 0.6654306084033625,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6654707831932785,
+                "right": 0.6755144806722702,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6755546554621861,
+                "right": 0.6855983529411777,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6856385277310937,
+                "right": 0.6956822252100853,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.6957224000000014,
+                "right": 0.705766097478993,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7058062722689089,
+                "right": 0.7158499697479006,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7158901445378165,
+                "right": 0.7259338420168081,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7259740168067241,
+                "right": 0.7360177142857157,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7360578890756319,
+                "right": 0.7461015865546234,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7461417613445394,
+                "right": 0.756185458823531,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.756225633613447,
+                "right": 0.7662693310924386,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7663095058823546,
+                "right": 0.7763532033613462,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7763933781512623,
+                "right": 0.7864370756302539,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7864772504201698,
+                "right": 0.7965209478991615,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.7965611226890774,
+                "right": 0.806604820168069,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.806644994957985,
+                "right": 0.8166886924369766,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.8167288672268928,
+                "right": 0.8267725647058843,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.8268127394958003,
+                "right": 0.836856436974792,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              },
+              {
+                "top": 0.24717589073634236,
+                "left": 0.8368966117647079,
+                "right": 0.8469403092436995,
+                "bottom": 0.2590048693586702,
+                "page_index": 4
+              }
+            ],
+            "quote": "   semantically from an offset of \"Z\" or \"+00:00\", which imply that UTC ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-4-line-12",
+            "end_offset": 72,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "d732c90d8d2dc19e90c012b6deda059fa252d39ab35b668e5c507afcf90ff208",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "d732c90d8d2dc19e90c012b6deda059fa252d39ab35b668e5c507afcf90ff208"
+          },
+          "label": "E3",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "92abdaa3-37b9-507b-a22e-2efe204d8a92",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        }
+      ],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-013",
+      "split": "dev",
+      "question": "RFC 2119 如何区分 SHOULD 与 MUST？忽略 SHOULD 前需要考虑什么？",
+      "question_type": "multi_evidence",
+      "reference_answer": "MUST is absolute. SHOULD permits justified exceptions in particular circumstances, after understanding and weighing the full implications.",
+      "reference_answer_zh_assistance": "MUST 是绝对要求；SHOULD 在特定情况下允许有正当理由的例外，但必须先理解并权衡全部影响。",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-21",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-22",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute requirement of the specification."
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-25",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "3. SHOULD   This word, or the adjective \"RECOMMENDED\", mean that there"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-26",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "may exist valid reasons in particular circumstances to ignore a"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-27",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "particular item, but the full implications must be understood and"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-28",
+          "start_offset": 3,
+          "end_offset": 56,
+          "quote": "carefully weighed before choosing a different course."
+        }
+      ],
+      "query_run_id": "800d4bb9-0e67-41f4-b6b7-2a9041cde66f",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "      RFC 2119.",
+          "label": "E1"
+        },
+        {
+          "text": "   SHOULD, or doing something the specification says MUST NOT or SHOULD",
+          "label": "E2"
+        },
+        {
+          "text": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the",
+          "label": "E3"
+        },
+        {
+          "text": "   document are to be interpreted as described in RFC 2119 [RFC2119]. ",
+          "label": "E4"
+        },
+        {
+          "text": "   An implementation which does not include a particular option MUST be",
+          "label": "E5"
+        },
+        {
+          "text": "      The key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-015",
+      "split": "dev",
+      "question": "按 NIST，IaaS 用户与 SaaS 用户对操作系统的控制有何区别？",
+      "question_type": "multi_evidence",
+      "reference_answer": "IaaS consumers control operating systems; SaaS consumers do not manage the underlying operating systems.",
+      "reference_answer_zh_assistance": "IaaS 消费者控制操作系统；SaaS 消费者不管理底层操作系统。",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-7",
+          "start_offset": 0,
+          "end_offset": 82,
+          "quote": "consumer is able to deploy and run arbitrary software, which can include operating"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-8",
+          "start_offset": 0,
+          "end_offset": 86,
+          "quote": "systems and applications. The consumer does not manage or control the underlying cloud"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-9",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "infrastructure but has control over operating systems, storage, and deployed applications;"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-38",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "web-based email), or a program interface. The consumer does not manage or control the"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-39",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "underlying cloud infrastructure including network, servers, operating systems, storage, or"
+        }
+      ],
+      "query_run_id": "e9f8e9c6-4065-4b0d-bb3d-0937c5c0dac3",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "Infrastructure as a Service (IaaS). The capability provided to the consumer is to provision ",
+          "label": "E1"
+        },
+        {
+          "text": "Software as a Service (SaaS). The capability provided to the consumer is to use the provider’s ",
+          "label": "E2"
+        },
+        {
+          "text": "web-based email), or a program interface. The consumer does not manage or control the ",
+          "label": "E3"
+        },
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E4"
+        },
+        {
+          "text": "2. The NIST Definition of Cloud Computing ",
+          "label": "E5"
+        },
+        {
+          "text": "The NIST Definition of Cloud Computing ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-017",
+      "split": "dev",
+      "question": "RFC 3339 如何定义 leap year？为什么有些世纪年不是闰年？",
+      "question_type": "multi_evidence",
+      "reference_answer": "A leap year has 366 days; divisibility by four is required, with century years also divisible by 400.",
+      "reference_answer_zh_assistance": "闰年有 366 天。年份须能被 4 整除；世纪年还须能被 400 整除。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-19",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "leap year   In the Gregorian calendar, a year which has 366 days."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-20",
+          "start_offset": 18,
+          "end_offset": 68,
+          "quote": "A leap year is a year whose number is divisible by"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-21",
+          "start_offset": 18,
+          "end_offset": 72,
+          "quote": "four an integral number of times, except that if it is"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-22",
+          "start_offset": 18,
+          "end_offset": 70,
+          "quote": "a centennial year (i.e. divisible by one hundred) it"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-23",
+          "start_offset": 18,
+          "end_offset": 69,
+          "quote": "shall also be divisible by four hundred an integral"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-24",
+          "start_offset": 18,
+          "end_offset": 34,
+          "quote": "number of times."
+        }
+      ],
+      "query_run_id": "740446a6-46e4-4591-9154-b2b5df051aa1",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "                  A leap year is a year whose number is divisible by ",
+          "label": "E1"
+        },
+        {
+          "text": "      leap year   In the Gregorian calendar, a year which has 366 days. ",
+          "label": "E2"
+        },
+        {
+          "text": "   int leap_year(int year) ",
+          "label": "E3"
+        },
+        {
+          "text": "Appendix C. Leap Years ",
+          "label": "E4"
+        },
+        {
+          "text": "   Appendix C. Leap Years .................................... 14 ",
+          "label": "E5"
+        },
+        {
+          "text": "   Appendix C contains sample C code to determine if a year is a leap ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-019",
+      "split": "dev",
+      "question": "NIST 所说的资源池化与快速弹性分别解决什么问题？",
+      "question_type": "multi_evidence",
+      "reference_answer": "Resource pooling dynamically assigns shared resources to multiple consumers; rapid elasticity scales capabilities outward and inward with demand.",
+      "reference_answer_zh_assistance": "资源池化为多个消费者动态分配共享资源；快速弹性随需求向外扩展或向内收缩能力。",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-14",
+          "start_offset": 0,
+          "end_offset": 91,
+          "quote": "Resource pooling. The provider’s computing resources are pooled to serve multiple consumers"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-15",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "using a multi-tenant model, with different physical and virtual resources dynamically"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-16",
+          "start_offset": 0,
+          "end_offset": 82,
+          "quote": "assigned and reassigned according to consumer demand. There is a sense of location"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-21",
+          "start_offset": 0,
+          "end_offset": 89,
+          "quote": "Rapid elasticity. Capabilities can be elastically provisioned and released, in some cases"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-22",
+          "start_offset": 0,
+          "end_offset": 83,
+          "quote": "automatically, to scale rapidly outward and inward commensurate with demand. To the"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-23",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "consumer, the capabilities available for provisioning often appear to be unlimited and can"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-24",
+          "start_offset": 0,
+          "end_offset": 44,
+          "quote": "be appropriated in any quantity at any time."
+        }
+      ],
+      "query_run_id": "6e9a6476-ab1b-4326-b570-9c14c89cd4e8",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "(NIST) promotes the U.S. economy and public welfare by providing technical leadership for the nation’s ",
+          "label": "E1"
+        },
+        {
+          "text": "Cloud computing is an evolving paradigm. The NIST definition characterizes important aspects of cloud ",
+          "label": "E2"
+        },
+        {
+          "text": "NIST is responsible for developing standards and guidelines, including minimum requirements, for ",
+          "label": "E3"
+        },
+        {
+          "text": "The NIST Definition of Cloud ",
+          "label": "E4"
+        },
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E5"
+        },
+        {
+          "text": "2. The NIST Definition of Cloud Computing ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-021",
+      "split": "dev",
+      "question": "结合 RFC 3339 和 RFC 2119，四位年份要求中的 MUST 是绝对要求还是建议？",
+      "question_type": "cross_document",
+      "reference_answer": "RFC 3339 says Internet protocols MUST generate four-digit years; RFC 2119 defines MUST as an absolute requirement.",
+      "reference_answer_zh_assistance": "是绝对要求。RFC 3339 要求 Internet 协议生成年份时使用四位数字，RFC 2119 将 MUST 定义为绝对要求。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-60",
+          "start_offset": 6,
+          "end_offset": 68,
+          "quote": "o  Internet Protocols MUST generate four digit years in dates."
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-21",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-22",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute requirement of the specification."
+        }
+      ],
+      "query_run_id": "2a3ac3ff-7bd4-459c-86c1-6e56eefe572e",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "      RFC 2119.",
+          "label": "E1"
+        },
+        {
+          "text": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the",
+          "label": "E2"
+        },
+        {
+          "text": "   document are to be interpreted as described in RFC 2119 [RFC2119]. ",
+          "label": "E3"
+        },
+        {
+          "text": "   SHOULD, or doing something the specification says MUST NOT or SHOULD",
+          "label": "E4"
+        },
+        {
+          "text": "   /* This returns non-zero if year is a leap year.  Must use 4 digit ",
+          "label": "E5"
+        },
+        {
+          "text": "   and sparingly.  In particular, they MUST only be used where it is",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-023",
+      "split": "dev",
+      "question": "分别依据 RFC 3339 和 NIST SP 800-145：前者讨论的是时刻还是区间，后者描述多少种服务模型？",
+      "question_type": "cross_document",
+      "reference_answer": "RFC 3339 represents instants, not intervals; NIST identifies three service models.",
+      "reference_answer_zh_assistance": "RFC 3339 表示时刻而非时间区间；NIST 规定三种服务模型。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 1,
+          "block_id": "page-1-line-42",
+          "start_offset": 3,
+          "end_offset": 60,
+          "quote": "o  Date and time expressions indicate an instant in time."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 1,
+          "block_id": "page-1-line-43",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "Description of time periods, or intervals, is not covered here."
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-4",
+          "start_offset": 0,
+          "end_offset": 105,
+          "quote": "This cloud model is composed of five essential characteristics, three service models, and four deployment"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-5",
+          "start_offset": 0,
+          "end_offset": 7,
+          "quote": "models."
+        }
+      ],
+      "query_run_id": "4ead8f34-3a4e-4a00-8627-e7237b2ca9d1",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E1"
+        },
+        {
+          "text": "National Institute of Standards and Technology Special Publication 800-145 ",
+          "label": "E2"
+        },
+        {
+          "text": "Special Publication 800-145 ",
+          "label": "E3"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E4"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E5"
+        },
+        {
+          "text": "Service Models: ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-025",
+      "split": "dev",
+      "question": "请从两份标准定位证据：RFC 3339 小时字段允许的上限是什么，NIST 的部署模型一共多少种？",
+      "question_type": "cross_document",
+      "reference_answer": "The hour is at most 23; NIST defines four deployment models.",
+      "reference_answer_zh_assistance": "小时字段上限为 23；NIST 规定四种部署模型。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-6",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "Although ISO 8601 permits the hour to be \"24\", this profile of ISO"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-7",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "8601 only allows values between \"00\" and \"23\" for the hour in order"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-8",
+          "start_offset": 3,
+          "end_offset": 23,
+          "quote": "to reduce confusion."
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-4",
+          "start_offset": 0,
+          "end_offset": 105,
+          "quote": "This cloud model is composed of five essential characteristics, three service models, and four deployment"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-5",
+          "start_offset": 0,
+          "end_offset": 7,
+          "quote": "models."
+        }
+      ],
+      "query_run_id": "9ee7678e-98e9-4096-8a51-d0ef4aee9c70",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "NIST is responsible for developing standards and guidelines, including minimum requirements, for ",
+          "label": "E1"
+        },
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E2"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E3"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E4"
+        },
+        {
+          "text": "2. The NIST Definition of Cloud Computing ",
+          "label": "E5"
+        },
+        {
+          "text": "      RFC 2119.",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-027",
+      "split": "dev",
+      "question": "这三份文档中，2026 年 DeepSeek API 的每百万输出 token 价格是多少？",
+      "question_type": "unanswerable",
+      "reference_answer": "证据不足，无法回答。",
+      "reference_answer_zh_assistance": "这三份文档未提供该价格，应在文档证据范围内拒答。",
+      "gold": [],
+      "query_run_id": "b7faea6c-8cb8-425e-848c-4ae48b41e239",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "                  pc/products/bulletins.html>. ",
+          "label": "E1"
+        },
+        {
+          "text": "   from a number of RFCs.  In addition, suggestions have been",
+          "label": "E2"
+        },
+        {
+          "text": "   } ",
+          "label": "E3"
+        },
+        {
+          "text": "   } ",
+          "label": "E4"
+        },
+        {
+          "text": "      } ",
+          "label": "E5"
+        },
+        {
+          "text": "   { ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-029",
+      "split": "dev",
+      "question": "NIST SP 800-145 推荐哪家云厂商的 GPU 实例最便宜？",
+      "question_type": "unanswerable",
+      "reference_answer": "证据不足，无法回答。",
+      "reference_answer_zh_assistance": "文档未提供厂商 GPU 价格比较，应拒答。",
+      "gold": [],
+      "query_run_id": "8039a948-bdf4-48d1-9149-6ba2f9657a0e",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E1"
+        },
+        {
+          "text": "National Institute of Standards and Technology Special Publication 800-145 ",
+          "label": "E2"
+        },
+        {
+          "text": "Special Publication 800-145 ",
+          "label": "E3"
+        },
+        {
+          "text": "Cloud computing is an evolving paradigm. The NIST definition characterizes important aspects of cloud ",
+          "label": "E4"
+        },
+        {
+          "text": "Badger, also of NIST, and Wayne Jansen of Booz Allen Hamilton, whose advice and technical insight ",
+          "label": "E5"
+        },
+        {
+          "text": "2. The NIST Definition of Cloud Computing ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-031",
+      "split": "dev",
+      "question": "RFC 2119 要求 Web 服务器使用多少 GB 内存？",
+      "question_type": "unanswerable",
+      "reference_answer": "证据不足，无法回答。",
+      "reference_answer_zh_assistance": "文档未规定 Web 服务器所需内存容量，应拒答。",
+      "gold": [],
+      "query_run_id": "123c3763-8dc5-472a-9217-067d7ab379a9",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "      RFC 2119.",
+          "label": "E1"
+        },
+        {
+          "text": "   document are to be interpreted as described in RFC 2119 [RFC2119]. ",
+          "label": "E2"
+        },
+        {
+          "text": "                  Requirement Levels\", BCP 14, RFC 2119, March 1997. ",
+          "label": "E3"
+        },
+        {
+          "text": "RFC 2119                     RFC Key Words                    March 1997",
+          "label": "E4"
+        },
+        {
+          "text": "RFC 2119                     RFC Key Words                    March 1997",
+          "label": "E5"
+        },
+        {
+          "text": "Request for Comments: 2119                            Harvard University",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-033",
+      "split": "dev",
+      "question": "这三份 PDF 中 CiteWeave 的默认管理员密码是什么？",
+      "question_type": "unanswerable",
+      "reference_answer": "证据不足，无法回答。",
+      "reference_answer_zh_assistance": "这三份文档未包含 CiteWeave 管理员密码，应拒答，不猜测或使用文档外凭据。",
+      "gold": [],
+      "query_run_id": "45af47eb-fe4b-4cc7-988e-49871feedbb4",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "                  pc/products/bulletins.html>. ",
+          "label": "E1"
+        },
+        {
+          "text": "9. Author’s Address",
+          "label": "E2"
+        },
+        {
+          "text": "   } ",
+          "label": "E3"
+        },
+        {
+          "text": "   } ",
+          "label": "E4"
+        },
+        {
+          "text": "      } ",
+          "label": "E5"
+        },
+        {
+          "text": "   { ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-035",
+      "split": "dev",
+      "question": "RFC 3339 允许 timestamp 的小时写成 24 吗？不要把 ISO 8601 的宽松规则混入。",
+      "question_type": "boundary",
+      "reference_answer": "No. This RFC profile only permits 00 through 23 even though ISO 8601 permits 24.",
+      "reference_answer_zh_assistance": "不允许。虽然 ISO 8601 允许 24，但 RFC 3339 的此 profile 仅允许 00 至 23。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-6",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "Although ISO 8601 permits the hour to be \"24\", this profile of ISO"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-7",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "8601 only allows values between \"00\" and \"23\" for the hour in order"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-8",
+          "start_offset": 3,
+          "end_offset": 23,
+          "quote": "to reduce confusion."
+        }
+      ],
+      "query_run_id": "09f3ea5f-a819-4afb-915e-eb0bcb26da98",
+      "answer_text": "不允许。RFC 3339 是 ISO 8601 的一个 profile，证据明确指出：尽管 ISO 8601 允许小时为“24”，但这个 profile（即 RFC 3339）[E2]；且 ISO 8601 本身对小时 24 是否仅在特定情况下允许并不清晰[E1]。因此按 RFC 3339 的规则，小时不应写成 24。",
+      "selected_evidence": [
+        {
+          "text": "   8601 is not clear on whether an hour of 24 is permissible only if ",
+          "label": "E1"
+        },
+        {
+          "text": "   Although ISO 8601 permits the hour to be \"24\", this profile of ISO ",
+          "label": "E2"
+        },
+        {
+          "text": "   be made.  First, ISO 8601 is not clear if mixtures of basic and ",
+          "label": "E3"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E4"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E5"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E6"
+        }
+      ],
+      "citations": [
+        {
+          "span": {
+            "id": "a16318f5-d8cc-5c20-8d0f-fdd1de2a7523",
+            "boxes": [
+              {
+                "top": 0.16636858907363436,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.45370946554621866,
+                "right": 0.4637531630252103,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.46379333781512627,
+                "right": 0.47383703529411786,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.4738772100840339,
+                "right": 0.48392090756302547,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.48396108235294155,
+                "right": 0.49400477983193314,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.4940449546218491,
+                "right": 0.5040886521008408,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5041288268907567,
+                "right": 0.5141725243697484,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5142126991596643,
+                "right": 0.5242563966386559,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.524296571428572,
+                "right": 0.5343402689075636,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5343804436974796,
+                "right": 0.5444241411764712,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5444643159663871,
+                "right": 0.5545080134453788,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5545481882352948,
+                "right": 0.5645918857142864,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5646320605042024,
+                "right": 0.574675757983194,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5747159327731101,
+                "right": 0.5847596302521016,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5847998050420176,
+                "right": 0.5948435025210093,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.5948836773109253,
+                "right": 0.6049273747899169,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6049675495798329,
+                "right": 0.6150112470588245,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6150514218487405,
+                "right": 0.6250951193277321,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.625135294117648,
+                "right": 0.6351789915966397,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6352191663865557,
+                "right": 0.6452628638655473,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6453030386554633,
+                "right": 0.6553467361344549,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.655386910924371,
+                "right": 0.6654306084033625,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6654707831932785,
+                "right": 0.6755144806722702,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6755546554621861,
+                "right": 0.6855983529411777,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6856385277310937,
+                "right": 0.6956822252100853,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.6957224000000014,
+                "right": 0.705766097478993,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7058062722689089,
+                "right": 0.7158499697479006,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7158901445378165,
+                "right": 0.7259338420168081,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7259740168067241,
+                "right": 0.7360177142857157,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7360578890756319,
+                "right": 0.7461015865546234,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7461417613445394,
+                "right": 0.756185458823531,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.756225633613447,
+                "right": 0.7662693310924386,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7663095058823546,
+                "right": 0.7763532033613462,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7763933781512623,
+                "right": 0.7864370756302539,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7864772504201698,
+                "right": 0.7965209478991615,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.7965611226890774,
+                "right": 0.806604820168069,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.806644994957985,
+                "right": 0.8166886924369766,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              },
+              {
+                "top": 0.16636858907363436,
+                "left": 0.8167288672268928,
+                "right": 0.8267725647058843,
+                "bottom": 0.17819756769596218,
+                "page_index": 8
+              }
+            ],
+            "quote": "   Although ISO 8601 permits the hour to be \"24\", this profile of ISO ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-8-line-6",
+            "end_offset": 70,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "98cc84f65242511eb8b786531deb30acedde5ac8c637a5922d7eecd4f3372a4b",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "98cc84f65242511eb8b786531deb30acedde5ac8c637a5922d7eecd4f3372a4b"
+          },
+          "label": "E2",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "a16318f5-d8cc-5c20-8d0f-fdd1de2a7523",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        },
+        {
+          "span": {
+            "id": "c0bdf587-6bfd-5614-a6ad-0c448eda8c29",
+            "boxes": [
+              {
+                "top": 0.4086473634204283,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.45370946554621866,
+                "right": 0.4637531630252103,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.46379333781512627,
+                "right": 0.47383703529411786,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.4738772100840339,
+                "right": 0.48392090756302547,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.48396108235294155,
+                "right": 0.49400477983193314,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.4940449546218491,
+                "right": 0.5040886521008408,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5041288268907567,
+                "right": 0.5141725243697484,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5142126991596643,
+                "right": 0.5242563966386559,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.524296571428572,
+                "right": 0.5343402689075636,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5343804436974796,
+                "right": 0.5444241411764712,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5444643159663871,
+                "right": 0.5545080134453788,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5545481882352948,
+                "right": 0.5645918857142864,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5646320605042024,
+                "right": 0.574675757983194,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5747159327731101,
+                "right": 0.5847596302521016,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5847998050420176,
+                "right": 0.5948435025210093,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.5948836773109253,
+                "right": 0.6049273747899169,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6049675495798329,
+                "right": 0.6150112470588245,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6150514218487405,
+                "right": 0.6250951193277321,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.625135294117648,
+                "right": 0.6351789915966397,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6352191663865557,
+                "right": 0.6452628638655473,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6453030386554633,
+                "right": 0.6553467361344549,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.655386910924371,
+                "right": 0.6654306084033625,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6654707831932785,
+                "right": 0.6755144806722702,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6755546554621861,
+                "right": 0.6855983529411777,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6856385277310937,
+                "right": 0.6956822252100853,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.6957224000000014,
+                "right": 0.705766097478993,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7058062722689089,
+                "right": 0.7158499697479006,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7158901445378165,
+                "right": 0.7259338420168081,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7259740168067241,
+                "right": 0.7360177142857157,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7360578890756319,
+                "right": 0.7461015865546234,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7461417613445394,
+                "right": 0.756185458823531,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.756225633613447,
+                "right": 0.7662693310924386,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7663095058823546,
+                "right": 0.7763532033613462,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7763933781512623,
+                "right": 0.7864370756302539,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7864772504201698,
+                "right": 0.7965209478991615,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.7965611226890774,
+                "right": 0.806604820168069,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              },
+              {
+                "top": 0.4086473634204283,
+                "left": 0.806644994957985,
+                "right": 0.8166886924369766,
+                "bottom": 0.420476342042756,
+                "page_index": 10
+              }
+            ],
+            "quote": "   8601 is not clear on whether an hour of 24 is permissible only if ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-10-line-24",
+            "end_offset": 69,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "2f2e674cccbb45049070ecb4660558d33d83ef44872b40621d2ab49765be6259",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "2f2e674cccbb45049070ecb4660558d33d83ef44872b40621d2ab49765be6259"
+          },
+          "label": "E1",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "c0bdf587-6bfd-5614-a6ad-0c448eda8c29",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        }
+      ],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-037",
+      "split": "dev",
+      "question": "NIST 资源池化中的位置独立，是否禁止消费者指定国家或数据中心？",
+      "question_type": "boundary",
+      "reference_answer": "No. Exact resource location is generally unknown, but location may be specified at a higher abstraction such as country, state or datacenter.",
+      "reference_answer_zh_assistance": "不禁止。通常不知道资源精确位置，但可以在较高抽象层级指定国家、州或数据中心。",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-17",
+          "start_offset": 0,
+          "end_offset": 86,
+          "quote": "independence in that the customer generally has no control or knowledge over the exact"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-18",
+          "start_offset": 0,
+          "end_offset": 91,
+          "quote": "location of the provided resources but may be able to specify location at a higher level of"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-19",
+          "start_offset": 0,
+          "end_offset": 89,
+          "quote": "abstraction (e.g., country, state, or datacenter). Examples of resources include storage,"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-20",
+          "start_offset": 0,
+          "end_offset": 42,
+          "quote": "processing, memory, and network bandwidth."
+        }
+      ],
+      "query_run_id": "1e6ee6f6-a5b1-4145-ac02-40f22d03f093",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "assigned and reassigned according to consumer demand. There is a sense of location ",
+          "label": "E1"
+        },
+        {
+          "text": "NIST is responsible for developing standards and guidelines, including minimum requirements, for ",
+          "label": "E2"
+        },
+        {
+          "text": "(NIST) promotes the U.S. economy and public welfare by providing technical leadership for the nation’s ",
+          "label": "E3"
+        },
+        {
+          "text": "2. The NIST Definition of Cloud Computing ",
+          "label": "E4"
+        },
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E5"
+        },
+        {
+          "text": "   and sparingly.  In particular, they MUST only be used where it is",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-039",
+      "split": "dev",
+      "question": "RFC 3339 的字符串排序能否无条件代替时间排序？",
+      "question_type": "boundary",
+      "reference_answer": "No. Conditions include the same timezone representation, same number of fractional digits and no optional punctuation.",
+      "reference_answer_zh_assistance": "不能无条件代替。须满足时区表示相同、小数秒位数相同，以及不存在可选标点等条件。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-55",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "If date and time components are ordered from least precise to most"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-56",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "precise, then a useful property is achieved.  Assuming that the time"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-57",
+          "start_offset": 3,
+          "end_offset": 64,
+          "quote": "zones of the dates and times are the same (e.g., all in UTC),"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-58",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "expressed using the same string (e.g., all \"Z\" or all \"+00:00\"), and"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-59",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "all times have the same number of fractional second digits, then the"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-60",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "date and time strings may be sorted as strings (e.g., using the"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 5,
+          "block_id": "page-5-line-0",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "strcmp() function in C) and a time-ordered sequence will result.  The"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 5,
+          "block_id": "page-5-line-1",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "presence of optional punctuation would violate this characteristic."
+        }
+      ],
+      "query_run_id": "7026cfde-5df8-44bd-bb47-d2aaf5f4fa09",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E1"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E2"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E3"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E4"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E5"
+        },
+        {
+          "text": "RFC 3339       Date and Time on the Internet: Timestamps       July 2002 ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-041",
+      "split": "dev",
+      "question": "NIST SP 800-145 要求所有云都由商业公司拥有吗？",
+      "question_type": "boundary",
+      "reference_answer": "No. For example, public cloud may be owned or managed by business, academic or government organizations or combinations.",
+      "reference_answer_zh_assistance": "不要求。例如公有云可由商业、学术、政府组织或其组合拥有、管理和运营。",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-22",
+          "start_offset": 0,
+          "end_offset": 99,
+          "quote": "Public cloud. The cloud infrastructure is provisioned for open use by the general public. It may be"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-23",
+          "start_offset": 0,
+          "end_offset": 84,
+          "quote": "owned, managed, and operated by a business, academic, or government organization, or"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-24",
+          "start_offset": 0,
+          "end_offset": 75,
+          "quote": "some combination of them.  It exists on the premises of the cloud provider."
+        }
+      ],
+      "query_run_id": "b54bcf28-1cc5-4a0f-a230-df4a65fe6307",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E1"
+        },
+        {
+          "text": "National Institute of Standards and Technology Special Publication 800-145 ",
+          "label": "E2"
+        },
+        {
+          "text": "Cloud computing is an evolving paradigm. The NIST definition characterizes important aspects of cloud ",
+          "label": "E3"
+        },
+        {
+          "text": "Special Publication 800-145 ",
+          "label": "E4"
+        },
+        {
+          "text": "security requirements, policy, and compliance considerations). It may be owned, ",
+          "label": "E5"
+        },
+        {
+          "text": "The NIST Definition of Cloud ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-043",
+      "split": "dev",
+      "question": "请定位 RFC 3339 中 time-secfrac 的 ABNF 定义。小数点后至少需要几位数字？",
+      "question_type": "localization",
+      "reference_answer": "time-secfrac is a dot followed by one or more digits; at least one digit.",
+      "reference_answer_zh_assistance": "定义是小数点后跟一位或多位数字；至少一位。",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 6,
+          "block_id": "page-6-line-45",
+          "start_offset": 3,
+          "end_offset": 32,
+          "quote": "time-secfrac    = \".\" 1*DIGIT"
+        }
+      ],
+      "query_run_id": "9e969c4d-32af-4b39-ad93-91137c5fa7cd",
+      "answer_text": "time-secfrac 的 ABNF 定义为 `time-secfrac = \".\" 1*DIGIT` [E1]。其中 `1*DIGIT` 表示小数点后至少需要 1 位数字 [E1]。",
+      "selected_evidence": [
+        {
+          "text": "   time-secfrac    = \".\" 1*DIGIT ",
+          "label": "E1"
+        },
+        {
+          "text": "                  defined in [ABNF]. ",
+          "label": "E2"
+        },
+        {
+          "text": "                     [time-secfrac] ",
+          "label": "E3"
+        },
+        {
+          "text": "   description notation defined in [ABNF]. ",
+          "label": "E4"
+        },
+        {
+          "text": "                  Specifications: ABNF\", RFC 2234, November 1997. ",
+          "label": "E5"
+        },
+        {
+          "text": "   Appendix A. ISO 8601 Collected ABNF ....................... 12 ",
+          "label": "E6"
+        }
+      ],
+      "citations": [
+        {
+          "span": {
+            "id": "c513b418-4c88-5339-8491-7cfc4dbddc70",
+            "boxes": [
+              {
+                "top": 0.6911150926365802,
+                "left": 0.12094168067226892,
+                "right": 0.13098537815126052,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.1310255529411765,
+                "right": 0.14106925042016807,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.14110942521008404,
+                "right": 0.15115312268907563,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.1511932974789916,
+                "right": 0.16123699495798322,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.16127716974789919,
+                "right": 0.17132086722689077,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.17136104201680674,
+                "right": 0.18140473949579833,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.1814449142857143,
+                "right": 0.19148861176470588,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.19152878655462185,
+                "right": 0.20157248403361347,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.2016126588235294,
+                "right": 0.211656356302521,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.21169653109243697,
+                "right": 0.22174022857142858,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.22178040336134452,
+                "right": 0.23182410084033614,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.23186427563025208,
+                "right": 0.24190797310924367,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.2419481478991596,
+                "right": 0.2519918453781512,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.2520320201680672,
+                "right": 0.2620757176470588,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.26211589243697475,
+                "right": 0.27215958991596634,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.2721997647058823,
+                "right": 0.2822434621848739,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.28228363697478986,
+                "right": 0.29232733445378145,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.2923675092436974,
+                "right": 0.302411206722689,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.302451381512605,
+                "right": 0.31249507899159656,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.31253525378151253,
+                "right": 0.3225789512605041,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.3226191260504201,
+                "right": 0.3326628235294117,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.33270299831932765,
+                "right": 0.34274669579831923,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.3427868705882352,
+                "right": 0.3528305680672268,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.3528707428571427,
+                "right": 0.3629144403361343,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.3629546151260503,
+                "right": 0.3729983126050419,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.3730384873949579,
+                "right": 0.38308218487394946,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.3831223596638654,
+                "right": 0.39316605714285696,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.393206231932773,
+                "right": 0.4032499294117646,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.40329010420168054,
+                "right": 0.41333380168067213,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.4133739764705882,
+                "right": 0.42341767394957985,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.4234578487394958,
+                "right": 0.4335015462184874,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.43354172100840344,
+                "right": 0.443585418487395,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              },
+              {
+                "top": 0.6911150926365802,
+                "left": 0.443625593277311,
+                "right": 0.4536692907563026,
+                "bottom": 0.7029440712589079,
+                "page_index": 6
+              }
+            ],
+            "quote": "   time-secfrac    = \".\" 1*DIGIT ",
+            "scope": {
+              "kb_id": "1b7b22a2-06f7-4695-907e-27bc56b1734c",
+              "revision_id": "ae0b8169-1427-4bd4-a432-ad992b04781b",
+              "workspace_id": "857d16f9-097e-5a7a-9ded-6cfcf293c057"
+            },
+            "block_id": "page-6-line-45",
+            "end_offset": 33,
+            "table_cell": null,
+            "locator_kind": "pdf_bbox",
+            "quote_sha256": "e249c3e6ca89663e59516805252266ad9e4f188a592fe387662eb60a11dbb12f",
+            "start_offset": 0,
+            "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+            "support_status": "not_assessed",
+            "normalizer_revision": "pdfplumber-display-glyph-v1",
+            "canonical_text_sha256": "e249c3e6ca89663e59516805252266ad9e4f188a592fe387662eb60a11dbb12f"
+          },
+          "label": "E1",
+          "filename": "rfc3339.pdf",
+          "content_url": "/v1/document-versions/ae0b8169-1427-4bd4-a432-ad992b04781b/content",
+          "evidence_id": "c513b418-4c88-5339-8491-7cfc4dbddc70",
+          "document_version_id": "ae0b8169-1427-4bd4-a432-ad992b04781b"
+        }
+      ],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-045",
+      "split": "dev",
+      "question": "请定位 NIST SP 800-145 对 measured service 的说明：计量信息为哪两方提供透明度？",
+      "question_type": "localization",
+      "reference_answer": "Both the provider and consumer of the utilized service.",
+      "reference_answer_zh_assistance": "为所使用服务的提供者与消费者双方提供透明度。",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-30",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "monitored, controlled, and reported, providing transparency for both the provider and"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-31",
+          "start_offset": 0,
+          "end_offset": 33,
+          "quote": "consumer of the utilized service."
+        }
+      ],
+      "query_run_id": "948fe313-eb8a-47e6-8825-4ef35aa419dc",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "NIST Special Publication 800-145 ",
+          "label": "E1"
+        },
+        {
+          "text": "National Institute of Standards and Technology Special Publication 800-145 ",
+          "label": "E2"
+        },
+        {
+          "text": "Special Publication 800-145 ",
+          "label": "E3"
+        },
+        {
+          "text": "Measured service. Cloud systems automatically control and optimize resource use by leveraging ",
+          "label": "E4"
+        },
+        {
+          "text": "The following changes have been incorporated into Special Publication 800-145, as of the date indicated ",
+          "label": "E5"
+        },
+        {
+          "text": "(NIST) promotes the U.S. economy and public welfare by providing technical leadership for the nation’s ",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    },
+    {
+      "case_id": "cw-public-047",
+      "split": "dev",
+      "question": "请定位 RFC 2119：作者应解释不遵循规范的什么方面的影响？",
+      "question_type": "localization",
+      "reference_answer": "Security implications of not following recommendations or requirements.",
+      "reference_answer_zh_assistance": "应解释不遵循建议或要求所带来的安全影响。",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-21",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "These terms are frequently used to specify behavior with security"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-22",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "implications.  The effects on security of not implementing a MUST or"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-23",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "SHOULD, or doing something the specification says MUST NOT or SHOULD"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-24",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "NOT be done may be very subtle. Document authors should take the time"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-25",
+          "start_offset": 3,
+          "end_offset": 58,
+          "quote": "to elaborate the security implications of not following"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-26",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "recommendations or requirements as most implementors will not have"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-27",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "had the benefit of the experience and discussion that produced the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-28",
+          "start_offset": 3,
+          "end_offset": 17,
+          "quote": "specification."
+        }
+      ],
+      "query_run_id": "784b19e5-9830-4a9d-8c07-97e8eab91717",
+      "answer_text": "证据不足，无法回答。",
+      "selected_evidence": [
+        {
+          "text": "      RFC 2119.",
+          "label": "E1"
+        },
+        {
+          "text": "   document are to be interpreted as described in RFC 2119 [RFC2119]. ",
+          "label": "E2"
+        },
+        {
+          "text": "Request for Comments: 2119                            Harvard University",
+          "label": "E3"
+        },
+        {
+          "text": "   [RFC2119]      Bradner, S, \"Key words for use in RFCs to Indicate ",
+          "label": "E4"
+        },
+        {
+          "text": "                  Requirement Levels\", BCP 14, RFC 2119, March 1997. ",
+          "label": "E5"
+        },
+        {
+          "text": "RFC 2119                     RFC Key Words                    March 1997",
+          "label": "E6"
+        }
+      ],
+      "citations": [],
+      "human_review": null
+    }
+  ]
+}

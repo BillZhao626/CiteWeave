@@ -1,0 +1,3 @@
+# 0003 · TypeScript compiler API compatibility
+
+The M0 UI used TypeScript 7.0.2. OpenAPI TypeScript 7.13.0 fails against that native compiler with `ts.factory.createKeywordTypeNode` undefined. The generated client is a required M1 boundary. Options were a separate compiler alias only for generation, hand-maintained types, or one compatible compiler for the frontend. M1 pins TypeScript 6.0.3 for typecheck, generation and ESLint interoperability; no React architecture changes. Upgrade again only after the schema generator and lint toolchain pass together. Actual reproduction and resolution were observed locally, not assumed from version numbers.

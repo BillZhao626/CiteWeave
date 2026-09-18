@@ -1,0 +1,208 @@
+{
+  "$defs": {
+    "Box": {
+      "additionalProperties": false,
+      "properties": {
+        "page_index": {
+          "minimum": 0,
+          "title": "Page Index",
+          "type": "integer"
+        },
+        "left": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Left",
+          "type": "number"
+        },
+        "top": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Top",
+          "type": "number"
+        },
+        "right": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Right",
+          "type": "number"
+        },
+        "bottom": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Bottom",
+          "type": "number"
+        }
+      },
+      "required": [
+        "page_index",
+        "left",
+        "top",
+        "right",
+        "bottom"
+      ],
+      "title": "Box",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "kb_id": {
+          "format": "uuid",
+          "title": "Kb Id",
+          "type": "string"
+        },
+        "revision_id": {
+          "format": "uuid",
+          "title": "Revision Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "kb_id",
+        "revision_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    },
+    "TableCell": {
+      "additionalProperties": false,
+      "properties": {
+        "table_id": {
+          "minLength": 1,
+          "title": "Table Id",
+          "type": "string"
+        },
+        "row_index": {
+          "minimum": 0,
+          "title": "Row Index",
+          "type": "integer"
+        },
+        "column_index": {
+          "minimum": 0,
+          "title": "Column Index",
+          "type": "integer"
+        },
+        "row_header": {
+          "minLength": 1,
+          "title": "Row Header",
+          "type": "string"
+        },
+        "column_header": {
+          "minLength": 1,
+          "title": "Column Header",
+          "type": "string"
+        }
+      },
+      "required": [
+        "table_id",
+        "row_index",
+        "column_index",
+        "row_header",
+        "column_header"
+      ],
+      "title": "TableCell",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "block_id": {
+      "title": "Block Id",
+      "type": "string"
+    },
+    "source_sha256": {
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "canonical_text_sha256": {
+      "title": "Canonical Text Sha256",
+      "type": "string"
+    },
+    "normalizer_revision": {
+      "title": "Normalizer Revision",
+      "type": "string"
+    },
+    "start_offset": {
+      "minimum": 0,
+      "title": "Start Offset",
+      "type": "integer"
+    },
+    "end_offset": {
+      "exclusiveMinimum": 0,
+      "title": "End Offset",
+      "type": "integer"
+    },
+    "quote": {
+      "minLength": 1,
+      "title": "Quote",
+      "type": "string"
+    },
+    "quote_sha256": {
+      "title": "Quote Sha256",
+      "type": "string"
+    },
+    "locator_kind": {
+      "enum": [
+        "paragraph",
+        "pdf_bbox",
+        "table_cells"
+      ],
+      "title": "Locator Kind",
+      "type": "string"
+    },
+    "boxes": {
+      "items": {
+        "$ref": "#/$defs/Box"
+      },
+      "title": "Boxes",
+      "type": "array"
+    },
+    "table_cell": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TableCell"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "support_status": {
+      "const": "not_assessed",
+      "default": "not_assessed",
+      "title": "Support Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "scope",
+    "block_id",
+    "source_sha256",
+    "canonical_text_sha256",
+    "normalizer_revision",
+    "start_offset",
+    "end_offset",
+    "quote",
+    "quote_sha256",
+    "locator_kind",
+    "boxes"
+  ],
+  "title": "EvidenceSpan",
+  "type": "object"
+}

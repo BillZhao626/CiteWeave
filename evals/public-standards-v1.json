@@ -1,0 +1,2046 @@
+{
+  "dataset_id": "public-standards-v1",
+  "schema_version": 1,
+  "frozen_at": "2026-09-14T23:56:05.517671+00:00",
+  "sources": [
+    {
+      "source_id": "rfc2119",
+      "title": "RFC 2119 (March 1997)",
+      "download_url": "https://docbox.etsi.org/Reference/IETF/RFC/RFC2119.pdf",
+      "canonical_url": "https://www.rfc-editor.org/info/rfc2119/",
+      "acquired_date": "2026-09-14",
+      "sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+      "license_notes": "IETF Trust RFC use rules; historical RFC copyright applies. Unmodified public reference copy; raw PDF excluded. https://www.rfc-editor.org/series/rfc-use/",
+      "redistribute_raw": false,
+      "filename": "rfc2119.pdf"
+    },
+    {
+      "source_id": "rfc3339",
+      "title": "RFC 3339 (July 2002)",
+      "download_url": "https://docbox.etsi.org/Reference/IETF/RFC/RFC3339.pdf",
+      "canonical_url": "https://www.rfc-editor.org/info/rfc3339/",
+      "acquired_date": "2026-09-14",
+      "sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+      "license_notes": "IETF Trust RFC use rules; historical RFC copyright applies. ETSI rendering uses different physical/printed pagination. Raw PDF excluded. https://www.rfc-editor.org/series/rfc-use/",
+      "redistribute_raw": false,
+      "filename": "rfc3339.pdf"
+    },
+    {
+      "source_id": "nist800145",
+      "title": "NIST SP 800-145 (September 2011)",
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-145.pdf",
+      "canonical_url": "https://doi.org/10.6028/NIST.SP.800-145",
+      "acquired_date": "2026-09-14",
+      "sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+      "license_notes": "US government publication. PDF states not subject to copyright, attribution desired; NIST copyright/fair-use rules at https://www.nist.gov/open/license . Raw PDF excluded consistently.",
+      "redistribute_raw": false,
+      "filename": "nist800145.pdf"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "cw-public-001",
+      "split": "dev",
+      "question_type": "direct",
+      "question": "RFC 2119 中 MUST、REQUIRED 和 SHALL 表达什么要求？",
+      "answerable": true,
+      "reference_answer": "They indicate an absolute requirement of the specification.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-21",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-22",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute requirement of the specification."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-002",
+      "split": "test",
+      "question_type": "direct",
+      "question": "RFC 2119 中 MUST NOT 与 SHALL NOT 表示什么？",
+      "answerable": true,
+      "reference_answer": "They indicate an absolute prohibition.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-23",
+          "start_offset": 0,
+          "end_offset": 67,
+          "quote": "2. MUST NOT   This phrase, or the phrase \"SHALL NOT\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-24",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute prohibition of the specification."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-003",
+      "split": "dev",
+      "question_type": "direct",
+      "question": "RFC 2119 中 MAY / OPTIONAL 是否允许供应商选择不实现某项功能？",
+      "answerable": true,
+      "reference_answer": "Yes. The item is truly optional; vendors may include it or omit it.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-1",
+          "start_offset": 0,
+          "end_offset": 69,
+          "quote": "5. MAY   This word, or the adjective \"OPTIONAL\", mean that an item is"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-2",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "truly optional.  One vendor may choose to include the item because a"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-3",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "particular marketplace requires it or because the vendor feels that"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-4",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "it enhances the product while another vendor may omit the same item."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-004",
+      "split": "test",
+      "question_type": "direct",
+      "question": "RFC 3339 的 timestamp 表示一个时刻，还是一段时间间隔？",
+      "answerable": true,
+      "reference_answer": "An unambiguous instant in time, not periods or intervals.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 1,
+          "block_id": "page-1-line-42",
+          "start_offset": 3,
+          "end_offset": 60,
+          "quote": "o  Date and time expressions indicate an instant in time."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 1,
+          "block_id": "page-1-line-43",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "Description of time periods, or intervals, is not covered here."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-37",
+          "start_offset": 6,
+          "end_offset": 67,
+          "quote": "Timestamp   This term is used in this document to refer to an"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-38",
+          "start_offset": 18,
+          "end_offset": 69,
+          "quote": "unambiguous representation of some instant in time."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-005",
+      "split": "dev",
+      "question_type": "direct",
+      "question": "RFC 3339 中 Z 后缀表示什么时区偏移？",
+      "answerable": true,
+      "reference_answer": "A UTC offset of 00:00, also called Zulu.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-40",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "Z           A suffix which, when applied to a time, denotes a UTC"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-41",
+          "start_offset": 18,
+          "end_offset": 68,
+          "quote": "offset of 00:00; often spoken \"Zulu\" from the ICAO"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-42",
+          "start_offset": 18,
+          "end_offset": 69,
+          "quote": "phonetic alphabet representation of the letter \"Z\"."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-006",
+      "split": "test",
+      "question_type": "direct",
+      "question": "NIST SP 800-145 的云模型包含多少种基本特征、服务模型和部署模型？",
+      "answerable": true,
+      "reference_answer": "Five essential characteristics, three service models and four deployment models.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-4",
+          "start_offset": 0,
+          "end_offset": 105,
+          "quote": "This cloud model is composed of five essential characteristics, three service models, and four deployment"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-5",
+          "start_offset": 0,
+          "end_offset": 7,
+          "quote": "models."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-007",
+      "split": "dev",
+      "question_type": "direct",
+      "question": "NIST 的按需自助服务是否需要与服务提供商人员逐次交互？",
+      "answerable": true,
+      "reference_answer": "No. Consumers provision capabilities unilaterally and automatically without human interaction with each provider.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-8",
+          "start_offset": 0,
+          "end_offset": 93,
+          "quote": "On-demand self-service. A consumer can unilaterally provision computing capabilities, such as"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-9",
+          "start_offset": 0,
+          "end_offset": 80,
+          "quote": "server time and network storage, as needed automatically without requiring human"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-10",
+          "start_offset": 0,
+          "end_offset": 39,
+          "quote": "interaction with each service provider."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-008",
+      "split": "test",
+      "question_type": "direct",
+      "question": "NIST 定义的 public cloud 面向谁开放，设施位于哪里？",
+      "answerable": true,
+      "reference_answer": "Open use by the general public; on the premises of the cloud provider.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-22",
+          "start_offset": 0,
+          "end_offset": 99,
+          "quote": "Public cloud. The cloud infrastructure is provisioned for open use by the general public. It may be"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-23",
+          "start_offset": 0,
+          "end_offset": 84,
+          "quote": "owned, managed, and operated by a business, academic, or government organization, or"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-24",
+          "start_offset": 0,
+          "end_offset": 75,
+          "quote": "some combination of them.  It exists on the premises of the cloud provider."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-009",
+      "split": "dev",
+      "question_type": "direct",
+      "question": "RFC 3339 要求 Internet 协议生成年份时使用几位数字？",
+      "answerable": true,
+      "reference_answer": "Four-digit years are mandatory.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-60",
+          "start_offset": 6,
+          "end_offset": 68,
+          "quote": "o  Internet Protocols MUST generate four digit years in dates."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-010",
+      "split": "test",
+      "question_type": "direct",
+      "question": "NIST SP 800-145 的目标读者有哪些角色？",
+      "answerable": true,
+      "reference_answer": "System planners, program managers, technologists and others adopting cloud computing as consumers or providers.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 4,
+          "block_id": "page-4-line-29",
+          "start_offset": 0,
+          "end_offset": 102,
+          "quote": "The intended audience of this document is system planners, program managers, technologists, and others"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 4,
+          "block_id": "page-4-line-30",
+          "start_offset": 0,
+          "end_offset": 69,
+          "quote": "adopting cloud computing as consumers or providers of cloud services."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-011",
+      "split": "dev",
+      "question_type": "direct",
+      "question": "RFC 3339 的 UTC 已知而本地偏移未知时，使用哪一种 offset 表示？",
+      "answerable": true,
+      "reference_answer": "Use -00:00; it differs semantically from Z or +00:00.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-10",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "If the time in UTC is known, but the offset to local time is unknown,"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-11",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "this can be represented with an offset of \"-00:00\".  This differs"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-12",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "semantically from an offset of \"Z\" or \"+00:00\", which imply that UTC"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-13",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "is the preferred reference point for the specified time.  RFC2822"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-14",
+          "start_offset": 3,
+          "end_offset": 59,
+          "quote": "[IMAIL-UPDATE] describes a similar convention for email."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-012",
+      "split": "test",
+      "question_type": "direct",
+      "question": "按 NIST 定义，private cloud 是否只能部署在组织自有场地？",
+      "answerable": true,
+      "reference_answer": "No. It may exist on or off premises.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-13",
+          "start_offset": 0,
+          "end_offset": 97,
+          "quote": "Private cloud. The cloud infrastructure is provisioned for exclusive use by a single organization"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-14",
+          "start_offset": 0,
+          "end_offset": 83,
+          "quote": "comprising multiple consumers (e.g., business units). It may be owned, managed, and"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-15",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "operated by the organization, a third party, or some combination of them, and it may exist"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-16",
+          "start_offset": 0,
+          "end_offset": 19,
+          "quote": "on or off premises."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-013",
+      "split": "dev",
+      "question_type": "multi_evidence",
+      "question": "RFC 2119 如何区分 SHOULD 与 MUST？忽略 SHOULD 前需要考虑什么？",
+      "answerable": true,
+      "reference_answer": "MUST is absolute. SHOULD permits justified exceptions in particular circumstances, after understanding and weighing the full implications.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-21",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-22",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute requirement of the specification."
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-25",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "3. SHOULD   This word, or the adjective \"RECOMMENDED\", mean that there"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-26",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "may exist valid reasons in particular circumstances to ignore a"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-27",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "particular item, but the full implications must be understood and"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-28",
+          "start_offset": 3,
+          "end_offset": 56,
+          "quote": "carefully weighed before choosing a different course."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-014",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 2119 对实现可选功能与不实现可选功能的两方各有什么互操作要求？",
+      "answerable": true,
+      "reference_answer": "Each MUST interoperate with the other, allowing reduced functionality; the implementation with the option may require it for the feature that option provides.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-5",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "An implementation which does not include a particular option MUST be"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-6",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "prepared to interoperate with another implementation which does"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-7",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "include the option, though perhaps with reduced functionality. In the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-8",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "same vein an implementation which does include a particular option"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-9",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "MUST be prepared to interoperate with another implementation which"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-10",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "does not include the option (except, of course, for the feature the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-11",
+          "start_offset": 3,
+          "end_offset": 20,
+          "quote": "option provides.)"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-015",
+      "split": "dev",
+      "question_type": "multi_evidence",
+      "question": "按 NIST，IaaS 用户与 SaaS 用户对操作系统的控制有何区别？",
+      "answerable": true,
+      "reference_answer": "IaaS consumers control operating systems; SaaS consumers do not manage the underlying operating systems.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-7",
+          "start_offset": 0,
+          "end_offset": 82,
+          "quote": "consumer is able to deploy and run arbitrary software, which can include operating"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-8",
+          "start_offset": 0,
+          "end_offset": 86,
+          "quote": "systems and applications. The consumer does not manage or control the underlying cloud"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-9",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "infrastructure but has control over operating systems, storage, and deployed applications;"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-38",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "web-based email), or a program interface. The consumer does not manage or control the"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-39",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "underlying cloud infrastructure including network, servers, operating systems, storage, or"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-016",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "NIST 的 community cloud 与 public cloud 服务对象有何不同？",
+      "answerable": true,
+      "reference_answer": "Community cloud serves a specific community of organizations with shared concerns; public cloud is open to the general public.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-17",
+          "start_offset": 0,
+          "end_offset": 88,
+          "quote": "Community cloud. The cloud infrastructure is provisioned for exclusive use by a specific"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-18",
+          "start_offset": 0,
+          "end_offset": 83,
+          "quote": "community of consumers from organizations that have shared concerns (e.g., mission,"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-19",
+          "start_offset": 0,
+          "end_offset": 79,
+          "quote": "security requirements, policy, and compliance considerations). It may be owned,"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-22",
+          "start_offset": 0,
+          "end_offset": 99,
+          "quote": "Public cloud. The cloud infrastructure is provisioned for open use by the general public. It may be"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-017",
+      "split": "dev",
+      "question_type": "multi_evidence",
+      "question": "RFC 3339 如何定义 leap year？为什么有些世纪年不是闰年？",
+      "answerable": true,
+      "reference_answer": "A leap year has 366 days; divisibility by four is required, with century years also divisible by 400.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-19",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "leap year   In the Gregorian calendar, a year which has 366 days."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-20",
+          "start_offset": 18,
+          "end_offset": 68,
+          "quote": "A leap year is a year whose number is divisible by"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-21",
+          "start_offset": 18,
+          "end_offset": 72,
+          "quote": "four an integral number of times, except that if it is"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-22",
+          "start_offset": 18,
+          "end_offset": 70,
+          "quote": "a centennial year (i.e. divisible by one hundred) it"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-23",
+          "start_offset": 18,
+          "end_offset": 69,
+          "quote": "shall also be divisible by four hundred an integral"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-24",
+          "start_offset": 18,
+          "end_offset": 34,
+          "quote": "number of times."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-018",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 3339 对插入闰秒、删除闰秒和普通时刻的秒字段最大值分别规定多少？",
+      "answerable": true,
+      "reference_answer": "60 for an inserted leap second, 58 when a leap second is subtracted, otherwise 59.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-51",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "The grammar element time-second may have the value \"60\" at the end of"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-52",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "months in which a leap second occurs -- to date: June (XXXX-06-"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-53",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "30T23:59:60Z) or December (XXXX-12-31T23:59:60Z); see Appendix D for"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-54",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "a table of leap seconds.  It is also possible for a leap second to be"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-55",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "subtracted, at which times the maximum value of time-second is \"58\"."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-56",
+          "start_offset": 3,
+          "end_offset": 63,
+          "quote": "At all other times the maximum value of time-second is \"59\"."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-019",
+      "split": "dev",
+      "question_type": "multi_evidence",
+      "question": "NIST 所说的资源池化与快速弹性分别解决什么问题？",
+      "answerable": true,
+      "reference_answer": "Resource pooling dynamically assigns shared resources to multiple consumers; rapid elasticity scales capabilities outward and inward with demand.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-14",
+          "start_offset": 0,
+          "end_offset": 91,
+          "quote": "Resource pooling. The provider’s computing resources are pooled to serve multiple consumers"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-15",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "using a multi-tenant model, with different physical and virtual resources dynamically"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-16",
+          "start_offset": 0,
+          "end_offset": 82,
+          "quote": "assigned and reassigned according to consumer demand. There is a sense of location"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-21",
+          "start_offset": 0,
+          "end_offset": 89,
+          "quote": "Rapid elasticity. Capabilities can be elastically provisioned and released, in some cases"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-22",
+          "start_offset": 0,
+          "end_offset": 83,
+          "quote": "automatically, to scale rapidly outward and inward commensurate with demand. To the"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-23",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "consumer, the capabilities available for provisioning often appear to be unlimited and can"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-24",
+          "start_offset": 0,
+          "end_offset": 44,
+          "quote": "be appropriated in any quantity at any time."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-020",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "NIST 的 hybrid cloud 要求组成部分保持什么性质，以及支持何种可移植性？",
+      "answerable": true,
+      "reference_answer": "Two or more distinct cloud infrastructures remain unique entities and are bound by technology enabling data and application portability.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-25",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "Hybrid cloud. The cloud infrastructure is a composition of two or more distinct cloud"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-26",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "infrastructures (private, community, or public) that remain unique entities, but are bound"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-27",
+          "start_offset": 0,
+          "end_offset": 84,
+          "quote": "together by standardized or proprietary technology that enables data and application"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-28",
+          "start_offset": 0,
+          "end_offset": 69,
+          "quote": "portability (e.g., cloud bursting for load balancing between clouds)."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-021",
+      "split": "dev",
+      "question_type": "cross_document",
+      "question": "结合 RFC 3339 和 RFC 2119，四位年份要求中的 MUST 是绝对要求还是建议？",
+      "answerable": true,
+      "reference_answer": "RFC 3339 says Internet protocols MUST generate four-digit years; RFC 2119 defines MUST as an absolute requirement.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-60",
+          "start_offset": 6,
+          "end_offset": 68,
+          "quote": "o  Internet Protocols MUST generate four digit years in dates."
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-21",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "1. MUST   This word, or the terms \"REQUIRED\" or \"SHALL\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-22",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute requirement of the specification."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-022",
+      "split": "test",
+      "question_type": "cross_document",
+      "question": "RFC 3339 建议新 Internet 协议采用其日期时间 profile。按 RFC 2119 的 SHOULD 定义，是否绝不允许例外？",
+      "answerable": true,
+      "reference_answer": "No. RFC 3339 uses SHOULD; RFC 2119 permits valid exceptions in particular circumstances after the implications are understood and weighed.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 6,
+          "block_id": "page-6-line-33",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "The following profile of ISO 8601 [ISO8601] dates SHOULD be used in"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 6,
+          "block_id": "page-6-line-34",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "new protocols on the Internet.  This is specified using the syntax"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 6,
+          "block_id": "page-6-line-35",
+          "start_offset": 3,
+          "end_offset": 42,
+          "quote": "description notation defined in [ABNF]."
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-25",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "3. SHOULD   This word, or the adjective \"RECOMMENDED\", mean that there"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-26",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "may exist valid reasons in particular circumstances to ignore a"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-27",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "particular item, but the full implications must be understood and"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-28",
+          "start_offset": 3,
+          "end_offset": 56,
+          "quote": "carefully weighed before choosing a different course."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-023",
+      "split": "dev",
+      "question_type": "cross_document",
+      "question": "分别依据 RFC 3339 和 NIST SP 800-145：前者讨论的是时刻还是区间，后者描述多少种服务模型？",
+      "answerable": true,
+      "reference_answer": "RFC 3339 represents instants, not intervals; NIST identifies three service models.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 1,
+          "block_id": "page-1-line-42",
+          "start_offset": 3,
+          "end_offset": 60,
+          "quote": "o  Date and time expressions indicate an instant in time."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 1,
+          "block_id": "page-1-line-43",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "Description of time periods, or intervals, is not covered here."
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-4",
+          "start_offset": 0,
+          "end_offset": 105,
+          "quote": "This cloud model is composed of five essential characteristics, three service models, and four deployment"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-5",
+          "start_offset": 0,
+          "end_offset": 7,
+          "quote": "models."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-024",
+      "split": "test",
+      "question_type": "cross_document",
+      "question": "分别依据 RFC 2119 与 NIST 云定义：OPTIONAL 是必须实现吗，public cloud 是否仅供一个组织专用？",
+      "answerable": true,
+      "reference_answer": "OPTIONAL is not mandatory; public cloud is open to the general public, not exclusive to one organization.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-1",
+          "start_offset": 0,
+          "end_offset": 69,
+          "quote": "5. MAY   This word, or the adjective \"OPTIONAL\", mean that an item is"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-2",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "truly optional.  One vendor may choose to include the item because a"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-22",
+          "start_offset": 0,
+          "end_offset": 99,
+          "quote": "Public cloud. The cloud infrastructure is provisioned for open use by the general public. It may be"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-025",
+      "split": "dev",
+      "question_type": "cross_document",
+      "question": "请从两份标准定位证据：RFC 3339 小时字段允许的上限是什么，NIST 的部署模型一共多少种？",
+      "answerable": true,
+      "reference_answer": "The hour is at most 23; NIST defines four deployment models.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-6",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "Although ISO 8601 permits the hour to be \"24\", this profile of ISO"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-7",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "8601 only allows values between \"00\" and \"23\" for the hour in order"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-8",
+          "start_offset": 3,
+          "end_offset": 23,
+          "quote": "to reduce confusion."
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-4",
+          "start_offset": 0,
+          "end_offset": 105,
+          "quote": "This cloud model is composed of five essential characteristics, three service models, and four deployment"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-5",
+          "start_offset": 0,
+          "end_offset": 7,
+          "quote": "models."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-026",
+      "split": "test",
+      "question_type": "cross_document",
+      "question": "分别依据 RFC 3339 和 RFC 2119，Z 的 offset 是多少，MUST NOT 是建议避免还是绝对禁止？",
+      "answerable": true,
+      "reference_answer": "Z is UTC offset 00:00; MUST NOT is an absolute prohibition.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-40",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "Z           A suffix which, when applied to a time, denotes a UTC"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-41",
+          "start_offset": 18,
+          "end_offset": 68,
+          "quote": "offset of 00:00; often spoken \"Zulu\" from the ICAO"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-42",
+          "start_offset": 18,
+          "end_offset": 69,
+          "quote": "phonetic alphabet representation of the letter \"Z\"."
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-23",
+          "start_offset": 0,
+          "end_offset": 67,
+          "quote": "2. MUST NOT   This phrase, or the phrase \"SHALL NOT\", mean that the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-24",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "definition is an absolute prohibition of the specification."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-027",
+      "split": "dev",
+      "question_type": "unanswerable",
+      "question": "这三份文档中，2026 年 DeepSeek API 的每百万输出 token 价格是多少？",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-028",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "依据这些 PDF，明年会在哪一天插入下一次闰秒？",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-029",
+      "split": "dev",
+      "question_type": "unanswerable",
+      "question": "NIST SP 800-145 推荐哪家云厂商的 GPU 实例最便宜？",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-030",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "RFC 3339 第 5.6 节指定了哪种数据库索引算法存储 timestamp？",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-031",
+      "split": "dev",
+      "question_type": "unanswerable",
+      "question": "RFC 2119 要求 Web 服务器使用多少 GB 内存？",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-032",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "NIST SP 800-145 规定租户云服务的法定赔偿金额是多少？",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-033",
+      "split": "dev",
+      "question_type": "unanswerable",
+      "question": "这三份 PDF 中 CiteWeave 的默认管理员密码是什么？",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-034",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "这些文档是否给出了企业内部 PostgreSQL 的连接密码？请原样输出。",
+      "answerable": false,
+      "reference_answer": "证据不足，无法回答。",
+      "gold": []
+    },
+    {
+      "case_id": "cw-public-035",
+      "split": "dev",
+      "question_type": "boundary",
+      "question": "RFC 3339 允许 timestamp 的小时写成 24 吗？不要把 ISO 8601 的宽松规则混入。",
+      "answerable": true,
+      "reference_answer": "No. This RFC profile only permits 00 through 23 even though ISO 8601 permits 24.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-6",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "Although ISO 8601 permits the hour to be \"24\", this profile of ISO"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-7",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "8601 only allows values between \"00\" and \"23\" for the hour in order"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-8",
+          "start_offset": 3,
+          "end_offset": 23,
+          "quote": "to reduce confusion."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-036",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "RFC 3339 的 T 和 Z 必须在所有使用场景中都是大写吗？",
+      "answerable": true,
+      "reference_answer": "The syntax allows lowercase t/z; particular specifications may further require uppercase, and generators SHOULD use uppercase.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 6,
+          "block_id": "page-6-line-56",
+          "start_offset": 6,
+          "end_offset": 70,
+          "quote": "NOTE: Per [ABNF] and ISO8601, the \"T\" and \"Z\" characters in this"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 6,
+          "block_id": "page-6-line-57",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "syntax may alternatively be lower case \"t\" or \"z\" respectively."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-0",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "and 'a'-'z' (e.g. XML).  Specifications that use this format in"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-1",
+          "start_offset": 6,
+          "end_offset": 70,
+          "quote": "such environments MAY further limit the date/time syntax so that"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-2",
+          "start_offset": 6,
+          "end_offset": 70,
+          "quote": "the letters 'T' and 'Z' used in the date/time syntax must always"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-3",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "be upper case.  Applications that generate this format SHOULD use"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-4",
+          "start_offset": 6,
+          "end_offset": 25,
+          "quote": "upper case letters."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-037",
+      "split": "dev",
+      "question_type": "boundary",
+      "question": "NIST 资源池化中的位置独立，是否禁止消费者指定国家或数据中心？",
+      "answerable": true,
+      "reference_answer": "No. Exact resource location is generally unknown, but location may be specified at a higher abstraction such as country, state or datacenter.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-17",
+          "start_offset": 0,
+          "end_offset": 86,
+          "quote": "independence in that the customer generally has no control or knowledge over the exact"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-18",
+          "start_offset": 0,
+          "end_offset": 91,
+          "quote": "location of the provided resources but may be able to specify location at a higher level of"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-19",
+          "start_offset": 0,
+          "end_offset": 89,
+          "quote": "abstraction (e.g., country, state, or datacenter). Examples of resources include storage,"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-20",
+          "start_offset": 0,
+          "end_offset": 42,
+          "quote": "processing, memory, and network bandwidth."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-038",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "RFC 2119 的 SHOULD NOT 是否意味着任何情况下都禁止此行为？",
+      "answerable": true,
+      "reference_answer": "No. There may be valid particular circumstances where it is acceptable or useful; full implications must be understood and the case weighed.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-29",
+          "start_offset": 0,
+          "end_offset": 70,
+          "quote": "4. SHOULD NOT   This phrase, or the phrase \"NOT RECOMMENDED\" mean that"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-30",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "there may exist valid reasons in particular circumstances when the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-31",
+          "start_offset": 3,
+          "end_offset": 65,
+          "quote": "particular behavior is acceptable or even useful, but the full"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-32",
+          "start_offset": 3,
+          "end_offset": 67,
+          "quote": "implications should be understood and the case carefully weighed"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 0,
+          "block_id": "page-0-line-33",
+          "start_offset": 3,
+          "end_offset": 62,
+          "quote": "before implementing any behavior described with this label."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-039",
+      "split": "dev",
+      "question_type": "boundary",
+      "question": "RFC 3339 的字符串排序能否无条件代替时间排序？",
+      "answerable": true,
+      "reference_answer": "No. Conditions include the same timezone representation, same number of fractional digits and no optional punctuation.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-55",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "If date and time components are ordered from least precise to most"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-56",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "precise, then a useful property is achieved.  Assuming that the time"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-57",
+          "start_offset": 3,
+          "end_offset": 64,
+          "quote": "zones of the dates and times are the same (e.g., all in UTC),"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-58",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "expressed using the same string (e.g., all \"Z\" or all \"+00:00\"), and"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-59",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "all times have the same number of fractional second digits, then the"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 4,
+          "block_id": "page-4-line-60",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "date and time strings may be sorted as strings (e.g., using the"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 5,
+          "block_id": "page-5-line-0",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "strcmp() function in C) and a time-ordered sequence will result.  The"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 5,
+          "block_id": "page-5-line-1",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "presence of optional punctuation would violate this characteristic."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-040",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "按 RFC 3339，2001 年的 2 月 29 日能作为合法 date-mday 吗？",
+      "answerable": true,
+      "reference_answer": "No. February in a normal year has 28 days, and 2001 is not divisible by four.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-35",
+          "start_offset": 6,
+          "end_offset": 43,
+          "quote": "02            February, normal     28"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-36",
+          "start_offset": 6,
+          "end_offset": 43,
+          "quote": "02            February, leap year  29"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-19",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "leap year   In the Gregorian calendar, a year which has 366 days."
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-20",
+          "start_offset": 18,
+          "end_offset": 68,
+          "quote": "A leap year is a year whose number is divisible by"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-21",
+          "start_offset": 18,
+          "end_offset": 72,
+          "quote": "four an integral number of times, except that if it is"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-22",
+          "start_offset": 18,
+          "end_offset": 70,
+          "quote": "a centennial year (i.e. divisible by one hundred) it"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-23",
+          "start_offset": 18,
+          "end_offset": 69,
+          "quote": "shall also be divisible by four hundred an integral"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 2,
+          "block_id": "page-2-line-24",
+          "start_offset": 18,
+          "end_offset": 34,
+          "quote": "number of times."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-041",
+      "split": "dev",
+      "question_type": "boundary",
+      "question": "NIST SP 800-145 要求所有云都由商业公司拥有吗？",
+      "answerable": true,
+      "reference_answer": "No. For example, public cloud may be owned or managed by business, academic or government organizations or combinations.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-22",
+          "start_offset": 0,
+          "end_offset": 99,
+          "quote": "Public cloud. The cloud infrastructure is provisioned for open use by the general public. It may be"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-23",
+          "start_offset": 0,
+          "end_offset": 84,
+          "quote": "owned, managed, and operated by a business, academic, or government organization, or"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-24",
+          "start_offset": 0,
+          "end_offset": 75,
+          "quote": "some combination of them.  It exists on the premises of the cloud provider."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-042",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "RFC 3339 是否要求现在就生成多年以后的闰秒 timestamp？",
+      "answerable": true,
+      "reference_answer": "No. Leap seconds cannot be predicted far ahead; applications should wait until they are announced.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-0",
+          "start_offset": 3,
+          "end_offset": 61,
+          "quote": "Leap seconds cannot be predicted far into the future.  The"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-1",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "International Earth Rotation Service publishes bulletins [IERS] that"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-2",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "announce leap seconds with a few weeks' warning.  Applications should"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-3",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "not generate timestamps involving inserted leap seconds until after"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-4",
+          "start_offset": 3,
+          "end_offset": 34,
+          "quote": "the leap seconds are announced."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-043",
+      "split": "dev",
+      "question_type": "localization",
+      "question": "请定位 RFC 3339 中 time-secfrac 的 ABNF 定义。小数点后至少需要几位数字？",
+      "answerable": true,
+      "reference_answer": "time-secfrac is a dot followed by one or more digits; at least one digit.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 6,
+          "block_id": "page-6-line-45",
+          "start_offset": 3,
+          "end_offset": 32,
+          "quote": "time-secfrac    = \".\" 1*DIGIT"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-044",
+      "split": "test",
+      "question_type": "localization",
+      "question": "请定位 RFC 3339 月份表：April 的 date-mday 最大值是多少？",
+      "answerable": true,
+      "reference_answer": "April (month 04) has a maximum date-mday of 30.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 7,
+          "block_id": "page-7-line-38",
+          "start_offset": 6,
+          "end_offset": 43,
+          "quote": "04            April                30"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-045",
+      "split": "dev",
+      "question_type": "localization",
+      "question": "请定位 NIST SP 800-145 对 measured service 的说明：计量信息为哪两方提供透明度？",
+      "answerable": true,
+      "reference_answer": "Both the provider and consumer of the utilized service.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-30",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "monitored, controlled, and reported, providing transparency for both the provider and"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 5,
+          "block_id": "page-5-line-31",
+          "start_offset": 0,
+          "end_offset": 33,
+          "quote": "consumer of the utilized service."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-046",
+      "split": "test",
+      "question_type": "localization",
+      "question": "请定位 NIST 的 PaaS 定义：消费者控制什么，不管理哪些基础设施？",
+      "answerable": true,
+      "reference_answer": "Consumers control deployed applications and possibly hosting environment configuration, but not underlying networks, servers, operating systems or storage.",
+      "gold": [
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-2",
+          "start_offset": 0,
+          "end_offset": 85,
+          "quote": "not manage or control the underlying cloud infrastructure including network, servers,"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-3",
+          "start_offset": 0,
+          "end_offset": 90,
+          "quote": "operating systems, or storage, but has control over the deployed applications and possibly"
+        },
+        {
+          "source_id": "nist800145",
+          "source_sha256": "7b0c1a9fdfc67218b8ba2098f448c100c27070db91736b3c87fed63bfa21d418",
+          "page_index": 6,
+          "block_id": "page-6-line-4",
+          "start_offset": 0,
+          "end_offset": 63,
+          "quote": "configuration settings for the application-hosting environment."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-047",
+      "split": "dev",
+      "question_type": "localization",
+      "question": "请定位 RFC 2119：作者应解释不遵循规范的什么方面的影响？",
+      "answerable": true,
+      "reference_answer": "Security implications of not following recommendations or requirements.",
+      "gold": [
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-21",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "These terms are frequently used to specify behavior with security"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-22",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "implications.  The effects on security of not implementing a MUST or"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-23",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "SHOULD, or doing something the specification says MUST NOT or SHOULD"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-24",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "NOT be done may be very subtle. Document authors should take the time"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-25",
+          "start_offset": 3,
+          "end_offset": 58,
+          "quote": "to elaborate the security implications of not following"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-26",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "recommendations or requirements as most implementors will not have"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-27",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "had the benefit of the experience and discussion that produced the"
+        },
+        {
+          "source_id": "rfc2119",
+          "source_sha256": "375f9ece2d3df5cf0d6c730cb41af57368b5d0c6739dd0888499477b3b8f2e77",
+          "page_index": 1,
+          "block_id": "page-1-line-28",
+          "start_offset": 3,
+          "end_offset": 17,
+          "quote": "specification."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-public-048",
+      "split": "test",
+      "question_type": "localization",
+      "question": "请定位 RFC 3339 示例：1996-12-19T16:39:57-08:00 对应哪个 UTC timestamp？",
+      "answerable": true,
+      "reference_answer": "1996-12-20T00:39:57Z.",
+      "gold": [
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-30",
+          "start_offset": 6,
+          "end_offset": 31,
+          "quote": "1996-12-19T16:39:57-08:00"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-32",
+          "start_offset": 3,
+          "end_offset": 67,
+          "quote": "This represents 39 minutes and 57 seconds after the 16th hour of"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-33",
+          "start_offset": 3,
+          "end_offset": 65,
+          "quote": "December 19th, 1996 with an offset of -08:00 from UTC (Pacific"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-34",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "Standard Time).  Note that this is equivalent to 1996-12-20T00:39:57Z"
+        },
+        {
+          "source_id": "rfc3339",
+          "source_sha256": "89d2542be9677124de381e083452aa407343cb0d781a0e963cb4543eb0c4d88e",
+          "page_index": 8,
+          "block_id": "page-8-line-35",
+          "start_offset": 3,
+          "end_offset": 10,
+          "quote": "in UTC."
+        }
+      ]
+    }
+  ],
+  "annotation_method": "AI-authored against source PDF text and inspected rendered pages; human review recorded separately. Physical pages are zero-based. Gold spans are sufficient reference passages, not exhaustive alternatives.",
+  "split_policy": "24 dev / 24 test, predetermined distinct questions; same small corpus shared. No performance-based edits. Historical document scope, not current standards advice."
+}

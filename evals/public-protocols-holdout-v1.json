@@ -1,0 +1,925 @@
+{
+  "dataset_id": "public-protocols-holdout-v1",
+  "schema_version": 1,
+  "frozen_at": "2026-09-17T04:51:37.044179+00:00",
+  "sources": [
+    {
+      "source_id": "rfc2606",
+      "filename": "rfc2606.pdf",
+      "canonical_url": "https://www.rfc-editor.org/info/rfc2606/",
+      "text_url": "https://www.rfc-editor.org/rfc/rfc2606.txt",
+      "text_sha256": "b6869c8984701701bc2e6973b6ffc750d497f845cc1a65a106e9301590a13ab0",
+      "sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+      "rendering": "local-rfc-text-courier9-v1; original RFC pages retained; blank page edges trimmed; raw PDFs excluded",
+      "reportlab": "4.5.1",
+      "pages": 5,
+      "chunks": 143,
+      "redistribute_raw": false
+    },
+    {
+      "source_id": "rfc8174",
+      "filename": "rfc8174.pdf",
+      "canonical_url": "https://www.rfc-editor.org/info/rfc8174/",
+      "text_url": "https://www.rfc-editor.org/rfc/rfc8174.txt",
+      "text_sha256": "5ca0e2f90be0bc5928ee465f76518fee316dfa775aed885658a29a419cc293b7",
+      "sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+      "rendering": "local-rfc-text-courier9-v1; original RFC pages retained; blank page edges trimmed; raw PDFs excluded",
+      "reportlab": "4.5.1",
+      "pages": 4,
+      "chunks": 107,
+      "redistribute_raw": false
+    },
+    {
+      "source_id": "rfc7405",
+      "filename": "rfc7405.pdf",
+      "canonical_url": "https://www.rfc-editor.org/info/rfc7405/",
+      "text_url": "https://www.rfc-editor.org/rfc/rfc7405.txt",
+      "text_sha256": "f85c88bcf8ca8035585b39f518adfe274bb095801c95ef665b49a27b61245f17",
+      "sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+      "rendering": "local-rfc-text-courier9-v1; original RFC pages retained; blank page edges trimmed; raw PDFs excluded",
+      "reportlab": "4.5.1",
+      "pages": 4,
+      "chunks": 129,
+      "redistribute_raw": false
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "cw-holdout-001",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 2606 为测试和文档保留了哪四个顶级域名？",
+      "reference_answer": "The four TLDs are .test, .example, .invalid, and .localhost.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-19",
+          "start_offset": 3,
+          "end_offset": 67,
+          "quote": "To safely satisfy these needs, four domain names are reserved as"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-20",
+          "start_offset": 3,
+          "end_offset": 30,
+          "quote": "listed and described below."
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-21",
+          "start_offset": 19,
+          "end_offset": 24,
+          "quote": ".test"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-22",
+          "start_offset": 16,
+          "end_offset": 24,
+          "quote": ".example"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-23",
+          "start_offset": 16,
+          "end_offset": 24,
+          "quote": ".invalid"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-24",
+          "start_offset": 14,
+          "end_offset": 24,
+          "quote": ".localhost"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-002",
+      "split": "test",
+      "question_type": "direct",
+      "question": "按 RFC 2606，.test 推荐用于测试哪类代码？",
+      "reference_answer": "Testing current or new DNS-related code.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-25",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "\".test\" is recommended for use in testing of current or new DNS"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-26",
+          "start_offset": 6,
+          "end_offset": 19,
+          "quote": "related code."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-003",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 2606 中 .example 与 .invalid 的预定用途有什么区别？",
+      "reference_answer": ".example is for documentation/examples; .invalid is for constructing domain names that are certainly and obviously invalid.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-27",
+          "start_offset": 6,
+          "end_offset": 72,
+          "quote": "\".example\" is recommended for use in documentation or as examples."
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-28",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "\".invalid\" is intended for use in online construction of domain"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-29",
+          "start_offset": 6,
+          "end_offset": 68,
+          "quote": "names that are sure to be invalid and which it is obvious at a"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-30",
+          "start_offset": 6,
+          "end_offset": 25,
+          "quote": "glance are invalid."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-004",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 2606 描述 .localhost 传统上具有哪类 DNS 记录、指向什么地址？",
+      "reference_answer": "A statically defined A record pointing to the loopback IP address.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-31",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "The \".localhost\" TLD has traditionally been statically defined in"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-32",
+          "start_offset": 6,
+          "end_offset": 68,
+          "quote": "host DNS implementations as having an A record pointing to the"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-33",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "loop back IP address and is reserved for such use.  Any other use"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-005",
+      "split": "test",
+      "question_type": "localization",
+      "question": "请定位 RFC 2606 第 3 节列出的三个保留示例二级域名。",
+      "reference_answer": "example.com, example.net, and example.org.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 2,
+          "block_id": "page-2-line-1",
+          "start_offset": 8,
+          "end_offset": 19,
+          "quote": "example.com"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 2,
+          "block_id": "page-2-line-2",
+          "start_offset": 8,
+          "end_offset": 19,
+          "quote": "example.net"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 2,
+          "block_id": "page-2-line-3",
+          "start_offset": 8,
+          "end_offset": 19,
+          "quote": "example.org"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-006",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "依据 RFC 2606，本地测试随意使用目前未用的 TLD，为什么可能影响以后访问真实 DNS 数据？",
+      "reference_answer": "The TLD may later enter real global use, and local test versions can thwart attempts to reference the real data.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-7",
+          "start_offset": 3,
+          "end_offset": 64,
+          "quote": "For example, without guidance, a site might set up some local"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-8",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "additional unused top level domains for testing of its local DNS code"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-9",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "and configuration. Later, these TLDs might come into actual use on"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-10",
+          "start_offset": 3,
+          "end_offset": 69,
+          "quote": "the global Internet.  As a result, local attempts to reference the"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-11",
+          "start_offset": 3,
+          "end_offset": 63,
+          "quote": "real data in these zones could be thwarted by the local test"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-12",
+          "start_offset": 3,
+          "end_offset": 70,
+          "quote": "versions.  Or test or example code might be written that accesses a"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-007",
+      "split": "test",
+      "question_type": "direct",
+      "question": "RFC 2606 的 IANA Considerations 记录 IANA 同意采取什么措施？",
+      "reference_answer": "IANA agreed to the four TLD reservations and will reserve them for the indicated uses.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 2,
+          "block_id": "page-2-line-5",
+          "start_offset": 3,
+          "end_offset": 65,
+          "quote": "IANA has agreed to the four top level domain name reservations"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 2,
+          "block_id": "page-2-line-6",
+          "start_offset": 3,
+          "end_offset": 64,
+          "quote": "specified in this document and will reserve them for the uses"
+        },
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 2,
+          "block_id": "page-2-line-7",
+          "start_offset": 3,
+          "end_offset": 13,
+          "quote": "indicated."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-008",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "按 RFC 8174，关键词全大写与未大写时分别按什么含义理解？",
+      "reference_answer": "Only all-capital keywords have the defined special meanings; otherwise they retain their normal English meanings and are unaffected by this document.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-24",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "o  The words have the meanings specified herein only when they are in"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-25",
+          "start_offset": 6,
+          "end_offset": 19,
+          "quote": "all capitals."
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-26",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "o  When these words are not capitalized, they have their normal"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-27",
+          "start_offset": 6,
+          "end_offset": 61,
+          "quote": "English meanings and are not affected by this document."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-009",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "RFC 8174 是否要求规范性文本必须包含 MUST 等关键词才算规范性内容？",
+      "reference_answer": "No. Such keywords are optional; text can still be normative without using them.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-19",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "o  These words can be used as defined here, but using them is not"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-20",
+          "start_offset": 6,
+          "end_offset": 70,
+          "quote": "required.  Specifically, normative text does not require the use"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-21",
+          "start_offset": 6,
+          "end_offset": 68,
+          "quote": "of these key words.  They are used for clarity and consistency"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-22",
+          "start_offset": 6,
+          "end_offset": 70,
+          "quote": "when that is what's wanted, but a lot of normative text does not"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-23",
+          "start_offset": 6,
+          "end_offset": 38,
+          "quote": "use them and is still normative."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-010",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 8174 更新了哪个 RFC，并属于哪个 BCP？",
+      "reference_answer": "It updates RFC 2119 and is part of BCP 14.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 1,
+          "block_id": "page-1-line-25",
+          "start_offset": 3,
+          "end_offset": 67,
+          "quote": "This document updates RFC 2119 by clarifying that only UPPERCASE"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 1,
+          "block_id": "page-1-line-26",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "usage of the key words have the defined special meanings.  This"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 1,
+          "block_id": "page-1-line-27",
+          "start_offset": 3,
+          "end_offset": 30,
+          "quote": "document is part of BCP 14."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-011",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 8174 是否要求 IANA 操作，它是否提出相关安全事项？",
+      "reference_answer": "It requires no IANA actions and is purely procedural with no related security considerations.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 3,
+          "block_id": "page-3-line-2",
+          "start_offset": 3,
+          "end_offset": 51,
+          "quote": "This document does not require any IANA actions."
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 3,
+          "block_id": "page-3-line-4",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "This document is purely procedural; there are no related security"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 3,
+          "block_id": "page-3-line-5",
+          "start_offset": 3,
+          "end_offset": 18,
+          "quote": "considerations."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-012",
+      "split": "test",
+      "question_type": "direct",
+      "question": "RFC 8174 建议的声明引用哪两份 RFC，并在什么大小写条件下解释关键词？",
+      "reference_answer": "BCP 14 cites RFC 2119 and RFC 8174, when and only when the keywords appear in all capitals.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-30",
+          "start_offset": 6,
+          "end_offset": 67,
+          "quote": "The key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-31",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "NOT\", \"SHOULD\", \"SHOULD NOT\", \"RECOMMENDED\", \"NOT RECOMMENDED\","
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-32",
+          "start_offset": 6,
+          "end_offset": 69,
+          "quote": "\"MAY\", and \"OPTIONAL\" in this document are to be interpreted as"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-33",
+          "start_offset": 6,
+          "end_offset": 71,
+          "quote": "described in BCP 14 [RFC2119] [RFC8174] when, and only when, they"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-34",
+          "start_offset": 6,
+          "end_offset": 44,
+          "quote": "appear in all capitals, as shown here."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-013",
+      "split": "test",
+      "question_type": "direct",
+      "question": "RFC 7405 的 ABNF 字符串前缀 %s 和 %i 分别表示什么？",
+      "reference_answer": "%s means case-sensitive; %i means case-insensitive.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-13",
+          "start_offset": 9,
+          "end_offset": 38,
+          "quote": "%s          =  case-sensitive"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-14",
+          "start_offset": 9,
+          "end_offset": 40,
+          "quote": "%i          =  case-insensitive"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-014",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "按 RFC 7405，不带前缀的 ABNF 字符串是否区分大小写，等价于哪个前缀？",
+      "reference_answer": "It is case-insensitive and equivalent to the %i prefix, preserving prior behavior.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-15",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "To be consistent with prior implementations of ABNF, having no prefix"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-16",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "means that the string is case insensitive and is equivalent to having"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-17",
+          "start_offset": 3,
+          "end_offset": 19,
+          "quote": "the \"%i\" prefix."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-015",
+      "split": "test",
+      "question_type": "boundary",
+      "question": "依据 RFC 7405，规则 %s\"aBc\" 能匹配 abc 或 ABC 吗？它只匹配什么？",
+      "reference_answer": "No. It matches only aBc, not abc or ABC.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-25",
+          "start_offset": 9,
+          "end_offset": 27,
+          "quote": "rulename = %s\"aBc\""
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-26",
+          "start_offset": 3,
+          "end_offset": 71,
+          "quote": "will match only \"aBc\" and will not match \"abc\", \"Abc\", \"abC\", \"ABc\","
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-27",
+          "start_offset": 3,
+          "end_offset": 26,
+          "quote": "\"aBC\", \"AbC\", or \"ABC\"."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-016",
+      "split": "test",
+      "question_type": "direct",
+      "question": "RFC 7405 说明旧 ABNF 怎样表达区分大小写的字符串，为什么需要改进？",
+      "reference_answer": "Using numeric representations of individual characters, which is inconvenient and error-prone to write and read.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 1,
+          "block_id": "page-1-line-13",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "in some situations, case-sensitive matching of string literals is"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 1,
+          "block_id": "page-1-line-14",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "needed.  Literals for case-sensitive matching must be specified using"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 1,
+          "block_id": "page-1-line-15",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "the numeric representation of those characters, which is inconvenient"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 1,
+          "block_id": "page-1-line-16",
+          "start_offset": 3,
+          "end_offset": 42,
+          "quote": "and error prone both to write and read."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-017",
+      "split": "test",
+      "question_type": "direct",
+      "question": "RFC 7405 的 literal text strings 使用哪个字符集？",
+      "reference_answer": "US-ASCII.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-8",
+          "start_offset": 3,
+          "end_offset": 51,
+          "quote": "The character set for these strings is US-ASCII."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-018",
+      "split": "test",
+      "question_type": "multi_evidence",
+      "question": "RFC 7405 示例中 %d97 %d98 %d99 与 %x61.62.63 都只匹配哪个字符串？",
+      "reference_answer": "They both match only the lowercase string abc.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 3,
+          "block_id": "page-3-line-2",
+          "start_offset": 9,
+          "end_offset": 38,
+          "quote": "rulename    =  %d97 %d98 %d99"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 3,
+          "block_id": "page-3-line-4",
+          "start_offset": 9,
+          "end_offset": 34,
+          "quote": "rulename    =  %x61.62.63"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 3,
+          "block_id": "page-3-line-5",
+          "start_offset": 3,
+          "end_offset": 63,
+          "quote": "will match only the string that comprises only the lowercase"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 3,
+          "block_id": "page-3-line-6",
+          "start_offset": 3,
+          "end_offset": 68,
+          "quote": "characters, abc.  Using a literal text string with a prefix has a"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-019",
+      "split": "test",
+      "question_type": "cross_document",
+      "question": "分别依据 RFC 2606 和 RFC 7405：文档示例推荐哪个 TLD，区分大小写的字符串用哪个前缀？",
+      "reference_answer": "Use .example for documentation/examples, and %s for case-sensitive string matching.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc2606",
+          "source_sha256": "583dcae5d3f2081574df10692f28eb2a0cfbed35f2858b88856a2053971d7274",
+          "page_index": 1,
+          "block_id": "page-1-line-27",
+          "start_offset": 6,
+          "end_offset": 72,
+          "quote": "\".example\" is recommended for use in documentation or as examples."
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-13",
+          "start_offset": 9,
+          "end_offset": 38,
+          "quote": "%s          =  case-sensitive"
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-020",
+      "split": "test",
+      "question_type": "cross_document",
+      "question": "分别依据 RFC 8174 和 RFC 7405：未大写关键词如何解释，不带前缀的 ABNF 字符串如何匹配？",
+      "reference_answer": "Non-capitalized keywords have normal English meanings; unprefixed ABNF strings use case-insensitive matching equivalent to %i.",
+      "answerable": true,
+      "gold": [
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-26",
+          "start_offset": 3,
+          "end_offset": 66,
+          "quote": "o  When these words are not capitalized, they have their normal"
+        },
+        {
+          "source_id": "rfc8174",
+          "source_sha256": "3900e70e0670fecd80213d4d1dbb1c5eb112b2c4f87083429f991c8968f93246",
+          "page_index": 2,
+          "block_id": "page-2-line-27",
+          "start_offset": 6,
+          "end_offset": 61,
+          "quote": "English meanings and are not affected by this document."
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-15",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "To be consistent with prior implementations of ABNF, having no prefix"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-16",
+          "start_offset": 3,
+          "end_offset": 72,
+          "quote": "means that the string is case insensitive and is equivalent to having"
+        },
+        {
+          "source_id": "rfc7405",
+          "source_sha256": "c421ff953a6ba43ef321e642db44301ec3552fdb44114c6c03a36d77abc1e5f7",
+          "page_index": 2,
+          "block_id": "page-2-line-17",
+          "start_offset": 3,
+          "end_offset": 19,
+          "quote": "the \"%i\" prefix."
+        }
+      ]
+    },
+    {
+      "case_id": "cw-holdout-021",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "仅依据这些 RFC，example.com 在 2026 年 9 月 17 日实际解析到哪个 IPv6 地址？",
+      "reference_answer": "The documents do not provide a live 2026 DNS resolution result.",
+      "answerable": false,
+      "gold": []
+    },
+    {
+      "case_id": "cw-holdout-022",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "这些 RFC 为生产递归 DNS 服务指定的运维管理员登录密码是什么？",
+      "reference_answer": "The documents contain no production administrator password.",
+      "answerable": false,
+      "gold": []
+    },
+    {
+      "case_id": "cw-holdout-023",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "仅依据 RFC 7405，它指定使用哪个 Python 库实现 ABNF 解析器？",
+      "reference_answer": "RFC 7405 specifies syntax rather than a required Python implementation library.",
+      "answerable": false,
+      "gold": []
+    },
+    {
+      "case_id": "cw-holdout-024",
+      "split": "test",
+      "question_type": "unanswerable",
+      "question": "仅依据 RFC 8174，它为违规使用小写 must 的作者规定了多少元罚款？",
+      "reference_answer": "The RFC provides capitalization interpretation rules, not a monetary fine.",
+      "answerable": false,
+      "gold": []
+    }
+  ],
+  "split_policy": "New documents/questions. Test-only procedural holdout; no results may be opened before final candidate source freeze. Old public-standards Test is regression-only.",
+  "provenance": "AI-authored reference answers checked against literal official RFC text and local PDF spans. No human-independent adjudication or independent annotation is claimed. Same RFC genre and model pretraining familiarity limit generalization. Original notices retained in local PDFs; raw text/PDF files are excluded from public candidate."
+}

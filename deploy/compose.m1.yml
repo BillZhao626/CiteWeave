@@ -1,0 +1,62 @@
+# Reuses only CiteWeave's own M0 volumes via the same project name.
+name: citeweave-m0
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/app.Dockerfile
+    image: citeweave-m1:local
+    environment:
+      CW_DATABASE_URL: postgresql://citeweave:${CW_DB_PASSWORD}@postgres:5432/citeweave
+      CW_ADMIN_TOKEN: ${CW_ADMIN_TOKEN:?Run bootstrap}
+      CW_BROKER_URL: redis://broker:6379/0
+      CW_QDRANT_URL: http://qdrant:6333
+      CW_MODEL_URL: http://host.docker.internal:18081
+      CW_BLOB_ROOT: /app/blobs
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      CW_DEEPSEEK_MODEL: ${CW_DEEPSEEK_MODEL:-deepseek-flash}
+      CW_MONTHLY_BUDGET_YUAN: ${CW_MONTHLY_BUDGET_YUAN:-50}
+      CW_QUERY_DEADLINE_SECONDS: ${CW_QUERY_DEADLINE_SECONDS:-45}
+      CW_PROVIDER_ATTEMPTS: ${CW_PROVIDER_ATTEMPTS:-2}
+      CW_MODEL_ATTEMPTS: ${CW_MODEL_ATTEMPTS:-2}
+      CW_RETRY_BACKOFF_SECONDS: ${CW_RETRY_BACKOFF_SECONDS:-0.5}
+      CW_BREAKER_THRESHOLD: ${CW_BREAKER_THRESHOLD:-3}
+      CW_BREAKER_COOLDOWN_SECONDS: ${CW_BREAKER_COOLDOWN_SECONDS:-20}
+    volumes: ["../.runtime/blobs:/app/blobs"]
+    ports: ["127.0.0.1:18080:8000"]
+    command: ["uvicorn", "citeweave.api:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    mem_limit: 384m
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=3)"]
+      interval: 5s
+      retries: 12
+  m1-worker:
+    image: citeweave-m1:local
+    environment:
+      CW_DATABASE_URL: postgresql://citeweave:${CW_DB_PASSWORD}@postgres:5432/citeweave
+      CW_ADMIN_TOKEN: ${CW_ADMIN_TOKEN:?Run bootstrap}
+      CW_BROKER_URL: redis://broker:6379/0
+      CW_QDRANT_URL: http://qdrant:6333
+      CW_MODEL_URL: http://host.docker.internal:18081
+      CW_BLOB_ROOT: /app/blobs
+      CW_ENABLE_FAULTS: ${CW_ENABLE_FAULTS:-false}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      CW_DEEPSEEK_MODEL: ${CW_DEEPSEEK_MODEL:-deepseek-flash}
+      CW_MONTHLY_BUDGET_YUAN: ${CW_MONTHLY_BUDGET_YUAN:-50}
+      CW_FAULT_ROOT: /app/faults
+      CW_QUERY_DEADLINE_SECONDS: ${CW_QUERY_DEADLINE_SECONDS:-45}
+      CW_PROVIDER_ATTEMPTS: ${CW_PROVIDER_ATTEMPTS:-2}
+      CW_MODEL_ATTEMPTS: ${CW_MODEL_ATTEMPTS:-2}
+      CW_RETRY_BACKOFF_SECONDS: ${CW_RETRY_BACKOFF_SECONDS:-0.5}
+      CW_BREAKER_THRESHOLD: ${CW_BREAKER_THRESHOLD:-3}
+      CW_BREAKER_COOLDOWN_SECONDS: ${CW_BREAKER_COOLDOWN_SECONDS:-20}
+    volumes: ["../.runtime/blobs:/app/blobs", "../.runtime/faults:/app/faults"]
+    command: ["python", "-m", "citeweave.worker_runtime"]
+    mem_limit: 512m
+    depends_on:
+      api: {condition: service_healthy}
+      broker: {condition: service_started}
+      qdrant: {condition: service_started}
+    restart: unless-stopped

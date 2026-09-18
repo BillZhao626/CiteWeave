@@ -1,0 +1,52 @@
+[project]
+name = "citeweave-rag"
+version = "0.3.0a1"
+license = "MIT"
+description = "Evidence-bound retrieval engine - independent implementation"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "pydantic>=2.10,<3",
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.30,<1",
+  "sqlalchemy>=2.0,<2.1",
+  "psycopg[binary]>=3.2,<4",
+  "celery[redis]>=5.5,<6",
+  "qdrant-client==1.16.2",
+  "httpx>=0.27,<1",
+  "numpy>=2,<3",
+  "jieba==0.42.1",
+  "pdfplumber>=0.11,<1",
+  "alembic>=1.20.0",
+  "pydantic-settings>=2.15.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "reportlab>=4,<5", "pdfplumber>=0.11,<1", "pypdf>=5,<7", "pypdfium2>=4,<6", "psutil>=6,<8"]
+
+[project.optional-dependencies]
+models = ["sentence-transformers>=3,<6", "huggingface-hub>=0.28,<2"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/citeweave"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = ["integration: needs isolated CiteWeave services"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# Experiment processes must configure model cache / DB environment before third-party imports.
+"experiments/model_download.py" = ["E402"]
+"experiments/p02_models.py" = ["E402"]
+"experiments/p03_recovery.py" = ["E402"]

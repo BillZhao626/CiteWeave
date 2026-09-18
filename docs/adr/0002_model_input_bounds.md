@@ -1,0 +1,3 @@
+# 0002 · M1 model input bounds
+
+M0 measured reranker at 256 tokens on short original fixtures. A real query plus a 160-codepoint chunk can exceed that window. Silent tokenizer truncation would obscure which text was scored. Alternatives: truncate, split all evidence further, or raise only pair length. M1 uses a 512-token pair cap, checks tokenizer length, and explicitly fails overflow. Embedding remains 256 tokens / 384 dimensions and M0 BM25/RRF math is unchanged. Both model revisions remain fixed. This is a declared execution-profile change, not a new benchmark result; M0 latency figures must not be attributed to M1. Models share one authenticated GPU gateway and concurrency slot. Future CPU/remote adapters must retain these input contracts or declare a new profile.

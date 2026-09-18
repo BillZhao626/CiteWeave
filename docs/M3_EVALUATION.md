@@ -1,0 +1,15 @@
+# M3 evaluation workflow
+
+Use [the benchmark report](M3_BENCHMARK.md) for actual results and [the frozen dataset](../evals/public-standards-v1.json) for source URLs, hashes, questions and finite-gold spans. The two supplied Dev review assets remain byte-identical and belong only to M2 run `a32e838b-b5c2-4a6c-b8e7-7aabf2e8f944`. Their provenance is owner-submitted AI-assisted material review. No candidate or Test labels are inferred from them.
+
+For a fresh installation, download the three source PDFs with `scripts/fetch_eval_corpus.py`, upload them into one knowledge base under their applicable permission, and wait for READY. The source hashes must match exactly. There must be exactly one active matching version for each source. Raw PDFs remain in ignored runtime storage and are not part of the source archive. See [source notices](DATA_NOTICES.md).
+
+Run Dev using `scripts/evaluate.py --kb <id> --split dev`. The default is selected C2/Judge v4. Persist the returned EvalRun ID; after terminal interruption use `--resume <id>`. The existing worker recovers durable cases. Unknown interrupted charges stay reserved and are not silently reissued. Artifacts are exported under `.runtime/evaluation/runs/<id>/`.
+
+Compare completed runs with the UI or `scripts/compare_m3.py --baseline <id> --candidate <id> --name <report-name>`. The comparison contains aggregate retrieval/answer/citation metrics, per-case answers and final evidence, wins/ties/losses/unavailable, latency and cost. Inspector provides each stage's ranks and real reranker membership. Rejudging a historical run uses `--replay-source <id>` with its original query profile and a versioned rubric, creating a separate record.
+
+Attribution is nonexclusive. Zero initial finite-gold coverage differs from partial coverage. Candidate loss means gold left between initial recall and actual reranker input; selection loss means it left before final evidence. Generation error requires reviewed sufficient context, not simply one gold hit. Semantic support compares factual sentence units to their own citations; physical grounding reparses immutable PDF text and boxes. Citation finite-gold precision/recall are not semantic precision/recall.
+
+Every candidate requires a prior hypothesis and one controlled change. The M3 journal records three candidates and one C2 verification repeat. `scripts/freeze_m3.py` sealed selected source/config/lock/prompt hashes after full gates; subsequent invocations verify without overwriting. The single formal Test comparison is recorded separately. Do not use these Test cases to tune a next iteration; create a new independently frozen test set if new quality development is authorized.
+
+Public comparison reports deliberately keep failures. Test baseline Judge 016 and candidate Judge 024/046 failed attachment-support validation; no repair/resampling hid them. `m3-selected-test.json` reports 3 unavailable paired cases. Score means exclude unavailable values and expose denominators; sensitivity bounds in the benchmark show the possible missing-score range. Scores from this small shared corpus cannot establish general RAG accuracy or broad Judge accuracy.

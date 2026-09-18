@@ -1,0 +1,182 @@
+{
+  "$defs": {
+    "Box": {
+      "additionalProperties": false,
+      "properties": {
+        "page_index": {
+          "minimum": 0,
+          "title": "Page Index",
+          "type": "integer"
+        },
+        "left": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Left",
+          "type": "number"
+        },
+        "top": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Top",
+          "type": "number"
+        },
+        "right": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Right",
+          "type": "number"
+        },
+        "bottom": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Bottom",
+          "type": "number"
+        }
+      },
+      "required": [
+        "page_index",
+        "left",
+        "top",
+        "right",
+        "bottom"
+      ],
+      "title": "Box",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "kb_id": {
+          "format": "uuid",
+          "title": "Kb Id",
+          "type": "string"
+        },
+        "revision_id": {
+          "format": "uuid",
+          "title": "Revision Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "kb_id",
+        "revision_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    },
+    "TableCell": {
+      "additionalProperties": false,
+      "properties": {
+        "table_id": {
+          "minLength": 1,
+          "title": "Table Id",
+          "type": "string"
+        },
+        "row_index": {
+          "minimum": 0,
+          "title": "Row Index",
+          "type": "integer"
+        },
+        "column_index": {
+          "minimum": 0,
+          "title": "Column Index",
+          "type": "integer"
+        },
+        "row_header": {
+          "minLength": 1,
+          "title": "Row Header",
+          "type": "string"
+        },
+        "column_header": {
+          "minLength": 1,
+          "title": "Column Header",
+          "type": "string"
+        }
+      },
+      "required": [
+        "table_id",
+        "row_index",
+        "column_index",
+        "row_header",
+        "column_header"
+      ],
+      "title": "TableCell",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "block_id": {
+      "title": "Block Id",
+      "type": "string"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    },
+    "locator_kind": {
+      "default": "paragraph",
+      "enum": [
+        "paragraph",
+        "pdf_bbox",
+        "table_cells"
+      ],
+      "title": "Locator Kind",
+      "type": "string"
+    },
+    "boxes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Box"
+      },
+      "title": "Boxes",
+      "type": "array"
+    },
+    "char_boxes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Box"
+      },
+      "title": "Char Boxes",
+      "type": "array"
+    },
+    "table_cell": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TableCell"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "normalizer_revision": {
+      "default": "literal-codepoints-v1",
+      "title": "Normalizer Revision",
+      "type": "string"
+    }
+  },
+  "required": [
+    "scope",
+    "source_sha256",
+    "block_id",
+    "text"
+  ],
+  "title": "Block",
+  "type": "object"
+}

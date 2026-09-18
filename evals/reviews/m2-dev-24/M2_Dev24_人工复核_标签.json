@@ -1,0 +1,221 @@
+{
+  "dataset_sha256": "3769061016dc8b6ec0009a03e6510fa0722e437a60f10e5011799f1a32c16476",
+  "run_id": "a32e838b-b5c2-4a6c-b8e7-7aabf2e8f944",
+  "split": "dev",
+  "review_schema": {
+    "conclusion_enum": [
+      "正确完整",
+      "部分正确",
+      "错误或不当拒答",
+      "无法判断"
+    ],
+    "evidence_support_enum": [
+      "充分",
+      "部分",
+      "不支持",
+      "无事实断言",
+      "无法判断"
+    ],
+    "citation_location_enum": [
+      "通过",
+      "不通过",
+      "无引用",
+      "未检查"
+    ]
+  },
+  "provenance": "assistant-assisted material review using the project's human-review rubric; project owner confirmation required before claiming independent human annotation",
+  "reviews": [
+    {
+      "case_id": "001",
+      "human_review": "错误或不当拒答",
+      "reason": "RFC 2119 原文明确给出 MUST、REQUIRED、SHALL 表示规范的绝对要求；系统完全拒答，未覆盖核心答案。实际 Final Evidence 只取到定义的前半行，说明更像证据组装/切片覆盖不足导致的不当拒答。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "003",
+      "human_review": "错误或不当拒答",
+      "reason": "实际证据 E1 已说明该项 truly optional、供应商可选择 include，E4 又明确 another vendor may omit；现有证据已足以回答“可以不实现”，系统仍完全拒答。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "005",
+      "human_review": "正确完整",
+      "reason": "回答正确说明 Z 表示 UTC，且等价于 +00:00，覆盖了问题核心。参考答案中的 Zulu 是补充称呼，并非题目必须回答项。",
+      "evidence_support": "充分",
+      "citation_location": "通过",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "007",
+      "human_review": "错误或不当拒答",
+      "reason": "E3 给出 automatically without requiring human，E1 给出 interaction with each service provider；两条合起来已足以回答“不需要逐次与服务提供商人员交互”，系统仍拒答。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "009",
+      "human_review": "错误或不当拒答",
+      "reason": "RFC 3339 原文明确规定 Internet Protocols MUST generate four digit years。系统拒答，未回答“四位”。本次 Final Evidence 几乎只有页眉，主要暴露检索/证据覆盖失败。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "011",
+      "human_review": "部分正确",
+      "reason": "回答正确识别了 Unknown Local Offset Convention，并指出它与 Z/+00:00 语义不同；但题目最关键的具体 offset“-00:00”没有回答，因此核心信息缺失。现有 Final Evidence 也确实没有包含“-00:00”那一行。",
+      "evidence_support": "部分",
+      "citation_location": "通过",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "013",
+      "human_review": "错误或不当拒答",
+      "reason": "原文可明确区分 MUST 与 SHOULD，并要求忽略 SHOULD 前理解并权衡全部影响；系统完全拒答。Final Evidence 只包含零散定义前缀，说明主要是证据覆盖/组装问题。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "015",
+      "human_review": "错误或不当拒答",
+      "reason": "原文明确：IaaS 用户可控制操作系统，而 SaaS 用户不管理底层操作系统。系统未回答任何一侧差异。Final Evidence 只有服务模型标题和被截断片段，未完整覆盖关键事实。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "017",
+      "human_review": "错误或不当拒答",
+      "reason": "原文明确给出闰年 366 天、通常可被 4 整除，世纪年还需可被 400 整除。系统完全拒答。Final Evidence 只覆盖了定义和规则开头，未带入完整世纪年条件。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "019",
+      "human_review": "错误或不当拒答",
+      "reason": "原文分别明确说明资源池化为多个消费者动态分配共享资源、快速弹性按需求向外/向内伸缩；系统完全拒答。本次 Final Evidence 基本没有命中对应定义，属于明显证据召回/选择失败。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "021",
+      "human_review": "错误或不当拒答",
+      "reason": "问题需要结合 RFC 3339 的四位年份 MUST 与 RFC 2119 对 MUST 的定义，结论应为绝对要求。系统完全拒答；Final Evidence 虽有零散 MUST 片段，但没有把两份文档的完整关键证据同时带入。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "023",
+      "human_review": "错误或不当拒答",
+      "reason": "两问均可由文档直接回答：RFC 3339 讨论时刻而非区间，NIST 描述三种服务模型。系统完全拒答；Final Evidence 只有文档页眉和“Service Models:”标题，未覆盖关键内容。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "025",
+      "human_review": "错误或不当拒答",
+      "reason": "两项事实均在原文明确存在：RFC 3339 小时上限 23，NIST 有四种部署模型。系统完全拒答，且 Final Evidence 没有带入对应定义，属于跨文档证据覆盖失败。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "027",
+      "human_review": "正确完整",
+      "reason": "三份文档都没有 2026 年 DeepSeek API 输出 token 价格，系统在文档证据边界内拒答，符合题意，也没有引入外部知识。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "029",
+      "human_review": "正确完整",
+      "reason": "NIST SP 800-145 不提供云厂商 GPU 实例价格比较，正确行为就是拒答；系统没有猜测或使用文档外信息。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "031",
+      "human_review": "正确完整",
+      "reason": "RFC 2119 不规定 Web 服务器内存容量，系统正确拒答，没有无依据补充数值。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "033",
+      "human_review": "正确完整",
+      "reason": "三份 PDF 不包含 CiteWeave 管理员密码，系统正确拒答，并未尝试从文档外或运行环境推测敏感凭据。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "035",
+      "human_review": "正确完整",
+      "reason": "核心结论“不允许小时写成 24”与 RFC 3339 一致，也正确区分了 ISO 8601 与 RFC 3339 profile。回答已覆盖用户要求。",
+      "evidence_support": "部分",
+      "citation_location": "通过",
+      "gold_issue": "未发现；但当前 E2 片段只包含规则前半句，没有包含“00–23”下一行，因此语义证据展示不够完整"
+    },
+    {
+      "case_id": "037",
+      "human_review": "错误或不当拒答",
+      "reason": "原文明示消费者通常不知道精确位置，但可在更高抽象层指定国家、州或数据中心，因此答案应为“不禁止”。系统完全拒答；Final Evidence 只取到了 location 句子的开头。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "039",
+      "human_review": "错误或不当拒答",
+      "reason": "RFC 3339 明确说明字符串排序成立需要相同时区表示、相同小数秒位数且不能有可选标点，因此不能无条件替代时间排序。系统完全拒答，Final Evidence 没有命中相关段落。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "041",
+      "human_review": "错误或不当拒答",
+      "reason": "NIST 对 public cloud 明确允许由商业、学术、政府组织或其组合拥有、管理、运营，因此“不要求所有云都由商业公司拥有”。系统完全拒答；Final Evidence 仅出现被截断的 owned 片段，未形成完整支持。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "043",
+      "human_review": "正确完整",
+      "reason": "回答准确给出 ABNF `time-secfrac = \".\" 1*DIGIT`，并正确解释为小数点后至少 1 位数字；E1 直接支持结论。",
+      "evidence_support": "充分",
+      "citation_location": "通过",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "045",
+      "human_review": "错误或不当拒答",
+      "reason": "原文明确说 measured service 的计量信息为所使用服务的 provider 与 consumer 双方提供透明度。系统完全拒答；Final Evidence 只带入 measured service 定义开头，没有包含关键两方。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    },
+    {
+      "case_id": "047",
+      "human_review": "错误或不当拒答",
+      "reason": "RFC 2119 明确要求作者解释不遵循建议或要求的安全影响。系统完全拒答，且 Final Evidence 未召回该安全影响段落。",
+      "evidence_support": "无事实断言",
+      "citation_location": "无引用",
+      "gold_issue": "未发现"
+    }
+  ]
+}

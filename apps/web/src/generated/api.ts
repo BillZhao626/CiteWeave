@@ -625,6 +625,20 @@ export interface components {
             /** Bottom */
             bottom: number;
         };
+        /** BranchHit */
+        BranchHit: {
+            /**
+             * Branch
+             * @enum {string}
+             */
+            branch: "dense" | "bm25";
+            /** Rank */
+            rank: number;
+            /** Raw Score */
+            raw_score: number;
+            /** Score Scope */
+            score_scope: string;
+        };
         /** ChildView */
         ChildView: {
             /**
@@ -850,7 +864,7 @@ export interface components {
              * @default m3-context
              * @enum {string}
              */
-            profile: "m2" | "m3-dedup" | "m3-context" | "m3-answer" | "m3-candidates40" | "m3-parent" | "m3-bge-dense";
+            profile: "m2" | "m3-dedup" | "m3-context" | "m3-answer" | "m3-candidates40" | "m3-parent" | "m3-bge-dense" | "telecom-structural-v1";
             /**
              * Judge Profile
              * @default judge-v4
@@ -859,6 +873,53 @@ export interface components {
             judge_profile: "judge-v1" | "judge-v2" | "judge-v3" | "judge-v4";
             /** Replay Source */
             replay_source?: string | null;
+        };
+        /** EvidencePack */
+        EvidencePack: {
+            /**
+             * Revision
+             * @default evidence-pack-v1
+             * @constant
+             */
+            revision: "evidence-pack-v1";
+            /**
+             * Token Proxy
+             * @default context-bge-token-proxy-v1
+             * @constant
+             */
+            token_proxy: "context-bge-token-proxy-v1";
+            /**
+             * Evidence Mode
+             * @enum {string}
+             */
+            evidence_mode: "single" | "compare";
+            /** Spans */
+            spans: components["schemas"]["PackSpan"][];
+            /** Seed Child Ids */
+            seed_child_ids: string[];
+            source_coverage: components["schemas"]["SourceCoverage"];
+            /** Degraded */
+            degraded?: "degraded_reranker_unavailable" | null;
+            /** Fallback Reason */
+            fallback_reason?: string | null;
+            /** Seed Chars */
+            seed_chars: number;
+            /** Seed Spans */
+            seed_spans: number;
+            /** Seed Tokens */
+            seed_tokens: number;
+            /** Added Chars */
+            added_chars: number;
+            /** Serialized Chars */
+            serialized_chars: number;
+            /** Serialized Tokens */
+            serialized_tokens: number;
+            /** Prompt Json */
+            prompt_json: string;
+            /** Decisions */
+            decisions: {
+                [key: string]: unknown;
+            }[];
         };
         /** EvidenceSpan */
         EvidenceSpan: {
@@ -1088,6 +1149,34 @@ export interface components {
              */
             created_at: string;
         };
+        /** PackSpan */
+        PackSpan: {
+            /** Label */
+            label: string;
+            /** Evidence Id */
+            evidence_id: string;
+            /** Document Id */
+            document_id: string;
+            /** Version Id */
+            version_id: string;
+            /** Parent Id */
+            parent_id: string;
+            /** Seed Child Id */
+            seed_child_id: string;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "seed" | "heading" | "sibling";
+            /** Cross Page */
+            cross_page: boolean;
+            /** Budget Before */
+            budget_before: number;
+            /** Budget After */
+            budget_after: number;
+            /** Covered By */
+            covered_by?: string[];
+        };
         /** QueryCreate */
         QueryCreate: {
             /**
@@ -1102,7 +1191,38 @@ export interface components {
              * @default m3-context
              * @enum {string}
              */
-            profile: "m2" | "m3-dedup" | "m3-context" | "m3-answer" | "m3-candidates40" | "m3-parent" | "m3-bge-dense";
+            profile: "m2" | "m3-dedup" | "m3-context" | "m3-answer" | "m3-candidates40" | "m3-parent" | "m3-bge-dense" | "telecom-structural-v1";
+            /**
+             * Evidence Mode
+             * @default auto
+             * @enum {string}
+             */
+            evidence_mode: "auto" | "single" | "compare";
+            /** Document Ids */
+            document_ids?: string[] | null;
+        };
+        /** RerankerRanking */
+        RerankerRanking: {
+            /** Input Rank */
+            input_rank: number;
+            /** Output Rank */
+            output_rank?: number | null;
+            /** Score */
+            score: number;
+            /** Model */
+            model: {
+                [key: string]: string;
+            };
+            /** Pair Tokens */
+            pair_tokens: number;
+            /** Body Tokens */
+            body_tokens: number;
+            /** Query Tokens */
+            query_tokens: number;
+            /** Queue Ms */
+            queue_ms: number;
+            /** Inference Ms */
+            inference_ms: number;
         };
         /** Rollback */
         Rollback: {
@@ -1131,6 +1251,14 @@ export interface components {
             kb_id: string;
             /** Question */
             question: string;
+            /**
+             * Trace Schema Revision
+             * @default legacy-v1
+             * @enum {string}
+             */
+            trace_schema_revision: "legacy-v1" | "structural-trace-v1";
+            structural_snapshot?: components["schemas"]["StructuralSnapshot"] | null;
+            evidence_pack?: components["schemas"]["EvidencePack"] | null;
             /** Status */
             status: string;
             /** Versions */
@@ -1185,6 +1313,8 @@ export interface components {
              * @constant
              */
             actual_charge: "unavailable";
+            /** Structural Candidates */
+            readonly structural_candidates: components["schemas"]["StructuralCandidate"][] | null;
         };
         /** RunSummary */
         RunSummary: {
@@ -1230,6 +1360,19 @@ export interface components {
              */
             revision_id: string;
         };
+        /** SourceCoverage */
+        SourceCoverage: {
+            /** Requested */
+            requested: string[];
+            /** Eligible */
+            eligible: string[];
+            /** Selected */
+            selected: string[];
+            /** Missing */
+            missing: string[];
+            /** Coverage Unmet */
+            coverage_unmet: boolean;
+        };
         /** StreamEvent */
         StreamEvent: {
             /**
@@ -1254,6 +1397,111 @@ export interface components {
             answer?: components["schemas"]["Answer"] | null;
             /** Code */
             code?: string | null;
+        };
+        /** StructuralBinding */
+        StructuralBinding: {
+            /** Document Id */
+            document_id: string;
+            /** Version Id */
+            version_id: string;
+            /** Filename */
+            filename: string;
+            /** Source Sha256 */
+            source_sha256: string;
+            /** Artifact Id */
+            artifact_id: string;
+            /** Canonical Sha */
+            canonical_sha: string;
+            /** Tree Hash */
+            tree_hash: string;
+            /** Membership Hash */
+            membership_hash: string;
+            /** Index Name */
+            index_name: string;
+            /**
+             * Unit Kind
+             * @default structural_child
+             * @constant
+             */
+            unit_kind: "structural_child";
+            /** Index Profile Hash */
+            index_profile_hash: string;
+            /** Bm25 Hash */
+            bm25_hash: string;
+            /** Embedding Identity */
+            embedding_identity: {
+                [key: string]: unknown;
+            };
+            /** Tokenizers */
+            tokenizers: {
+                [key: string]: unknown;
+            };
+        };
+        /** StructuralCandidate */
+        StructuralCandidate: {
+            /** Candidate Id */
+            candidate_id: string;
+            /** Child Id */
+            child_id: string;
+            /** Document Id */
+            document_id: string;
+            /** Version Id */
+            version_id: string;
+            /** Artifact Id */
+            artifact_id: string;
+            /** Parent Id */
+            parent_id: string;
+            /** Section Path */
+            section_path: {
+                [key: string]: unknown;
+            }[];
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Retrieval */
+            retrieval: components["schemas"]["BranchHit"][];
+            /** Rrf Rank */
+            rrf_rank: number;
+            /** Rrf Score */
+            rrf_score: number;
+            /**
+             * Pool Reason
+             * @enum {string}
+             */
+            pool_reason: "top20" | "outside_pool";
+            bge?: components["schemas"]["RerankerRanking"] | null;
+            /** Seed Rank */
+            seed_rank?: number | null;
+            /**
+             * Selection Reason
+             * @default outside_pool
+             */
+            selection_reason: string;
+        };
+        /** StructuralSnapshot */
+        StructuralSnapshot: {
+            /**
+             * Revision
+             * @default structural-trace-v1
+             * @constant
+             */
+            revision: "structural-trace-v1";
+            /** Workspace Id */
+            workspace_id: string;
+            /** Kb Id */
+            kb_id: string;
+            /**
+             * Evidence Mode
+             * @enum {string}
+             */
+            evidence_mode: "single" | "compare";
+            /** Requested Documents */
+            requested_documents: string[];
+            /** Bindings */
+            bindings: components["schemas"]["StructuralBinding"][];
+            /** Query Tokens */
+            query_tokens: {
+                [key: string]: unknown;
+            };
         };
         /** SystemStatus */
         SystemStatus: {

@@ -26,6 +26,17 @@ def runtime_config(profile=DEFAULT_PROFILE):
     revision = query_profile(profile)
     prompt = revision["answer_prompt"]
     embedding_override = {}
+    base_profile = PROFILE
+    target = revision.get("unit_kind") == "structural_child"
+    if target:
+        base_profile = dict(
+            PROFILE,
+            pipeline="pdf-structure-e5-child-v1",
+            unit_kind="structural_child",
+            chunk_chars=960,
+            bm25_scope="index_build",
+            evidence_limit=96,
+        )
     if revision.get("embedding_key"):
         from citeweave.embeddings import embedding_identity
 
@@ -38,8 +49,8 @@ def runtime_config(profile=DEFAULT_PROFILE):
         )
     return dict(
         dict(
-            PROFILE,
-            evidence_limit=revision.get("max_evidence_spans", PROFILE["evidence_limit"]),
+            base_profile,
+            evidence_limit=revision.get("max_evidence_spans", base_profile["evidence_limit"]),
             rerank_limit=revision.get("rerank_limit", PROFILE["rerank_limit"]),
             **embedding_override,
         ),
@@ -53,7 +64,7 @@ def runtime_config(profile=DEFAULT_PROFILE):
         prompt_sha256=hashlib.sha256((ROOT / "prompts" / (prompt + ".txt")).read_bytes()).hexdigest(),
         provider="deepseek",
         model=config.deepseek_model,
-        query_deadline_seconds=config.query_deadline_seconds,
+        query_deadline_seconds=60 if target else config.query_deadline_seconds,
         max_active_queries=config.max_active_queries,
         runtime_policy="runtime-deadlines-v1",
         provider_attempts=config.provider_attempts,
@@ -144,6 +155,10 @@ def record_call(value):
 
 def network_timeout(limit):
     """Check PG ownership before I/O; each adapter receives the remaining budget."""
+    if deadline := stage_deadline.get():
+        limit = min(limit, deadline - time.monotonic())
+        if limit <= 0:
+            raise TimeoutError("stage_deadline_exhausted")
     if trace := current_trace.get():
         return min(limit, trace.remaining())
     if guard := ingestion_guard.get():
@@ -152,3 +167,19 @@ def network_timeout(limit):
 
 
 ingestion_guard = ContextVar("ingestion_guard", default=None)
+
+stage_deadline = ContextVar("stage_deadline", default=None)
+
+
+@contextmanager
+def bounded_stage(seconds):
+    deadline = time.monotonic() + seconds
+    if outer := stage_deadline.get():
+        deadline = min(deadline, outer)
+    token = stage_deadline.set(deadline)
+    try:
+        network_timeout(seconds)
+        yield deadline
+        network_timeout(seconds)
+    finally:
+        stage_deadline.reset(token)

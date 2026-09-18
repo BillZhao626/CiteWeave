@@ -1,0 +1,17 @@
+# Structural query evidence
+
+Status: implemented as the opt-in `telecom-structural-v1` profile. The default and historical profiles remain unchanged. Quality promotion is a separate decision.
+
+The accepted structural indexes contain RetrievalChild IDs. Treating those IDs as citation IDs would lose original PDF evidence identity. The query path therefore captures authorized active versions and typed published builds in PostgreSQL before retrieval. Each build retains its own BM25 vocabulary and IDF. Dense and BM25 each contribute up to 40 children; deterministic RRF with k=60 selects the global 20-child pool. The pinned real BGE reranker orders that pool. Immutable ChildSpan membership projects selected Children into original evidence atoms.
+
+The query snapshot records source hashes, artifacts, canonical/tree/membership hashes, typed index/profile/model identities, and tokenizer identities. An expand-only migration adds a trace revision, snapshot, and EvidencePack. Historical rows use the explicit legacy reader without trace conversion. The existing Citation keys, PDF resolution, provisional SSE, and validated final publication remain authoritative.
+
+Single mode admits up to four complete Child seeds; compare mode admits up to six, with two-source preference restricted to the first twelve reranked candidates. Budgets can reduce either count. Parent projection adds only original headings and immediate siblings from at most three real Parents. Confidence restricts page scope. Expansion uses deterministic whole-atom prefix backoff and batched tokenizer measurements; it never clips source spans or reranks expansion atoms. Each accepted seed retains its source ranges.
+
+The actual serialized prompt EvidencePack, including source metadata and labels, is measured by the pinned BGE tokenizer (`context-bge-token-proxy-v1`). This proxy is not a DeepSeek token claim. Seed limits are 3,200 characters / 64 atoms / 1,024 proxy tokens; final limits are 6,400 characters / 96 atoms / 2,048 proxy tokens. Added text cannot exceed the seed character count or 3,200 characters. The prompt remains bounded to 12,000 characters and generation to 1,024 output tokens.
+
+A process-wide four-worker pool bounds actual Qdrant branch requests. All branches share an eight-second absolute deadline; any branch failure rejects the whole retrieval. Model retries share their stage deadline, with at most two reranker attempts within ten seconds. Only confirmed transient reranker failure permits explicit RRF seed-only degradation. Identity, protocol, score, and tokenizer errors fail closed. PostgreSQL deadline/owner/fence checks reject late publication. No evaluation recovery state machine is added here.
+
+The versioned gateway query contract preserves legacy and ingestion limits. API/worker processes load no model weights. The transport reuses a process TLS trust configuration, with verification enabled, to avoid repeated trust-store initialization. No model, retrieval, or answer cache is introduced.
+
+Rollback selects a compatible legacy profile/build. Applications reading new query records must retain the typed reader; deploying a reader that mistakes Child IDs for evidence IDs is not a valid rollback. Corpus, parser, model revisions, and existing artifacts are unchanged. Engineering tests use original fixtures and mock generation; real E5/BGE runtime evidence is separate from answer-quality evaluation.

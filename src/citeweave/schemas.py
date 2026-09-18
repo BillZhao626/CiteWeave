@@ -4,10 +4,11 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, SecretStr
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, computed_field, model_validator
 
 from citeweave.evidence import EvidenceSpan
 from citeweave.profiles import QueryProfile
+from citeweave.query_evidence import EvidencePack, StructuralCandidate, StructuralSnapshot
 
 
 class Contract(BaseModel):
@@ -81,8 +82,20 @@ class Document(Contract):
 
 class QueryCreate(Contract):
     kb_id: UUID
-    question: str = Field(min_length=1, max_length=160)
+    question: str = Field(min_length=1, max_length=512)
     profile: QueryProfile = "m3-context"
+    evidence_mode: Literal["auto", "single", "compare"] = "auto"
+    document_ids: list[UUID] | None = Field(default=None, min_length=1, max_length=10)
+
+    @model_validator(mode="after")
+    def query_contract(self):
+        if self.profile != "telecom-structural-v1" and (
+            len(self.question) > 160 or self.evidence_mode != "auto" or self.document_ids is not None
+        ):
+            raise ValueError("legacy_query_contract")
+        if self.document_ids and len(set(self.document_ids)) != len(self.document_ids):
+            raise ValueError("duplicate_document_scope")
+        return self
 
 
 class Citation(Contract):
@@ -118,6 +131,9 @@ class Run(Contract):
     id: UUID
     kb_id: UUID
     question: str
+    trace_schema_revision: Literal["legacy-v1", "structural-trace-v1"] = "legacy-v1"
+    structural_snapshot: StructuralSnapshot | None = None
+    evidence_pack: EvidencePack | None = None
     status: str
     versions: list[str]
     candidates: list[dict]
@@ -136,3 +152,10 @@ class Run(Contract):
     absolute_deadline: datetime | None = None
     runtime_policy: str | None = None
     actual_charge: Literal["unavailable"] = "unavailable"
+
+    @computed_field
+    @property
+    def structural_candidates(self) -> list[StructuralCandidate] | None:
+        if self.trace_schema_revision == "structural-trace-v1":
+            return [StructuralCandidate.model_validate(c) for c in self.candidates]
+        return None

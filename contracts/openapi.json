@@ -2157,6 +2157,39 @@
         ],
         "title": "Box"
       },
+      "BranchHit": {
+        "properties": {
+          "branch": {
+            "type": "string",
+            "enum": [
+              "dense",
+              "bm25"
+            ],
+            "title": "Branch"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "raw_score": {
+            "type": "number",
+            "title": "Raw Score"
+          },
+          "score_scope": {
+            "type": "string",
+            "title": "Score Scope"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "branch",
+          "rank",
+          "raw_score",
+          "score_scope"
+        ],
+        "title": "BranchHit"
+      },
       "ChildView": {
         "properties": {
           "id": {
@@ -2644,7 +2677,8 @@
               "m3-answer",
               "m3-candidates40",
               "m3-parent",
-              "m3-bge-dense"
+              "m3-bge-dense",
+              "telecom-structural-v1"
             ],
             "title": "Profile",
             "default": "m3-context"
@@ -2679,6 +2713,123 @@
           "kb_id"
         ],
         "title": "EvaluationCreate"
+      },
+      "EvidencePack": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "const": "evidence-pack-v1",
+            "title": "Revision",
+            "default": "evidence-pack-v1"
+          },
+          "token_proxy": {
+            "type": "string",
+            "const": "context-bge-token-proxy-v1",
+            "title": "Token Proxy",
+            "default": "context-bge-token-proxy-v1"
+          },
+          "evidence_mode": {
+            "type": "string",
+            "enum": [
+              "single",
+              "compare"
+            ],
+            "title": "Evidence Mode"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/components/schemas/PackSpan"
+            },
+            "type": "array",
+            "title": "Spans"
+          },
+          "seed_child_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Seed Child Ids"
+          },
+          "source_coverage": {
+            "$ref": "#/components/schemas/SourceCoverage"
+          },
+          "degraded": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "degraded_reranker_unavailable"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degraded"
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason"
+          },
+          "seed_chars": {
+            "type": "integer",
+            "title": "Seed Chars"
+          },
+          "seed_spans": {
+            "type": "integer",
+            "title": "Seed Spans"
+          },
+          "seed_tokens": {
+            "type": "integer",
+            "title": "Seed Tokens"
+          },
+          "added_chars": {
+            "type": "integer",
+            "title": "Added Chars"
+          },
+          "serialized_chars": {
+            "type": "integer",
+            "title": "Serialized Chars"
+          },
+          "serialized_tokens": {
+            "type": "integer",
+            "title": "Serialized Tokens"
+          },
+          "prompt_json": {
+            "type": "string",
+            "title": "Prompt Json"
+          },
+          "decisions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Decisions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "evidence_mode",
+          "spans",
+          "seed_child_ids",
+          "source_coverage",
+          "seed_chars",
+          "seed_spans",
+          "seed_tokens",
+          "added_chars",
+          "serialized_chars",
+          "serialized_tokens",
+          "prompt_json",
+          "decisions"
+        ],
+        "title": "EvidencePack"
       },
       "EvidenceSpan": {
         "properties": {
@@ -3245,6 +3396,77 @@
         ],
         "title": "Operation"
       },
+      "PackSpan": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "evidence_id": {
+            "type": "string",
+            "title": "Evidence Id"
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "version_id": {
+            "type": "string",
+            "title": "Version Id"
+          },
+          "parent_id": {
+            "type": "string",
+            "title": "Parent Id"
+          },
+          "seed_child_id": {
+            "type": "string",
+            "title": "Seed Child Id"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "seed",
+              "heading",
+              "sibling"
+            ],
+            "title": "Origin"
+          },
+          "cross_page": {
+            "type": "boolean",
+            "title": "Cross Page"
+          },
+          "budget_before": {
+            "type": "integer",
+            "title": "Budget Before"
+          },
+          "budget_after": {
+            "type": "integer",
+            "title": "Budget After"
+          },
+          "covered_by": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Covered By"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "label",
+          "evidence_id",
+          "document_id",
+          "version_id",
+          "parent_id",
+          "seed_child_id",
+          "origin",
+          "cross_page",
+          "budget_before",
+          "budget_after"
+        ],
+        "title": "PackSpan"
+      },
       "QueryCreate": {
         "properties": {
           "kb_id": {
@@ -3254,7 +3476,7 @@
           },
           "question": {
             "type": "string",
-            "maxLength": 160,
+            "maxLength": 512,
             "minLength": 1,
             "title": "Question"
           },
@@ -3267,10 +3489,38 @@
               "m3-answer",
               "m3-candidates40",
               "m3-parent",
-              "m3-bge-dense"
+              "m3-bge-dense",
+              "telecom-structural-v1"
             ],
             "title": "Profile",
             "default": "m3-context"
+          },
+          "evidence_mode": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "single",
+              "compare"
+            ],
+            "title": "Evidence Mode",
+            "default": "auto"
+          },
+          "document_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array",
+                "maxItems": 10,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Ids"
           }
         },
         "additionalProperties": false,
@@ -3280,6 +3530,81 @@
           "question"
         ],
         "title": "QueryCreate"
+      },
+      "RerankerRanking": {
+        "properties": {
+          "input_rank": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Input Rank"
+          },
+          "output_rank": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 20.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Rank"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "model": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Model"
+          },
+          "pair_tokens": {
+            "type": "integer",
+            "maximum": 512.0,
+            "minimum": 1.0,
+            "title": "Pair Tokens"
+          },
+          "body_tokens": {
+            "type": "integer",
+            "maximum": 320.0,
+            "minimum": 1.0,
+            "title": "Body Tokens"
+          },
+          "query_tokens": {
+            "type": "integer",
+            "maximum": 128.0,
+            "minimum": 1.0,
+            "title": "Query Tokens"
+          },
+          "queue_ms": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Queue Ms"
+          },
+          "inference_ms": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Inference Ms"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "input_rank",
+          "score",
+          "model",
+          "pair_tokens",
+          "body_tokens",
+          "query_tokens",
+          "queue_ms",
+          "inference_ms"
+        ],
+        "title": "RerankerRanking"
       },
       "Rollback": {
         "properties": {
@@ -3317,6 +3642,35 @@
           "question": {
             "type": "string",
             "title": "Question"
+          },
+          "trace_schema_revision": {
+            "type": "string",
+            "enum": [
+              "legacy-v1",
+              "structural-trace-v1"
+            ],
+            "title": "Trace Schema Revision",
+            "default": "legacy-v1"
+          },
+          "structural_snapshot": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StructuralSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence_pack": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvidencePack"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
             "type": "string",
@@ -3469,6 +3823,21 @@
             "const": "unavailable",
             "title": "Actual Charge",
             "default": "unavailable"
+          },
+          "structural_candidates": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StructuralCandidate"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structural Candidates",
+            "readOnly": true
           }
         },
         "additionalProperties": false,
@@ -3491,7 +3860,8 @@
           "usage",
           "estimated_yuan",
           "reserved_yuan",
-          "error_category"
+          "error_category",
+          "structural_candidates"
         ],
         "title": "Run"
       },
@@ -3583,6 +3953,52 @@
         ],
         "title": "Scope"
       },
+      "SourceCoverage": {
+        "properties": {
+          "requested": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requested"
+          },
+          "eligible": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Eligible"
+          },
+          "selected": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Selected"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing"
+          },
+          "coverage_unmet": {
+            "type": "boolean",
+            "title": "Coverage Unmet"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "requested",
+          "eligible",
+          "selected",
+          "missing",
+          "coverage_unmet"
+        ],
+        "title": "SourceCoverage"
+      },
       "StreamEvent": {
         "properties": {
           "type": {
@@ -3656,6 +4072,253 @@
           "run_id"
         ],
         "title": "StreamEvent"
+      },
+      "StructuralBinding": {
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "version_id": {
+            "type": "string",
+            "title": "Version Id"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "source_sha256": {
+            "type": "string",
+            "title": "Source Sha256"
+          },
+          "artifact_id": {
+            "type": "string",
+            "title": "Artifact Id"
+          },
+          "canonical_sha": {
+            "type": "string",
+            "title": "Canonical Sha"
+          },
+          "tree_hash": {
+            "type": "string",
+            "title": "Tree Hash"
+          },
+          "membership_hash": {
+            "type": "string",
+            "title": "Membership Hash"
+          },
+          "index_name": {
+            "type": "string",
+            "title": "Index Name"
+          },
+          "unit_kind": {
+            "type": "string",
+            "const": "structural_child",
+            "title": "Unit Kind",
+            "default": "structural_child"
+          },
+          "index_profile_hash": {
+            "type": "string",
+            "title": "Index Profile Hash"
+          },
+          "bm25_hash": {
+            "type": "string",
+            "title": "Bm25 Hash"
+          },
+          "embedding_identity": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Embedding Identity"
+          },
+          "tokenizers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Tokenizers"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "document_id",
+          "version_id",
+          "filename",
+          "source_sha256",
+          "artifact_id",
+          "canonical_sha",
+          "tree_hash",
+          "membership_hash",
+          "index_name",
+          "index_profile_hash",
+          "bm25_hash",
+          "embedding_identity",
+          "tokenizers"
+        ],
+        "title": "StructuralBinding"
+      },
+      "StructuralCandidate": {
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "title": "Candidate Id"
+          },
+          "child_id": {
+            "type": "string",
+            "title": "Child Id"
+          },
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "version_id": {
+            "type": "string",
+            "title": "Version Id"
+          },
+          "artifact_id": {
+            "type": "string",
+            "title": "Artifact Id"
+          },
+          "parent_id": {
+            "type": "string",
+            "title": "Parent Id"
+          },
+          "section_path": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Section Path"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Ids"
+          },
+          "retrieval": {
+            "items": {
+              "$ref": "#/components/schemas/BranchHit"
+            },
+            "type": "array",
+            "title": "Retrieval"
+          },
+          "rrf_rank": {
+            "type": "integer",
+            "title": "Rrf Rank"
+          },
+          "rrf_score": {
+            "type": "number",
+            "title": "Rrf Score"
+          },
+          "pool_reason": {
+            "type": "string",
+            "enum": [
+              "top20",
+              "outside_pool"
+            ],
+            "title": "Pool Reason"
+          },
+          "bge": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RerankerRanking"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "seed_rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed Rank"
+          },
+          "selection_reason": {
+            "type": "string",
+            "title": "Selection Reason",
+            "default": "outside_pool"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "candidate_id",
+          "child_id",
+          "document_id",
+          "version_id",
+          "artifact_id",
+          "parent_id",
+          "section_path",
+          "evidence_ids",
+          "retrieval",
+          "rrf_rank",
+          "rrf_score",
+          "pool_reason"
+        ],
+        "title": "StructuralCandidate"
+      },
+      "StructuralSnapshot": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "const": "structural-trace-v1",
+            "title": "Revision",
+            "default": "structural-trace-v1"
+          },
+          "workspace_id": {
+            "type": "string",
+            "title": "Workspace Id"
+          },
+          "kb_id": {
+            "type": "string",
+            "title": "Kb Id"
+          },
+          "evidence_mode": {
+            "type": "string",
+            "enum": [
+              "single",
+              "compare"
+            ],
+            "title": "Evidence Mode"
+          },
+          "requested_documents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requested Documents"
+          },
+          "bindings": {
+            "items": {
+              "$ref": "#/components/schemas/StructuralBinding"
+            },
+            "type": "array",
+            "title": "Bindings"
+          },
+          "query_tokens": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Query Tokens"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "workspace_id",
+          "kb_id",
+          "evidence_mode",
+          "requested_documents",
+          "bindings",
+          "query_tokens"
+        ],
+        "title": "StructuralSnapshot"
       },
       "SystemStatus": {
         "properties": {

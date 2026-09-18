@@ -5,7 +5,7 @@ import hashlib
 import json
 import logging
 import re
-from contextlib import aclosing
+from contextlib import aclosing, nullcontext
 from datetime import timedelta
 from decimal import Decimal
 from uuid import uuid4
@@ -31,11 +31,11 @@ from citeweave.evidence import Block, EvidenceSpan, resolve_span
 from citeweave.hybrid import HybridRetriever
 from citeweave.lifecycle import governance_lock
 from citeweave.llm import DeepSeekProvider
-from citeweave.profiles import query_profile
+from citeweave.profiles import STRUCTURAL_PROFILE, query_profile
 from citeweave.query_runtime import check_owned, expire_queries, remaining
 from citeweave.reliability import error_category
 from citeweave.settings import ROOT, settings
-from citeweave.trace import RunTrace, current_trace, runtime_config, stage
+from citeweave.trace import RunTrace, bounded_stage, current_trace, runtime_config, stage
 
 PROMPT = ROOT / "prompts/answer-v1.txt"
 REFUSAL = "证据不足，无法回答。"
@@ -43,9 +43,37 @@ REFUSAL = "证据不足，无法回答。"
 
 def begin_query(workspace, body, key, captured_bindings=None):
     fingerprint_body = body.model_dump(mode="json")
+    target = body.profile == STRUCTURAL_PROFILE
+    if not target:
+        fingerprint_body.pop("evidence_mode")
+        fingerprint_body.pop("document_ids")
     if body.profile == "m2":
         fingerprint_body.pop("profile")  # Preserve idempotency of historical M2 requests.
     digest = catalog.fingerprint(fingerprint_body)
+    query_tokens = None
+    if target:
+        from citeweave.model_client import ModelGateway
+
+        # Authenticate scope before contacting the local tokenizer; no open PG transaction during I/O.
+        with transaction() as db:
+            catalog.authorized_kb(db, body.kb_id, workspace)
+            requested_at = db.scalar(select(func.clock_timestamp()))
+            existing = db.scalar(
+                select(QueryRunRow).where(QueryRunRow.workspace_id == workspace, QueryRunRow.key == key)
+            )
+            if existing:
+                if existing.fingerprint != digest:
+                    raise HTTPException(409, "idempotency_conflict")
+                if existing.status == "RUNNING":
+                    raise HTTPException(409, "query_running")
+                return existing
+        try:
+            with bounded_stage(5):
+                query_tokens = ModelGateway().query_tokens(body.question)
+        except ValueError as exc:
+            if str(exc) in {"query_token_limit", "question_limit"}:
+                raise HTTPException(422, str(exc)) from None
+            raise
     with transaction() as db:
         catalog.authorized_kb(db, body.kb_id, workspace)
         # One local provider budget across all workspaces, serialized before reservation.
@@ -118,6 +146,16 @@ def begin_query(workspace, body, key, captured_bindings=None):
             captured_bindings = resolve_experiment_bindings(
                 db, workspace, versions, embedding_identity(profile["embedding_key"]), captured_bindings
             )
+        snapshot = None
+        if target:
+            from citeweave.structural_repository import capture
+
+            if captured_bindings is not None:
+                raise HTTPException(409, "structural_evaluation_binding_not_supported")
+            snapshot = capture(db, workspace, body, versions, query_tokens)
+            from uuid import UUID
+
+            versions = [UUID(b.version_id) for b in snapshot.bindings]
         bindings = {}
         for version_id in versions:
             version = db.get(VersionRow, version_id)
@@ -127,7 +165,7 @@ def begin_query(workspace, body, key, captured_bindings=None):
                 else version.index_collection
             )
             index = db.get(IndexRow, name)
-            if index and index.unit_kind != "legacy_span":
+            if index and index.unit_kind != "legacy_span" and not target:
                 raise HTTPException(409, "structural_query_not_enabled")
             if index and (
                 index.state not in {"PUBLISHED", "SUPERSEDED", "EXPERIMENT_READY"}
@@ -146,11 +184,14 @@ def begin_query(workspace, body, key, captured_bindings=None):
             key=key,
             fingerprint=digest,
             question=body.question,
+            trace_schema_revision="structural-trace-v1" if target else "legacy-v1",
+            structural_snapshot=snapshot.model_dump(mode="json") if snapshot else None,
             versions=[str(v) for v in versions],
             index_bindings=bindings,
             runtime_config=runtime_config(body.profile),
             created_at=now,
-            absolute_deadline=now + timedelta(seconds=settings().query_deadline_seconds),
+            absolute_deadline=(requested_at if target else now)
+            + timedelta(seconds=60 if target else settings().query_deadline_seconds),
             owner=uuid4(),
             fence=1,
             runtime_policy="runtime-deadlines-v1",
@@ -190,10 +231,14 @@ def validate_citations(answer, selected):
     return [available[label] for label in labels]
 
 
-def save_trace(run_id, trace, owner=None, fence=None):
+def save_trace(run_id, trace, owner=None, fence=None, pack=None):
     with transaction() as db:
         row, _ = check_owned(db, run_id, owner, fence)
         row.candidates = trace
+        if pack is not None:
+            if row.trace_schema_revision != "structural-trace-v1":
+                raise ValueError("query_trace_schema_mismatch")
+            row.evidence_pack = pack.model_dump(mode="json")
 
 
 def save_usage(run_id, usage, owner=None, fence=None):
@@ -267,19 +312,27 @@ async def _stream_answer(run, provider=None, retriever=None):
         budget = await asyncio.to_thread(remaining, run.id, run.owner, run.fence)
         async with asyncio.timeout(budget):
             yield sse(schemas.StreamEvent(type="stage", run_id=run.id, stage="混合检索与重排"))
+            target = run.trace_schema_revision == "structural-trace-v1"
+            if target:
+                from citeweave.structural_retrieval import StructuralRetriever
+
+                retriever = retriever or StructuralRetriever(run.structural_snapshot)
+            else:
+                retriever = retriever or HybridRetriever(
+                    index_bindings=run.index_bindings,
+                    profile=run.runtime_config.get("query_profile", "m2"),
+                )
             chunks, trace = await asyncio.to_thread(
-                (
-                    retriever
-                    or HybridRetriever(
-                        index_bindings=run.index_bindings,
-                        profile=run.runtime_config.get("query_profile", "m2"),
-                    )
-                ).retrieve,
+                retriever.retrieve,
                 run.question,
                 run.versions,
             )
-            await asyncio.to_thread(save_trace, run.id, trace, run.owner, run.fence)
-            with stage("evidence_binding", input_count=len(chunks), output_count=len(chunks)):
+            pack = retriever.pack if target else None
+            if target and pack is None:
+                raise ValueError("structural_evidence_pack_required")
+            binding_budget = bounded_stage(retriever.binding_remaining) if target else nullcontext()
+            with binding_budget, stage("evidence_binding", input_count=len(chunks), output_count=len(chunks)):
+                await asyncio.to_thread(save_trace, run.id, trace, run.owner, run.fence, pack)
                 selected = [
                     await asyncio.to_thread(citation_for, chunk, f"E{i}") for i, chunk in enumerate(chunks, 1)
                 ]
@@ -303,9 +356,22 @@ async def _stream_answer(run, provider=None, retriever=None):
                         ),
                     },
                 ]
+                if target:
+                    messages[1]["content"] = (
+                        json.dumps({"question": run.question}, ensure_ascii=False) + "\n" + pack.prompt_json
+                    )
+                    if sum(len(m["content"]) for m in messages) > 12000:
+                        raise ValueError("prompt_character_limit")
                 yield sse(schemas.StreamEvent(type="stage", run_id=run.id, stage="依据证据生成"))
                 contacted = True
-                async with aclosing(_provider_parts(provider or DeepSeekProvider(), messages)) as parts:
+                async with (
+                    asyncio.timeout(
+                        min(35, await asyncio.to_thread(remaining, run.id, run.owner, run.fence))
+                        if target
+                        else None
+                    ),
+                    aclosing(_provider_parts(provider or DeepSeekProvider(), messages)) as parts,
+                ):
                     async for part in parts:
                         if "usage" in part:
                             usage = dict(
@@ -349,6 +415,19 @@ async def _stream_answer(run, provider=None, retriever=None):
         await asyncio.shield(asyncio.to_thread(failed, run.id, "client_cancelled", contacted))
         raise
     except Exception as exc:
+        if getattr(run, "trace_schema_revision", None) == "structural-trace-v1" and getattr(
+            retriever, "candidates", None
+        ):
+            try:
+                await asyncio.to_thread(
+                    save_trace,
+                    run.id,
+                    [c.model_dump(mode="json") for c in retriever.candidates],
+                    run.owner,
+                    run.fence,
+                )
+            except (ValueError, TimeoutError):
+                pass  # Cancellation/stale ownership cannot publish even a partial trace.
         safe_validation_codes = {
             "invalid_or_missing_citation",
             "answer_length_limit",
@@ -357,6 +436,24 @@ async def _stream_answer(run, provider=None, retriever=None):
             "citation_version_mismatch",
             "citation_source_mismatch",
             "run_no_longer_active",
+            "reranker_identity_mismatch",
+            "reranker_token_accounting",
+            "reranker_protocol_error",
+            "reranker_invalid_score",
+            "reranker_count_mismatch",
+            "query_token_limit",
+            "child_membership_mismatch",
+            "child_scope_mismatch",
+            "child_parent_mismatch",
+            "structural_snapshot_mismatch",
+            "structural_hit_identity_mismatch",
+            "child_text_membership_mismatch",
+            "evidence_scope_mismatch",
+            "evidence_pack_budget",
+            "context_tokenizer_identity_mismatch",
+            "context_tokenizer_count_mismatch",
+            "prompt_character_limit",
+            "seed_coverage_lost",
         }
         code = (
             exc.code

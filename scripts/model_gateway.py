@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -23,7 +24,8 @@ def main():
 
     from citeweave.embeddings import embedding_identity
     from citeweave.reliability import FairGate, ModelCapacityError
-    from citeweave.tokenization import CONTRACT, fits, tokenize_response
+    from citeweave.structural_contract import QUERY_CONTRACT, pair_counts, query_counts
+    from citeweave.tokenization import CONTRACT, TOKENIZERS, fits, tokenize_response
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--embedding", choices=["e5-small", "bge-m3"], default="e5-small")
@@ -53,6 +55,11 @@ def main():
             raise ValueError("embedding_manifest_mismatch")
     else:
         selected_model = manifest[identity["model"]]
+    if (
+        selected_model["revision"] != identity["revision"]
+        or manifest[TOKENIZERS["bge"]["model"]]["revision"] != TOKENIZERS["bge"]["revision"]
+    ):
+        raise ValueError("resident_model_manifest_mismatch")
     embed = SentenceTransformer(
         selected_model["local_path"],
         device=device,
@@ -109,11 +116,71 @@ def main():
             acquired = False
             try:
                 size = int(self.headers.get("Content-Length", "0"))
-                if not 0 < size <= (128 * 1024 if self.path == "/tokenize" else 32767):
+                if not 0 < size <= 128 * 1024:
                     return self.reply(413, {"error": "request_size_limit"})
                 self.connection.settimeout(5)
                 body = json.loads(self.rfile.read(size))
+                target = body.get("contract") == QUERY_CONTRACT
+                if not target and self.path != "/tokenize" and size > 32767:
+                    return self.reply(413, {"error": "request_size_limit"})
                 texts = body.get("texts")
+                if target:
+                    if identity != embedding_identity():
+                        return self.reply(422, {"error": "embedding_identity_mismatch"})
+                    if self.path == "/context-tokenize":
+                        if (
+                            not isinstance(texts, list)
+                            or not 0 < len(texts) <= 20
+                            or any(not isinstance(t, str) or not 0 < len(t) <= 12000 for t in texts)
+                        ):
+                            return self.reply(422, {"error": "structural_text_limit"})
+                        return self.reply(
+                            200,
+                            dict(
+                                contract=QUERY_CONTRACT,
+                                tokenizers=TOKENIZERS,
+                                hashes=[hashlib.sha256(t.encode()).hexdigest() for t in texts],
+                                counts=[
+                                    len(
+                                        rerank.tokenizer(t, add_special_tokens=False, truncation=False)[
+                                            "input_ids"
+                                        ]
+                                    )
+                                    for t in texts
+                                ],
+                            ),
+                        )
+                    question = body.get("question")
+                    if self.path == "/embed":
+                        if not body.get("query") or not isinstance(texts, list) or len(texts) != 1:
+                            return self.reply(422, {"error": "structural_query_contract"})
+                        question = texts[0]
+                    measured = query_counts(question, embed.tokenizer, rerank.tokenizer)
+                    if self.path == "/query-tokenize":
+                        return self.reply(200, dict(measured, contract=QUERY_CONTRACT, tokenizers=TOKENIZERS))
+                    if self.path == "/rerank":
+                        measured = pair_counts(question, texts, embed.tokenizer, rerank.tokenizer)
+                        waiting = time.perf_counter()
+                        gate.acquire(timeout=8)
+                        acquired = True
+                        started = time.perf_counter()
+                        scores = rerank.predict(
+                            [(question, t) for t in texts],
+                            batch_size=4,
+                            show_progress_bar=False,
+                            activation_fn=torch.nn.Identity(),
+                        ).tolist()
+                        return self.reply(
+                            200,
+                            dict(
+                                measured,
+                                contract=QUERY_CONTRACT,
+                                tokenizers=TOKENIZERS,
+                                scores=scores,
+                                queue_ms=(started - waiting) * 1000,
+                                inference_ms=(time.perf_counter() - started) * 1000,
+                            ),
+                        )
                 if self.path == "/tokenize":
                     if body.get("contract") != CONTRACT or identity != embedding_identity():
                         return self.reply(422, {"error": "tokenizer_identity_mismatch"})
@@ -121,13 +188,14 @@ def main():
                     acquired = True
                     return self.reply(200, tokenize_response(texts, embed.tokenizer, rerank.tokenizer))
                 structural = body.get("contract") == CONTRACT
-                if body.get("contract") not in (None, CONTRACT):
+                if body.get("contract") not in (None, CONTRACT, QUERY_CONTRACT):
                     return self.reply(422, {"error": "unknown_model_contract"})
                 if (
                     not isinstance(texts, list)
                     or not 0 < len(texts) <= 20
                     or any(
-                        not isinstance(t, str) or not 0 < len(t) <= (960 if structural else 160)
+                        not isinstance(t, str)
+                        or not 0 < len(t) <= (512 if target else 960 if structural else 160)
                         for t in texts
                     )
                 ):
@@ -173,8 +241,19 @@ def main():
                 return self.reply(404, {"error": "not_found"})
             except ModelCapacityError as exc:
                 return self.reply(429, {"error": exc.code})
-            except ValueError:
-                return self.reply(422, {"error": "invalid_model_request"})
+            except ValueError as exc:
+                code = (
+                    str(exc)
+                    if str(exc)
+                    in {
+                        "query_token_limit",
+                        "question_limit",
+                        "structural_text_limit",
+                        "reranker_token_limit",
+                    }
+                    else "invalid_model_request"
+                )
+                return self.reply(422, {"error": code})
             except (BrokenPipeError, ConnectionResetError, TimeoutError):
                 return  # Disconnected client; inference is bounded to one admitted batch.
             except Exception as exc:

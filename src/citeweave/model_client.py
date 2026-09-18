@@ -9,9 +9,10 @@ import httpx
 
 from citeweave.circuit import Circuit
 from citeweave.embeddings import embedding_identity
+from citeweave.http_transport import TLS_CONTEXT
 from citeweave.reliability import CircuitOpen, error_category
 from citeweave.settings import settings
-from citeweave.trace import current_trace, network_timeout, record_call
+from citeweave.trace import current_trace, network_timeout, record_call, stage_deadline
 
 
 class Embedder(Protocol):
@@ -42,9 +43,13 @@ class ModelGateway:
         succeeded = False
         try:
             with httpx.Client(
-                transport=self.transport, timeout=httpx.Timeout(15, connect=3), trust_env=False
+                transport=self.transport,
+                timeout=httpx.Timeout(15, connect=3),
+                trust_env=False,
+                verify=TLS_CONTEXT,
             ) as client:
-                for attempt in range(config.model_attempts):
+                attempts = min(config.model_attempts, 2) if stage_deadline.get() else config.model_attempts
+                for attempt in range(attempts):
                     if (trace := current_trace.get()) and trace.cancelled.is_set():
                         raise GatewayError("client_cancelled")
                     start = time.perf_counter()
@@ -79,6 +84,8 @@ class ModelGateway:
                                 "text_limit_20_by_160",
                                 "question_limit",
                                 "embedding_identity_mismatch",
+                                "query_token_limit",
+                                "structural_text_limit",
                             }:
                                 code = supplied
                         if error_category(code) == "non_retryable":
@@ -106,13 +113,16 @@ class ModelGateway:
                             latency_ms=(time.perf_counter() - start) * 1000,
                         )
                         record_call(item)
-                    if attempt + 1 == config.model_attempts:
+                    if attempt + 1 == attempts:
                         raise GatewayError(item["error_code"])
+                    delay = config.retry_backoff_seconds * (attempt + 1)
+                    if stage_deadline.get():
+                        delay = min(delay, network_timeout(15))
                     if trace:
-                        if trace.cancelled.wait(config.retry_backoff_seconds * (attempt + 1)):
+                        if trace.cancelled.wait(delay):
                             raise GatewayError("client_cancelled")
                     else:
-                        time.sleep(config.retry_backoff_seconds * (attempt + 1))
+                        time.sleep(delay)
         except GatewayError as exc:
             self.circuit.change("abandon" if exc.code == "client_cancelled" else "failure", permit)
             raise
@@ -138,3 +148,28 @@ class ModelGateway:
         if len(scores) != len(texts) or any(not math.isfinite(x) for x in scores):
             raise ValueError("reranker_count_mismatch")
         return scores
+
+    def query_tokens(self, question):
+        from citeweave.structural_contract import QUERY_CONTRACT, validate_query_counts
+        from citeweave.tokenization import TOKENIZERS
+
+        response = self.call("/query-tokenize", {"contract": QUERY_CONTRACT, "question": question})
+        if response.get("contract") != QUERY_CONTRACT or response.get("tokenizers") != TOKENIZERS:
+            raise ValueError("tokenizer_identity_mismatch")
+        validate_query_counts(response)
+        return response
+
+    def structural_rerank(self, question, texts):
+        from citeweave.structural_contract import QUERY_CONTRACT, validate_rerank
+
+        return validate_rerank(
+            self.call(
+                "/rerank",
+                {
+                    "contract": QUERY_CONTRACT,
+                    "question": question,
+                    "texts": texts,
+                },
+            ),
+            len(texts),
+        )

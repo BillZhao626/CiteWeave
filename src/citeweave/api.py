@@ -278,7 +278,9 @@ def create_app(
             )
             if not row:
                 raise HTTPException(404, "run_not_found")
-            return schemas.Run.model_validate(row)
+            from citeweave.query_evidence import read_query
+
+            return schemas.Run.model_validate(read_query(row))
 
     @app.get("/v1/evidence/{evidence_id}", response_model=schemas.Citation)
     def evidence(evidence_id: UUID, run_id: UUID, workspace=Depends(principal)):

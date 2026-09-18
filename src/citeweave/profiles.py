@@ -3,10 +3,18 @@
 from typing import Literal
 
 QueryProfile = Literal[
-    "m2", "m3-dedup", "m3-context", "m3-answer", "m3-candidates40", "m3-parent", "m3-bge-dense"
+    "m2",
+    "m3-dedup",
+    "m3-context",
+    "m3-answer",
+    "m3-candidates40",
+    "m3-parent",
+    "m3-bge-dense",
+    "telecom-structural-v1",
 ]
 JudgeProfile = Literal["judge-v1", "judge-v2", "judge-v3", "judge-v4"]
 DEFAULT_PROFILE: QueryProfile = "m3-context"
+STRUCTURAL_PROFILE = "telecom-structural-v1"
 PROFILES = {
     "m2": dict(candidate_dedup="none", answer_prompt="answer-v1"),
     "m3-dedup": dict(candidate_dedup="version-whitespace-v1", answer_prompt="answer-v1"),
@@ -21,6 +29,17 @@ PROFILES = {
     ),
 }
 PROFILES["m3-answer"] = dict(PROFILES["m3-context"], answer_prompt="answer-v2")
+PROFILES[STRUCTURAL_PROFILE] = dict(
+    candidate_dedup="evidence-range-v1",
+    answer_prompt="answer-telecom-v1",
+    unit_kind="structural_child",
+    rerank_limit=20,
+    rrf_k=60,
+    branch_limit=40,
+    seed_limits={"single": 4, "compare": 6, "chars": 3200, "spans": 64, "tokens": 1024},
+    pack_limits={"chars": 6400, "spans": 96, "tokens": 2048},
+    context_token_proxy="context-bge-token-proxy-v1",
+)
 PROFILES["m3-candidates40"] = dict(PROFILES["m3-context"], rerank_limit=40)
 PROFILES["m3-bge-dense"] = dict(PROFILES["m3-context"], embedding_key="bge-m3")
 PROFILES["m3-parent"] = dict(

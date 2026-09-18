@@ -111,6 +111,11 @@ class QueryRunRow(Stamp, Base):
     fence: Mapped[int | None] = mapped_column()
     runtime_policy: Mapped[str | None] = mapped_column(String(40))
     question: Mapped[str] = mapped_column(Text)
+    trace_schema_revision: Mapped[str] = mapped_column(
+        String(40), default="legacy-v1", server_default="legacy-v1"
+    )
+    structural_snapshot: Mapped[dict | None] = mapped_column(JSONB)
+    evidence_pack: Mapped[dict | None] = mapped_column(JSONB)
     status: Mapped[str] = mapped_column(String(24), default="RUNNING")
     versions: Mapped[list] = mapped_column(JSONB, default=list)
     candidates: Mapped[list] = mapped_column(JSONB, default=list)

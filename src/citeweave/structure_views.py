@@ -1,4 +1,4 @@
-"""Authorized, bounded structure inspection. No structural Ask path is enabled."""
+"""Authorized, bounded inspection of published immutable structure."""
 
 from uuid import UUID
 
@@ -40,6 +40,7 @@ class NodeView(BaseModel):
     confidence: str
     reasons: list[str]
     details: dict
+    is_parent: bool = False
 
 
 class ChildView(BaseModel):
@@ -85,8 +86,15 @@ def mount(app, principal):
     ):
         with transaction() as db:
             artifact = artifact_for(db, workspace, version_id, artifact_id)
+            parent_ids = set(
+                db.scalars(
+                    select(RetrievalChildRow.parent_node_id)
+                    .where(RetrievalChildRow.artifact_id == artifact.id)
+                    .distinct()
+                )
+            )
             return [
-                NodeView.model_validate(n)
+                NodeView.model_validate(n).model_copy(update={"is_parent": n.id in parent_ids})
                 for n in db.scalars(
                     select(StructureNodeRow)
                     .where(StructureNodeRow.artifact_id == artifact.id)

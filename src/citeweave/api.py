@@ -3,6 +3,7 @@
 import hashlib
 import hmac
 import logging
+import mimetypes
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -294,12 +295,19 @@ def create_app(
     from citeweave.structure_views import mount as mount_structure
 
     mount_structure(app, principal)
+    from citeweave.inspection import mount as mount_inspection
+
+    mount_inspection(app, principal)
 
     if lab_root:
         from citeweave.lab import install_lab
 
         install_lab(app, lab_root)
     if (settings().web_root / "assets").is_dir():
+        # Windows registry can map .mjs to text/plain. Module workers require
+        # JavaScript MIME with nosniff; keep PDF.js on its real worker path.
+        mimetypes.init()
+        mimetypes.add_type("text/javascript", ".mjs")
         if (settings().web_root / "pdfjs").is_dir():
             app.mount("/pdfjs", StaticFiles(directory=settings().web_root / "pdfjs"), name="pdfjs")
 

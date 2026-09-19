@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowUp,
@@ -22,6 +22,7 @@ import {
   type Doc,
 } from "./api";
 import { readAnswer } from "./stream";
+import { generationLabel, sectionPath } from "./product-facts";
 import { PdfEvidence } from "./pdf-evidence";
 
 const statuses: Record<string, string> = {
@@ -41,6 +42,23 @@ export function KnowledgeWorkspace() {
 }
 
 function Workspace({ id }: { id: string }) {
+  const [params] = useSearchParams();
+  const replayId = params.get("run") ?? "";
+  const replay = useQuery({
+    queryKey: ["run", replayId],
+    enabled: !!replayId,
+    queryFn: async () =>
+      unwrap(
+        await api.GET("/v1/runs/{run_id}", {
+          params: { path: { run_id: replayId } },
+        }),
+      ),
+  });
+  const [profile, setProfile] = useState<
+    "m3-context" | "telecom-structural-v1"
+  >("m3-context");
+  const [scope, setScope] = useState<string[]>([]);
+  const [mode, setMode] = useState<"auto" | "single" | "compare">("auto");
   const cache = useQueryClient(),
     fileInput = useRef<HTMLInputElement>(null);
   const kb = useQuery({
@@ -68,13 +86,16 @@ function Workspace({ id }: { id: string }) {
     [replacing, setReplacing] = useState<string | null>(null);
   const [question, setQuestion] = useState(""),
     [draft, setDraft] = useState(""),
-    [answer, setAnswer] = useState<Answer | null>(null);
+    [liveAnswer, setAnswer] = useState<Answer | null>(null);
   const [stage, setStage] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [runId, setRunId] = useState("");
+    [liveRunId, setRunId] = useState("");
   const [selected, setSelected] = useState<Citation | null>(null),
-    [asked, setAsked] = useState("");
+    [liveAsked, setAsked] = useState("");
+  const answer = liveAsked ? liveAnswer : (replay.data?.result ?? null);
+  const runId = liveAsked ? liveRunId : (replay.data?.id ?? "");
+  const asked = liveAsked || replay.data?.question || "";
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
   const evidence = useQuery({
@@ -157,7 +178,7 @@ function Workspace({ id }: { id: string }) {
     setAnswer(null);
     setSelected(null);
     setRunId("");
-    setStage("准备检索");
+    setStage("检索中 / retrieving");
     controller.current = new AbortController();
     try {
       const response = await fetch("/v1/queries", {
@@ -166,12 +187,30 @@ function Workspace({ id }: { id: string }) {
           "Content-Type": "application/json",
           "Idempotency-Key": crypto.randomUUID(),
         },
-        body: JSON.stringify({ kb_id: id, question: q }),
+        body: JSON.stringify({
+          kb_id: id,
+          question: q,
+          profile,
+          ...(profile === "telecom-structural-v1"
+            ? {
+                evidence_mode: mode,
+                ...(scope.length ? { document_ids: scope } : {}),
+              }
+            : {}),
+        }),
         signal: controller.current.signal,
       });
       await readAnswer(response, (event) => {
+        if (controller.current?.signal.aborted) return;
         setRunId(event.run_id);
-        if (event.type === "stage") setStage(event.stage ?? "");
+        if (event.type === "stage")
+          setStage(
+            event.stage === "混合检索与重排"
+              ? "检索 / 重排中 · retrieving / reranking"
+              : event.stage === "依据证据生成"
+                ? "生成中 / generating"
+                : (event.stage ?? ""),
+          );
         if (event.type === "delta") setDraft((d) => d + (event.text ?? ""));
         if (event.type === "final" && event.answer) {
           setAnswer(event.answer);
@@ -220,7 +259,9 @@ function Workspace({ id }: { id: string }) {
             {kb.data?.description || "从文档获取答案，用原文验证答案。"}
           </p>
         </div>
-        <span className="chip">{ready} 份可用文档</span>
+        <Link className="ops-link" to={`/documents?kb=${id}`}>
+          {ready} 份可用文档 · 检查结构 →
+        </Link>
       </div>
       {(kb.error || docs.error) && (
         <p className="error" role="alert">
@@ -233,54 +274,57 @@ function Workspace({ id }: { id: string }) {
             <h3>资料</h3>
             <span>{docs.data?.length ?? 0} / 10</span>
           </div>
-          <div className="upload-box">
-            <Upload size={23} />
-            <strong>添加一份 PDF</strong>
-            <p>文字型 PDF · 最大 10 MB</p>
-            <label className="sr-only" htmlFor="license">
-              文档使用许可
-            </label>
-            <select
-              id="license"
-              value={license}
-              onChange={(e) => setLicense(e.target.value)}
-            >
-              <option value="original">我拥有原创内容权利</option>
-              <option value="CC0-1.0">CC0 1.0</option>
-              <option value="CC-BY-4.0">CC BY 4.0</option>
-              <option value="permission-held">已获得使用许可</option>
-            </select>
-            <input
-              ref={fileInput}
-              aria-label="上传 PDF 文件"
-              type="file"
-              accept="application/pdf,.pdf"
-              className="file-input"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) upload.mutate({ file, documentId: replacing });
-                e.target.value = "";
-              }}
-            />
-            <Button
-              className="wide"
-              variant="outline"
-              disabled={upload.isPending}
-              onClick={() => {
-                setReplacing(null);
-                fileInput.current?.click();
-              }}
-            >
-              {upload.isPending ? "正在上传…" : "选择 PDF"}
-            </Button>
-            <button
-              className="text-button"
-              disabled={example.isPending || upload.isPending}
-              onClick={() => example.mutate()}
-            >
-              使用原创示例手册 ↗
-            </button>
-          </div>
+          <details className="upload-disclosure">
+            <summary>添加 / 替换 PDF</summary>
+            <div className="upload-box">
+              <Upload size={23} />
+              <strong>添加一份 PDF</strong>
+              <p>文字型 PDF · 最大 10 MB</p>
+              <label className="sr-only" htmlFor="license">
+                文档使用许可
+              </label>
+              <select
+                id="license"
+                value={license}
+                onChange={(e) => setLicense(e.target.value)}
+              >
+                <option value="original">我拥有原创内容权利</option>
+                <option value="CC0-1.0">CC0 1.0</option>
+                <option value="CC-BY-4.0">CC BY 4.0</option>
+                <option value="permission-held">已获得使用许可</option>
+              </select>
+              <input
+                ref={fileInput}
+                aria-label="上传 PDF 文件"
+                type="file"
+                accept="application/pdf,.pdf"
+                className="file-input"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) upload.mutate({ file, documentId: replacing });
+                  e.target.value = "";
+                }}
+              />
+              <Button
+                className="wide"
+                variant="outline"
+                disabled={upload.isPending}
+                onClick={() => {
+                  setReplacing(null);
+                  fileInput.current?.click();
+                }}
+              >
+                {upload.isPending ? "正在上传…" : "选择 PDF"}
+              </Button>
+              <button
+                className="text-button"
+                disabled={example.isPending || upload.isPending}
+                onClick={() => example.mutate()}
+              >
+                使用原创示例手册 ↗
+              </button>
+            </div>
+          </details>
           {(upload.error || example.error) && (
             <p className="error" role="alert">
               {message(upload.error || example.error)}
@@ -309,7 +353,68 @@ function Workspace({ id }: { id: string }) {
             <h3>
               <Search size={15} /> 证据问答
             </h3>
-            <span>基于当前可用版本</span>
+            <span>{asked ? "固定来源版本" : "就绪 / idle"}</span>
+          </div>
+          <div className="query-options">
+            <label>
+              下一次提问 · 检索路径
+              <select
+                aria-label="检索路径"
+                disabled={busy}
+                value={profile}
+                onChange={(e) => {
+                  setProfile(e.target.value as typeof profile);
+                  setScope([]);
+                }}
+              >
+                <option value="m3-context">兼容路径 · Legacy</option>
+                <option value="telecom-structural-v1">
+                  结构感知 · Telecom
+                </option>
+              </select>
+            </label>
+            {profile === "telecom-structural-v1" && (
+              <>
+                <label>
+                  来源模式
+                  <select
+                    aria-label="来源模式"
+                    disabled={busy}
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value as typeof mode)}
+                  >
+                    <option value="auto">自动</option>
+                    <option value="single">单来源</option>
+                    <option value="compare">跨来源比较</option>
+                  </select>
+                </label>
+                <details>
+                  <summary>
+                    文档范围 ·{" "}
+                    {scope.length ? `${scope.length} 份` : "全部可用文档"}
+                  </summary>
+                  {docs.data
+                    ?.filter((d) => d.active_version_id)
+                    .map((d) => (
+                      <label className="scope-option" key={d.id}>
+                        <input
+                          type="checkbox"
+                          disabled={busy}
+                          checked={scope.includes(d.id)}
+                          onChange={(e) =>
+                            setScope(
+                              e.target.checked
+                                ? [...scope, d.id]
+                                : scope.filter((x) => x !== d.id),
+                            )
+                          }
+                        />
+                        {d.title}
+                      </label>
+                    ))}
+                </details>
+              </>
+            )}
           </div>
           <div className="conversation">
             {!asked && (
@@ -339,12 +444,38 @@ function Workspace({ id }: { id: string }) {
                   <div className="answer-author">
                     <span className="mini-logo">C</span>
                     <strong>CiteWeave</strong>
-                    <span>{busy ? stage : answer ? "已完成" : "未完成"}</span>
+                    <span>
+                      {busy
+                        ? stage
+                        : answer
+                          ? answer.citations.length
+                            ? "最终答案 / final"
+                            : "证据不足 / insufficient evidence"
+                          : error?.includes("停止")
+                            ? "已取消 / cancelled"
+                            : "失败 / failed"}
+                    </span>
                   </div>
+                  {trace.data && (
+                    <p className="replay-notice">
+                      {generationLabel(trace.data)}
+                    </p>
+                  )}
+                  {trace.data?.evidence_pack?.degraded && (
+                    <p className="warning-banner">
+                      降级检索 · BGE 不可用，使用 RRF 种子。
+                    </p>
+                  )}
+                  {trace.data?.evidence_pack?.source_coverage
+                    .coverage_unmet && (
+                    <p className="warning-banner">
+                      来源缺口 · 部分请求来源未进入答案上下文。
+                    </p>
+                  )}
                   {busy && (
                     <p className="draft-label">
                       <LoaderCircle size={13} className="spin" />
-                      生成中 · 引用将在完成时校验
+                      临时草稿 · provisional · 引用将在完成时校验
                     </p>
                   )}
                   <div className="answer-text">
@@ -360,7 +491,10 @@ function Workspace({ id }: { id: string }) {
                   {answer && (
                     <>
                       <div className="verified-label">
-                        <Check size={13} /> 引用与原文片段一致{" "}
+                        <Check size={13} />{" "}
+                        {answer.citations.length
+                          ? "引用与原文片段一致"
+                          : "未提供可引用答案"}{" "}
                         <span>· 不代表语义支持已自动验证</span>
                       </div>
                       <div className="citation-cards">
@@ -442,7 +576,7 @@ function Workspace({ id }: { id: string }) {
               }
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              maxLength={160}
+              maxLength={profile === "telecom-structural-v1" ? 512 : 160}
               rows={2}
               disabled={!ready || busy}
               onKeyDown={(e) => {
@@ -457,7 +591,10 @@ function Workspace({ id }: { id: string }) {
               }}
             />
             <div className="composer-foot">
-              <span>{question.length} / 160 · Enter 发送</span>
+              <span>
+                {question.length} /{" "}
+                {profile === "telecom-structural-v1" ? 512 : 160} · Enter 发送
+              </span>
               {busy ? (
                 <Button
                   type="button"
@@ -499,6 +636,20 @@ function Workspace({ id }: { id: string }) {
             )}
             {evidence.error && (
               <p className="error padded">{message(evidence.error)}</p>
+            )}
+            {selected && trace.data?.structural_candidates && (
+              <p className="padded muted">
+                {sectionPath(
+                  trace.data.structural_candidates.find(
+                    (c) =>
+                      c.evidence_ids.includes(selected.evidence_id) ||
+                      c.parent_id ===
+                        trace.data?.evidence_pack?.spans.find(
+                          (s) => s.evidence_id === selected.evidence_id,
+                        )?.parent_id,
+                  )?.section_path ?? [],
+                )}
+              </p>
             )}
             {evidence.data && (
               <PdfEvidence

@@ -95,6 +95,9 @@ export function PdfEvidence({ citation }: { citation: Citation }) {
       </div>
       <p className="version-meta">
         固定版本 {citation.document_version_id.slice(0, 8)} · 原始 PDF
+        <span className="block-id" title={citation.evidence_id}>
+          EvidenceSpan {citation.evidence_id}
+        </span>
       </p>
       <blockquote>{citation.span.quote}</blockquote>
       <div className="pdf-toolbar">

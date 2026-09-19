@@ -3,6 +3,9 @@ import { Link, useParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, listKBs, message, unwrap, type Citation } from "./api";
 import { Button } from "./components/ui/button";
+import { StructuralTrace } from "./structural-trace";
+import { CaseRuntimeView } from "./runtime-view";
+import { statusTone, judgmentLabel } from "./product-facts";
 import { PdfEvidence } from "./pdf-evidence";
 import type { components } from "./generated/api";
 
@@ -87,13 +90,7 @@ function Pages({
   );
 }
 function Status({ value }: { value: string }) {
-  return (
-    <span
-      className={`status ${["COMPLETED", "READY", "closed"].includes(value) ? "ready" : ["FAILED", "FAILED_FINAL", "open"].includes(value) ? "failed" : ""}`}
-    >
-      {value}
-    </span>
-  );
+  return <span className={`status ${statusTone(value)}`}>{value}</span>;
 }
 function Metric({
   label,
@@ -233,8 +230,8 @@ export function RunInspector() {
               <Status value={row.status} />
             </div>
             <p className="ops-id">{row.id}</p>
-            <Link className="ops-link" to={`/kb/${row.kb_id}`}>
-              返回知识库 →
+            <Link className="ops-link" to={`/kb/${row.kb_id}?run=${row.id}`}>
+              在 Ask 中查看答案 →
             </Link>
             <div className="ops-metrics">
               <Metric label="文档版本" value={row.versions.length} />
@@ -302,61 +299,72 @@ export function RunInspector() {
             <Json label="阶段时间戳和配置" value={row.stages} />
           </div>
           <div className="ops-panel">
-            <h2>证据的筛选过程</h2>
-            <div className="ops-tabs">
-              {[
-                ["dense", "Dense"],
-                ["bm25", "BM25"],
-                ["rrf", "RRF"],
-                ["input", "重排输入"],
-                ["reranker", "Reranker"],
-                ["final", "最终证据"],
-              ].map(([key, label]) => (
-                <button
-                  key={key}
-                  aria-pressed={branch === key}
-                  onClick={() => setBranch(key)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <p className="muted">
-              {candidates.length} 条 · Dense / BM25 的名次与分数按文档版本解释。
-            </p>
-            <div className="ops-table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>排名</th>
-                    <th>片段</th>
-                    <th>分数</th>
-                    <th>文档版本</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {candidates.map((c, i) => (
-                    <tr key={`${text(c.candidate_id)}-${i}`}>
-                      <td>{text(c.rank)}</td>
-                      <td>
-                        <p>{text(c.text ?? c.candidate_id)}</p>
-                        <small>{short(c.candidate_id)}</small>
-                        {!!c.duplicate_of && (
-                          <small>同版本重复 → {short(c.duplicate_of)}</small>
-                        )}
-                        {!!c.context_seed && (
-                          <small>相邻原文 · seed {short(c.context_seed)}</small>
-                        )}
-                      </td>
-                      <td>{number(c.score)?.toFixed(4) ?? "—"}</td>
-                      <td title={text(c.document_version_id)}>
-                        {short(c.document_version_id)}
-                      </td>
-                    </tr>
+            {row.trace_schema_revision === "structural-trace-v1" ? (
+              <StructuralTrace run={row} />
+            ) : (
+              <>
+                <h2>证据的筛选过程</h2>
+                <div className="ops-tabs">
+                  {[
+                    ["dense", "Dense"],
+                    ["bm25", "BM25"],
+                    ["rrf", "RRF"],
+                    ["input", "重排输入"],
+                    ["reranker", "Reranker"],
+                    ["final", "最终证据"],
+                  ].map(([key, label]) => (
+                    <button
+                      key={key}
+                      aria-pressed={branch === key}
+                      onClick={() => setBranch(key)}
+                    >
+                      {label}
+                    </button>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </div>
+                <p className="muted">
+                  {candidates.length} 条 · Dense / BM25
+                  的名次与分数按文档版本解释。
+                </p>
+                <div className="ops-table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>排名</th>
+                        <th>片段</th>
+                        <th>分数</th>
+                        <th>文档版本</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {candidates.map((c, i) => (
+                        <tr key={`${text(c.candidate_id)}-${i}`}>
+                          <td>{text(c.rank)}</td>
+                          <td>
+                            <p>{text(c.text ?? c.candidate_id)}</p>
+                            <small>{short(c.candidate_id)}</small>
+                            {!!c.duplicate_of && (
+                              <small>
+                                同版本重复 → {short(c.duplicate_of)}
+                              </small>
+                            )}
+                            {!!c.context_seed && (
+                              <small>
+                                相邻原文 · seed {short(c.context_seed)}
+                              </small>
+                            )}
+                          </td>
+                          <td>{number(c.score)?.toFixed(4) ?? "—"}</td>
+                          <td title={text(c.document_version_id)}>
+                            {short(c.document_version_id)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </div>
           <div className="ops-panel">
             <h2>最终答案与引用</h2>
@@ -436,7 +444,12 @@ export function EvaluationsPage() {
   const cache = useQueryClient(),
     [offset, setOffset] = useState(0),
     [kbId, setKbId] = useState(""),
-    [split, setSplit] = useState<"dev" | "test" | "all">("dev");
+    [split, setSplit] = useState<
+      "dev" | "test" | "all" | "regression" | "safety"
+    >("dev"),
+    [dataset, setDataset] = useState<
+      "public-standards-v1" | "citeweave-public-telecom-eval-v1"
+    >("citeweave-public-telecom-eval-v1");
   const kbs = useQuery({ queryKey: ["kbs"], queryFn: listKBs });
   const runs = useQuery({
     queryKey: ["evaluations", offset],
@@ -454,9 +467,12 @@ export function EvaluationsPage() {
         await api.POST("/v1/evaluations", {
           body: {
             kb_id: kbId,
-            dataset_id: "public-standards-v1",
+            dataset_id: dataset,
             split,
-            profile: "m3-context",
+            profile:
+              dataset === "citeweave-public-telecom-eval-v1"
+                ? "telecom-structural-v1"
+                : "m3-context",
             judge_profile: "judge-v4",
           },
           params: { header: { "idempotency-key": crypto.randomUUID() } },
@@ -472,10 +488,29 @@ export function EvaluationsPage() {
       subtitle="使用冻结问题集比较检索、证据覆盖、回答质量和引用定位。"
     >
       <div className="ops-panel">
-        <h2>运行公开标准评测</h2>
+        <h2>冻结数据集与评测</h2>
+        <label>
+          数据集
+          <select
+            aria-label="评测数据集"
+            value={dataset}
+            onChange={(e) => {
+              setDataset(e.target.value as typeof dataset);
+              setSplit("dev");
+            }}
+          >
+            <option value="citeweave-public-telecom-eval-v1">
+              CiteWeave independent public telecom corpus
+            </option>
+            <option value="public-standards-v1">
+              历史 public-standards-v1
+            </option>
+          </select>
+        </label>
         <p className="muted">
-          3 份公开 PDF · 48 题 · 开发 / 测试各 24 题。选中的知识库须已包含
-          manifest 指定的三份原件。
+          {dataset === "citeweave-public-telecom-eval-v1"
+            ? "72 个可见案例 · Dev 32 / Regression 24 / Safety 16。Holdout: NOT_YET_SEALED · 24 题待独立封存。AI/source-grounded labels，不是 Human Gold。"
+            : "历史数据集 · 48 题 · Dev/Test 各 24；历史结果不代表新语料质量。"}
         </p>
         <div className="ops-form">
           <label>
@@ -495,16 +530,26 @@ export function EvaluationsPage() {
               value={split}
               onChange={(e) => setSplit(e.target.value as typeof split)}
             >
-              <option value="dev">Development · 24 题</option>
-              <option value="test">Frozen Test · 24 题</option>
-              <option value="all">全部 · 48 题</option>
+              {dataset === "citeweave-public-telecom-eval-v1" ? (
+                <>
+                  <option value="dev">Development · 32</option>
+                  <option value="regression">Regression · 24</option>
+                  <option value="safety">Safety · 16</option>
+                </>
+              ) : (
+                <>
+                  <option value="dev">Development · 24</option>
+                  <option value="test">Frozen Test · 24</option>
+                  <option value="all">全部 · 48</option>
+                </>
+              )}
             </select>
           </label>
           <Button
             disabled={!kbId || create.isPending}
             onClick={() => create.mutate()}
           >
-            开始批量评测
+            启动已配置 Provider 的评测
           </Button>
         </div>
         <p className="muted">
@@ -613,6 +658,30 @@ export function EvaluationDetail() {
               <Status value={evaluation.data.status} />
             </div>
             <p className="ops-id">{id}</p>
+            <p className="ops-notice">
+              {evaluation.data.dataset_id === "fixture"
+                ? "TEST FIXTURE · 原创故障注入记录 · 不是语料质量评测"
+                : evaluation.data.dataset_id ===
+                    "citeweave-public-telecom-eval-v1"
+                  ? "AI / source-grounded labels · 未经人审的标签不是 Human Gold。Holdout: NOT_YET_SEALED。"
+                  : "历史评测 · 不代表当前结构语料质量"}
+            </p>
+            <div className="state-counts">
+              {Object.entries(object(summary.case_status)).map(
+                ([state, count]) => (
+                  <span key={state}>
+                    <Status value={state} /> {text(count)}
+                  </span>
+                ),
+              )}
+            </div>
+            <Json
+              label="完整性 / 失败分母 / 缺失语义判断"
+              value={{
+                completeness: evaluation.data.completeness,
+                quality_accounting: summary.quality_accounting,
+              }}
+            />
             <div className="ops-metrics">
               <Metric
                 label="已评估 / 总题数"
@@ -659,8 +728,8 @@ export function EvaluationDetail() {
               evaluation.data.status,
             ) && (
               <p className="muted">
-                停止后不再派发新题；当前题目会在既定超时内结束，不再启动新的
-                Judge。
+                取消由 PostgreSQL 提交并使旧 owner
+                失效。已经发出的上游请求无法召回；未知费用仍保留。
               </p>
             )}
             <Json
@@ -673,7 +742,7 @@ export function EvaluationDetail() {
             />
           </div>
           <div className="ops-panel">
-            <h2>检索指标 @20</h2>
+            <h2>检索指标 · Recall@20 / MRR@10 / nDCG@10</h2>
             <div className="ops-table-wrap">
               <table>
                 <thead>
@@ -687,12 +756,13 @@ export function EvaluationDetail() {
                 <tbody>
                   {["dense", "bm25", "rrf", "reranked"].map((s) => {
                     const m = object(object(retrieval[s])["20"]);
+                    const rank10 = object(object(retrieval[s])["10"]);
                     return (
                       <tr key={s}>
                         <td>{s}</td>
                         <td>{metric(m.recall)}</td>
-                        <td>{metric(m.mrr)}</td>
-                        <td>{metric(m.ndcg)}</td>
+                        <td>{metric(rank10.mrr)}</td>
+                        <td>{metric(rank10.ndcg)}</td>
                       </tr>
                     );
                   })}
@@ -705,6 +775,10 @@ export function EvaluationDetail() {
       )}
       <div className="ops-panel">
         <h2>逐题结果</h2>
+        <p className="muted">
+          FAILED / CANCELLED / OUTCOME_UNKNOWN 保留在总题数；缺少判断不折算为 0
+          分。
+        </p>
         {cases.data?.map((c) => (
           <div key={c.case_id} className="ops-case">
             <button
@@ -715,17 +789,19 @@ export function EvaluationDetail() {
             >
               <div>
                 <strong>{c.case_id}</strong>
-                <p>{text(c.result.question ?? "等待执行")}</p>
+                <p>{text(c.result.question ?? "此记录未保存题面")}</p>
               </div>
               <Status value={c.status} />
             </button>
             {expanded === c.case_id && (
               <>
+                <CaseRuntimeView evaluationId={id} value={c} />
                 <p className="answer-text">
                   {text(object(c.result.answer).text ?? "无有效答案")}
                 </p>
                 <p className="muted">
-                  Judge：{text(object(c.judge.scores).verdict)} ·{" "}
+                  {judgmentLabel(c.judge)} ·{" "}
+                  {text(object(c.judge.scores).verdict)} ·{" "}
                   {text(object(c.judge.scores).reason)}
                 </p>
                 {!!c.human_review.verdict && (
@@ -1050,6 +1126,11 @@ export function SystemPage() {
     queryFn: async () => unwrap(await api.GET("/v1/system")),
     refetchInterval: 5000,
   });
+  const broker = useQuery({
+    queryKey: ["broker"],
+    queryFn: async () => unwrap(await api.GET("/v1/runtime/broker")),
+    refetchInterval: 10000,
+  });
   const jobs = useQuery({
     queryKey: ["jobs", offset],
     queryFn: async () =>
@@ -1090,6 +1171,11 @@ export function SystemPage() {
       {row && (
         <div className="ops-panel">
           <div className="ops-metrics">
+            <Metric
+              label="Redis / PING"
+              value={`${broker.data?.version ?? "不可用"} / ${broker.data?.ping ? "OK" : "不可用"}`}
+              note="PostgreSQL 是业务事实来源"
+            />
             <Metric label="本地模型" value={text(row.model_gateway.status)} />
             <Metric label="回答次数" value={row.query_count} />
             <Metric

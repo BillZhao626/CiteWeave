@@ -21,10 +21,6 @@ test('independent contexts: Ask, SSE, citation, PDF and trace', async ({ browser
       extraHTTPHeaders: { Authorization: `Bearer ${process.env.CW_BENCH_TOKEN ?? ''}` },
     });
     const page = await context.newPage();
-    await page.route('**/v1/queries', async route => {
-      const body = route.request().postDataJSON();
-      await route.continue({ postData: JSON.stringify({ ...body, profile: 'telecom-structural-v1' }) });
-    });
     try {
       for (let round = 0; round < rounds; round++) {
         const question = 'Does HTTP/3 support HTTP Upgrade?';
@@ -34,6 +30,7 @@ test('independent contexts: Ask, SSE, citation, PDF and trace', async ({ browser
           question_sha256: createHash('sha256').update(question).digest('hex') };
         try {
           await page.goto(`${base}/kb/${kb}`);
+          await page.getByLabel('检索路径', { exact: true }).selectOption('telecom-structural-v1');
           await page.locator('#question').fill(question);
           const responsePromise = page.waitForResponse(r => r.url().endsWith('/v1/queries'), { timeout: 62000 });
           await page.getByRole('button', { name: '发送问题' }).click();
@@ -43,15 +40,16 @@ test('independent contexts: Ask, SSE, citation, PDF and trace', async ({ browser
             row.status = response.status() === 429 ? '429' : 'admission_rejected';
           } else {
             row.admission = performance.now() / 1000; row.start = row.admission;
-            const events = (await response.text()).split('\n').filter(s => s.startsWith('data:')).map(s => JSON.parse(s.slice(5)));
-            const final = events.find(e => e.type === 'final');
-            expect(final).toBeTruthy();
-            expect(runIds.has(final.run_id)).toBe(false); runIds.add(final.run_id);
-            row.run_id = final.run_id;
+            await expect(page.getByRole('button', { name: '查看引用 E1', exact: true }).first()).toBeVisible({ timeout: 62000 });
+            const link = page.locator('.trace a[href^="/runs/"]');
+            await expect(link).toHaveAttribute('href', /\/runs\/[0-9a-f-]+/);
+            const runId = (await link.getAttribute('href'))!.split('/').pop()!;
+            expect(runIds.has(runId)).toBe(false); runIds.add(runId);
+            row.run_id = runId;
             await page.getByRole('button', { name: '查看引用 E1', exact: true }).first().click();
             await expect(page.locator('.pdf-viewer canvas')).toBeVisible();
-            await page.goto(`${base}/runs/${final.run_id}`);
-            await expect(page.locator('main')).toBeVisible();
+            await page.goto(`${base}/runs/${runId}`);
+            await expect(page.getByTestId('structural-trace')).toBeVisible();
             row.status = 'success';
           }
         } catch (error) { row.error_code = error instanceof Error ? error.name : 'unknown'; }

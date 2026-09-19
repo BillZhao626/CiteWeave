@@ -62,4 +62,28 @@ describe("Fetch SSE boundary", () => {
       new EventDecoder().push(new TextEncoder().encode("data: {"), true),
     ).toThrow("stream_incomplete");
   });
+  it("rejects a late final after an error without delivering it", async () => {
+    const events = [
+      { type: "error", run_id: id, code: "query_cancelled" },
+      {
+        type: "final",
+        run_id: id,
+        answer: {
+          run_id: id,
+          text: "late",
+          citations: [],
+          prompt_version: "original-test",
+        },
+      },
+    ];
+    const delivered: string[] = [];
+    const response = new Response(
+      events.map((e) => `data: ${JSON.stringify(e)}\n\n`).join(""),
+      { headers: { "content-type": "text/event-stream" } },
+    );
+    await expect(
+      readAnswer(response, (e) => delivered.push(e.type)),
+    ).rejects.toThrow("event_after_terminal");
+    expect(delivered).toEqual(["error"]);
+  });
 });

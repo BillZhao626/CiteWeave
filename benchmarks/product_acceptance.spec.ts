@@ -1,0 +1,125 @@
+import { test, expect } from '@playwright/test';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+// Operator-supplied accepted identities. No fabricated route responses or DOM evidence.
+test('accepted product surfaces, immutable PDF and eight independent mock sessions', async ({browser}) => {
+  test.skip(!process.env.CW_PRODUCT_ACCEPTANCE, 'explicit private runtime configuration required');
+  const config=JSON.parse(readFileSync(process.env.CW_PRODUCT_ACCEPTANCE!, 'utf8'));
+  expect(process.env.CW_BENCH_PROVIDER).toBe('mock');
+  test.setTimeout(240000);
+  mkdirSync(config.output,{recursive:true});
+  const headers={Authorization:`Bearer ${process.env.CW_BENCH_TOKEN}`};
+  const context=await browser.newContext({extraHTTPHeaders:headers,viewport:{width:1600,height:1100}});
+  const page=await context.newPage();
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  const shots:Record<string,unknown>[]=[];
+  async function shot(name:string,identity:Record<string,unknown>={}) {
+    const path=`${config.output}/${name}.png`;
+    await page.screenshot({path,fullPage:false});
+    shots.push({file:`${name}.png`,sha256:createHash('sha256').update(readFileSync(path)).digest('hex'),url:page.url(),...identity});
+  }
+  await page.goto(config.base);
+  await expect(page.getByRole('link',{name:'文档 / 结构',exact:true})).toBeVisible();
+  await page.goto(`${config.base}/documents?kb=${config.kb}`);
+  await expect(page.locator('.ops-row')).toHaveCount(7);
+  await shot('01-corpus',{corpus:'CiteWeave independent public telecom corpus'});
+  await page.goto(`${config.base}/kb/${config.kb}?run=${config.healthy}`);
+  await expect(page.getByRole('button',{name:'查看引用 E1',exact:true})).toBeVisible();
+  await expect(page.locator('.replay-notice')).toContainText(/MOCK|未记录/);
+  await shot('02-ask-final',{run_id:config.healthy,generation:'mock engineering replay'});
+  const citationResponse=page.waitForResponse(r=>r.url().includes('/v1/evidence/'));
+  await page.getByRole('button',{name:'查看引用 E1',exact:true}).click();
+  const citation=await (await citationResponse).json();
+  await expect(page.locator('.evidence-highlight').first()).toBeVisible();
+  expect(await page.locator('.evidence-highlight').first().getAttribute('data-evidence-id')).toBe(citation.evidence_id);
+  expect(await page.locator('.pdf-page').getAttribute('data-page-index')).toBe(String(citation.span.boxes[0].page_index));
+  const pdf=await context.request.get(config.base+citation.content_url);
+  expect(pdf.ok()).toBeTruthy();
+  expect(createHash('sha256').update(await pdf.body()).digest('hex')).toBe(citation.span.source_sha256);
+  await shot('03-pdf-highlight',{run_id:config.healthy,evidence_id:citation.evidence_id,pdf_sha256:citation.span.source_sha256});
+  await page.goto(`${config.base}/runs/${config.healthy}`);
+  await expect(page.getByTestId('candidate-table')).toBeVisible();
+  const run=await (await context.request.get(`${config.base}/v1/runs/${config.healthy}`)).json();
+  expect(run.structural_candidates.filter((c:Record<string,unknown>)=>c.bge).length).toBe(20);
+  expect(run.evidence_pack.added_chars).toBeGreaterThan(0);
+  await page.getByTestId('candidate-table').scrollIntoViewIfNeeded();
+  await shot('04-retrieval-trace',{run_id:run.id,profile:run.runtime_config.profile});
+  await page.getByTestId('evidence-pack').scrollIntoViewIfNeeded();
+  await expect(page.locator('[data-origin="sibling"]').first()).toBeAttached();
+  await shot('05-parent-evidence-pack',{run_id:run.id,added_chars:run.evidence_pack.added_chars});
+  const seed=run.structural_candidates.find((c:Record<string,unknown>)=>c.seed_rank);
+  await page.goto(`${config.base}/versions/${seed.version_id}/structure?artifact=${seed.artifact_id}&node=${seed.parent_id}`);
+  await expect(page.locator('.child-detail').first()).toBeVisible();
+  const childDetail=page.locator('.child-detail').filter({hasText:seed.child_id.slice(0,12)});
+  await childDetail.locator('summary').click();
+  await expect(childDetail.locator('.member-ids')).toContainText(seed.evidence_ids[0]);
+  await shot('06-structure',{artifact_id:seed.artifact_id,parent_id:seed.parent_id,child_id:seed.child_id});
+  await page.locator('.span-quote').first().click();
+  await expect(page.locator('.evidence-highlight').first()).toBeVisible();
+  await page.goto(`${config.base}/runs/${config.compare}`);
+  await expect(page.getByTestId('source-gaps')).toBeVisible();
+  await shot('07-source-gaps',{run_id:config.compare});
+  await page.goto(`${config.base}/runs/${config.degraded}`);
+  await expect(page.getByTestId('structural-trace')).toContainText('degraded_reranker_unavailable');
+  const degraded=await (await context.request.get(`${config.base}/v1/runs/${config.degraded}`)).json();
+  expect(degraded.structural_candidates.every((c:Record<string,unknown>)=>c.bge===null)).toBeTruthy();
+  await shot('08-degraded-bge',{run_id:config.degraded});
+  await page.goto(`${config.base}/system`);
+  await expect(page.getByText('PostgreSQL 是业务事实来源')).toBeVisible();
+  await expect(page.locator('.ops-metric').first()).toContainText('OK');
+  await page.locator('.ops-job').first().locator('summary').first().click();
+  await shot('09-runtime-tasks');
+  await page.goto(`${config.base}/evaluations/${config.evaluation}`);
+  await expect(page.getByText(/Holdout: NOT_YET_SEALED/)).toBeVisible();
+  await shot('10a-evaluation-summary',{eval_run_id:config.evaluation,generation:'mock engineering subset; not quality evidence'});
+  await page.locator('.ops-case-heading').first().click();
+  await expect(page.locator('.case-runtime')).toContainText('PostgreSQL 持久状态');
+  await shot('10-evaluation',{eval_run_id:config.evaluation,generation:'mock C4 engineering subset; other cases cancelled'});
+  await page.goto(`${config.faultBase}/evaluations/${config.unknown}`);
+  await expect(page.getByText(/TEST FIXTURE/)).toBeVisible();
+  await page.locator('.ops-case-heading').first().click();
+  await expect(page.locator('.case-runtime')).toContainText('不会自动重发');
+  await expect(page.locator('.case-runtime')).toContainText('not_eligible');
+  await expect(page.locator('.case-runtime .status')).toHaveText('UNKNOWN');
+  await expect(page.locator('.case-runtime .status')).toHaveClass(/failed/);
+  await page.locator('.case-runtime').scrollIntoViewIfNeeded();
+  await shot('11-unknown-case',{eval_run_id:config.unknown,provenance:'accepted C4 counting-provider fault fixture'});
+  if(config.clean) {
+    await page.goto(`${config.clean.base}/kb/${config.clean.kb}?run=${config.clean.run_id}`);
+    await expect(page.getByText('MOCK · 工程回放 · 非答案质量证据',{exact:true})).toBeVisible();
+    await page.getByRole('button',{name:'查看引用 E1',exact:true}).click();
+    await expect(page.locator('.evidence-highlight').first()).toBeVisible();
+    await shot('12-clean-start-original-fixture',{run_id:config.clean.run_id,fixture:'original CC0 fixture; real E5/BGE, mock generation'});
+  }
+  await context.close();
+  const sessions=[]; const ids=new Set<string>();
+  // Eight independent browser contexts, sequential requests at the accepted capacity=1.
+  // This is isolation/UI acceptance, not an eight-user throughput claim.
+  for(let i=0;i<8;i++) {
+    const ctx=await browser.newContext({extraHTTPHeaders:headers,viewport:{width:1280,height:900}});
+    const p=await ctx.newPage();
+    await p.goto(`${config.base}/kb/${config.kb}`);
+    await p.getByLabel('检索路径',{exact:true}).selectOption('telecom-structural-v1');
+    await p.locator('#question').fill('Does HTTP/3 support HTTP Upgrade?');
+    const responsePromise=p.waitForResponse(r=>r.url().endsWith('/v1/queries'));
+    await p.getByRole('button',{name:'发送问题',exact:true}).click();
+    const response=await responsePromise;
+    expect(response.status()).toBe(200);
+    await expect(p.getByRole('button',{name:'查看引用 E1',exact:true})).toBeVisible({timeout:60000});
+    const runLink=p.locator('.trace a[href^="/runs/"]');
+    await expect(runLink).toHaveAttribute('href',/\/runs\/[0-9a-f-]+/);
+    const runId=(await runLink.getAttribute('href'))!.split('/').pop()!;
+    expect(ids.has(runId)).toBe(false);ids.add(runId);
+    await expect(p.locator('.draft-label')).toHaveCount(0);
+    await p.getByRole('button',{name:'查看引用 E1',exact:true}).click();
+    await expect(p.locator('.evidence-highlight').first()).toBeVisible();
+    const r=await (await ctx.request.get(`${config.base}/v1/runs/${runId}`)).json();
+    expect(r.trace_schema_revision).toBe('structural-trace-v1');
+    expect(r.usage.provider_id).toContain('mock');
+    sessions.push({session:i,run_id:runId,status:'PASS',profile:'telecom-structural-v1'});
+    await ctx.close();
+  }
+  expect(errors).toEqual([]);
+  writeFileSync(`${config.output}/browser-acceptance.json`,JSON.stringify({status:'PASS',source:config.source,screenshots:shots,sessions,console_errors:errors,paid_calls:0,scope:'C5 engineering UI acceptance; eight independent contexts, sequential at capacity one'},null,2));
+});

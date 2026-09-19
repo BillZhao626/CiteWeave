@@ -28,6 +28,7 @@ import {
   VersionsPage,
   SystemPage,
 } from "./operations";
+import { DocumentsPage, StructureView } from "./structure-view";
 import "./index.css";
 
 const client = new QueryClient({
@@ -135,8 +136,11 @@ function Layout() {
           <BookOpen size={17} /> 知识库
         </NavLink>
         <nav className="ops-nav" aria-label="开发与管理">
+          <NavLink className="nav-item" to="/documents">
+            文档 / 结构
+          </NavLink>
           <NavLink className="nav-item" to="/runs">
-            回答记录
+            运行 / Trace
           </NavLink>
           <NavLink className="nav-item" to="/evaluations">
             评测
@@ -160,7 +164,7 @@ function Layout() {
           <p>
             <span className="online-dot" /> 本地工作空间
           </p>
-          <small>Production-oriented alpha</small>
+          <small>Independent engineering · Alpha</small>
           <button
             className="text-button"
             onClick={async () => {
@@ -179,7 +183,7 @@ function Layout() {
       <div className="main">
         <header className="topbar">
           <span>知识与证据 / 工作台</span>
-          <span className="chip">CITEWEAVE · M3</span>
+          <span className="chip">CITEWEAVE · LOCAL</span>
         </header>
         <Outlet />
       </div>
@@ -305,6 +309,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route element={<Layout />}>
             <Route index element={<Library />} />
             <Route path="kb/:id" element={<KnowledgeWorkspace />} />
+            <Route path="documents" element={<DocumentsPage />} />
+            <Route path="versions/:id/structure" element={<StructureView />} />
             <Route path="runs" element={<RunsPage />} />
             <Route path="runs/:id" element={<RunInspector />} />
             <Route path="evaluations" element={<EvaluationsPage />} />

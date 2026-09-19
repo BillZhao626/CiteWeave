@@ -1,82 +1,52 @@
-# CiteWeave · 让每条引用回到原文
+# CiteWeave · Trace every citation to its source
 
-**Production-oriented open-source evidence-grounded RAG engine · 0.3.0-alpha.1**
-
-个人独立实现的证据化知识库引擎，面向单人本机部署。将 PDF 摄取、中文混合检索、流式问答、精确引用、开发者复盘、批量评测和版本恢复串成一条可验证的工程链路。**M3 COMPLETE：本地开源候选验收通过。** 不宣称企业生产就绪或通用业务准确率。
+CiteWeave is an **independent public engineering reconstruction** of a local evidence-grounded RAG product. React Ask, immutable PDF citations, structural inspection, retrieval trace and durable evaluation share one PostgreSQL source of truth. This is a local engineering release candidate; remote publication and Stage-D quality promotion have not occurred.
 
 ```text
-创建知识库 → 上传 PDF → 持久摄取 → Dense + 中文 BM25 → RRF → BGE 重排
-→ 有界相邻原文补全 → DeepSeek 流式回答 → 引用校验 → 原 PDF 字符高亮
-                        ↘ Run Inspector / 同题对比 / 版本治理 / 故障恢复
+Official PDF → immutable EvidenceSpans → Section / Clause → Parent → RetrievalChild
+                                    ↓
+Ask scope → E5 Dense + BM25 → RRF k=60 → BGE → seeds + bounded Parent context
+        → EvidencePack → streamed provisional answer → validated Citation → original PDF
 ```
 
-引用绑定不可变文档版本、原文字符范围和坐标。PostgreSQL 保存业务事实；租约与 fencing 避免部分索引发布；Qdrant 可以从 PG + BlobStore 重建，Redis 消息丢失不等于业务任务丢失。
+The structural path is selectable as `telecom-structural-v1`. Existing knowledge bases retain their legacy profile. Target ingestion, retrieval parameters and C1–C4 durable semantics are preserved. Structure inspection does not reparse or edit a source. Citation geometry validity is separate from semantic support.
 
-## 快速开始
+## Run locally
 
-验证环境：Windows / PowerShell 7 / Python 3.12 / Node ≥22.20 / pnpm 11.19 / Docker Desktop / 16 GB RAM / RTX 4060 Laptop 8 GB。本地 E5/BGE 模型，生成使用个人 DeepSeek API。首次需下载依赖、模型和镜像。CPU-only 与 Linux 一键入口尚未验收。
+Supported acceptance environment: Windows 11, PowerShell 7, Python 3.12, Node ≥22.20, pnpm 11.19, Docker Desktop, 16 GB RAM and an RTX 4060 Laptop with 8 GB VRAM. CPU-only and Linux one-command setup have not been accepted. Dependencies, images and model revisions are pinned; no models or dependency binaries are redistributed.
 
 ```powershell
-# 在启动环境配置个人 DEEPSEEK_API_KEY，不写入源码、前端变量或日志。
-.\scripts\m1.ps1 -Setup         # 首次安装锁定依赖、固定 revision 模型并启动
-.\scripts\m1.ps1 -Action Up     # 后续启动当前版本
-.\scripts\m1.ps1 -Action Verify # 真实数据库/检索模型 + 模拟 LLM 的回归门禁
-.\scripts\m1.ps1 -Action Stop   # 保留容器、卷和文档
+.\scripts\m1.ps1 -Setup          # install locked dependencies, start services
+.\scripts\m1.ps1 -Action Up      # subsequent start; applies forward migrations
+.\scripts\m1.ps1 -Action Verify  # real database/models, mocked generation tests
+.\scripts\m1.ps1 -Action Stop    # preserve volumes and original documents
 ```
 
-脚本名沿用历史版本以保留已有数据卷，运行内容是当前 M3。打开 [工作台](http://127.0.0.1:18080/)，用本机生成的 `.env` 中 `CW_ADMIN_TOKEN` 登录。创建知识库，上传页面提供的原创示例 PDF，等待可提问，再问：“湖畔观测站的温度传感器多久采样一次，原始数据保留多久？”点击引用核对原件，从回答记录进入 Inspector。详见 [安装与恢复](docs/M3_OPERATIONS.md)。
+The historical script name preserves the existing deployment/data layout. Open [the local workbench](http://127.0.0.1:18080/), then use the generated local `CW_ADMIN_TOKEN`. Do not paste tokens into source or frontend variables. `.env.example` documents optional settings. `DEEPSEEK_API_KEY` is optional: without it, existing runs and evidence remain inspectable, but real generation is unavailable. Configuring a key and starting Ask/evaluation can incur charges; Stage-C evidence uses explicitly mocked generation.
 
-## 能力与技术栈
+For an initial functional check, create a knowledge base and upload the original handbook from the UI. For the structural corpus, follow [source acquisition and ingestion](docs/CURRENT_OPERATIONS.md). Official downloaded PDFs stay private; the repository includes metadata, original parser fixtures and source-grounded evaluation annotations, not complete third-party PDFs or bulk extracted text.
 
-| 能力 | 实际实现 |
-|---|---|
-| 有据问答 | SSE 草稿与最终答案分离；按 run / immutable version / span 授权，PDF.js 字符高亮 |
-| 检索复盘 | Dense、BM25、RRF、实际重排输入、BGE 排序、最终证据及相邻片段来源 |
-| 质量闭环 | 冻结 Dev/Test、人工参考对照、版本化 Judge、坏案例归因、基线/候选逐题对比 |
-| 版本治理 | rebuild、显式 rollback、引用保护、GC dry-run 与幂等维护审计 |
-| 可靠性 | 持久恢复、fencing、有界超时/重试/取消、共享熔断、单 GPU FIFO、未知费用保留预算 |
-| 恢复能力 | PG + 内容寻址原件备份，空 Qdrant 重建后重新解析历史引用 |
+## Product surfaces
 
-后端：FastAPI / Pydantic / SQLAlchemy 2 / Alembic / PostgreSQL 18 / Redis 8.2.9 / Celery 5.6 / Qdrant 1.16。检索：multilingual-e5-small + 中文 BM25 + RRF + BGE reranker v2-m3。前端：React 19 / TypeScript 6 / Vite 8 / Router / TanStack Query / Tailwind 4 / shadcn。API-first，OpenAPI 自动生成前端类型；没有新增无关基础设施。
+- **Ask:** knowledge-base/document scope, structural or legacy path, streamed provisional text, final citations and source PDF highlights. A loaded run preserves its recorded profile and version identities.
+- **Documents / Structure:** Section/Clause hierarchy, Parent context, Child text and original EvidenceSpan membership.
+- **Runs / Trace:** per-build Dense/BM25 ranks, RRF/BGE, seed decisions, Parent additions, source gaps and evidence budgets. Degraded runs do not display fabricated BGE values.
+- **Evaluation / Tasks:** finite execution/dispatch/admission accounting, provider outcomes, cancellations, explicit OUTCOME_UNKNOWN and missing semantic judgment. Redis/Celery transport work; PostgreSQL owns business state.
 
-## 真实质量证据
+## Engineering evidence and limits
 
-3 份历史英文标准 PDF、27 个物理页面、869 个原文片段；48 个中文问题，Dev/Test 各 24。相同版本与 Judge v4，对比真实 M2 输出和选定 C2。C2 只给已有六个种子补充有界同页原文，保留模型、召回预算、重排器和 answer-v1。
+C1–C4 engineering gates established the real Redis/Celery runtime, structural ingestion/typed Qdrant, real E5/BGE retrieval and finite evaluation recovery. Batch 4 passed 167 backend and four frontend tests, plus 18 real-service fault scenarios. Its tiny benchmark smokes prove the harness only. Current UI acceptance is documented in [the product ADR](docs/ADR_C5_PRODUCT_INSPECTION.md); private runtime/screenshots are not bundled into a public source candidate.
 
-| 指标 | M2 Dev → C2 Dev 复验 | M2 Test → C2 正式 Test |
-|---|---|---|
-| 最终有限 gold 覆盖 | .2383 → .5358，n=20 | .2227 → .5083，n=20 |
-| Judge 正确性/完整度均值 | .3125 → .5833，n=24 | .3261，n=23 → .7045，n=22 |
-| 正确性成对变化 | 7 提升 / 17 持平 / 0 退步 | 9 提升 / 12 持平 / 0 退步 / 3 不可比 |
-| C2 原 PDF 引用校验 | 50/50 | 59/59 |
+The independent telecom dataset has **72 visible cases**: Development 32, Regression 24 and Safety 16. The remaining 24 Holdout cases are **NOT_YET_SEALED**. Labels are AI/source-grounded, not human Gold. Missing judgments remain missing. The full 96-case quality study, final capacity matrix, paid model evaluation and default-profile promotion belong to Stage D and are not claimed here.
 
-Test 的 3 道不可比来自 Judge 引用支持校验失败，保留原始失败，不重复采样补分。定位通过不等于语义完全支持；Test 仍有 3 个事实句被 Judge 判为无支持，有限 gold 引用精度下降，p95 从约 1.83 秒增至 3.54 秒。首次 C2 Dev 分数 .6522（n=23），独立复验 .5833（n=24），同时公开而不挑选最高分。见 [完整指标、实验与代价](docs/M3_BENCHMARK.md)。
+Earlier M0–M3 and General Assistant V2 material, where referenced in repository history, is historical. Earlier corpus scores, screenshots and environment inventories do not describe this structural release candidate. No production SLA, enterprise readiness, quality improvement or eight-user capacity is claimed.
 
-24 道用户提交的 AI 辅助人工参考成功校验导入：7 正确、1 部分、16 错误/不当拒答。v1 一致率 21/24；v4 流水线 24/24，其中 20 道是确定性拒答规则，只有 4 道是 LLM 评估，不能写成“LLM Judge 准确率 100%”。
+## Architecture and reproducibility
 
-后端 64 项、前端 4 项回归通过；真实 worker SIGKILL 恢复 3/3。隔离恢复重建 16 个版本、验证 52 个 CAS 文件与 333 条历史引用，保留 221 个 QueryRun，用时 130.89 秒。这些是本机验收数据，不是持续容量或异地容灾保证。
+- [Current architecture](docs/CURRENT_ARCHITECTURE.md) · [Setup / operations](docs/CURRENT_OPERATIONS.md)
+- [Corpus acquisition](docs/data/public_telecom_sources.md) · [Source manifest](corpus/public_telecom_manifest.json)
+- [Structural ingestion](docs/ADR_STRUCTURAL_INGESTION.md) · [Structural retrieval](docs/ADR_C3_STRUCTURAL_QUERY_EVIDENCE.md)
+- [Durable evaluation](docs/ADR_C4_DURABLE_EVALUATION.md) · [Benchmark harness](benchmarks/README.md)
+- [Generated OpenAPI](contracts/openapi.json) · [Third-party terms](THIRD_PARTY.md) · [MIT](LICENSE)
 
-![同一道问题的基线与候选答案](docs/images/m3-comparison.png)
-
-## 文档
-
-- [架构](docs/M3_ARCHITECTURE.md) · [API](docs/M3_API_USAGE.md) · [OpenAPI](contracts/openapi.json)
-- [评测方法](docs/M3_EVALUATION.md) · [Benchmark](docs/M3_BENCHMARK.md) · [实验日志](docs/reports/m3-experiments.json)
-- [运行/恢复/发布](docs/M3_OPERATIONS.md) · [能力限制](docs/M3_LIMITATIONS.md) · [贡献指南](CONTRIBUTING.md)
-- [来源记录](docs/PROVENANCE.md) · [第三方许可](THIRD_PARTY.md) · [标准摘录声明](docs/DATA_NOTICES.md) · [SBOM](docs/reports/m3-sbom.cdx.json)
-- [M1 历史验收](docs/reports/M1_ACCEPTANCE.md) · [M2 历史验收](docs/reports/M2_ACCEPTANCE.md)
-- [M3 完整验收](docs/reports/M3_ACCEPTANCE.md) · [实际演示](docs/M3_DEMO.md) · [源码与证据审计](docs/reports/m3-release-audit.json) · [发布清单](docs/reports/m3-manifest.json)
-
-## 开源边界
-
-原创业务代码、文档和原创示例使用 [MIT](LICENSE)；依赖、模型和标准摘录保留各自权利。初期规划曾进行旧项目评审，因此不声称严格 clean-room 或未经核验的“100% 无权属争议”。后续实现使用本项目新代码/规格与公开资料，不混入旧单位源码、内部资料或凭证。
-
-原始第三方 PDF、`.env`、运行数据、模型缓存和私有审计不进入发布候选。使用经过扫描的独立源码包创建公开仓库，不要上传整个工作目录。298 个已安装组件的许可台账与 CycloneDX SBOM、活跃凭证检查及 Gitleaks 扫描分别记录；它们不是完整法律审计或漏洞认证。API 费用为估算，实际扣费 unavailable。当前未创建或推送远程仓库。
-
-## Opt-in structural PDF ingestion
-
-Uploads may explicitly select `ingestion_profile=general-text-pdf-v1` or `telecom-protocol-pdf-v1`. The default remains the legacy profile. New profiles persist immutable structure artifacts, numbered sections/clauses, structural parents, multi-span retrieval children and typed E5/BM25 index builds through the existing fenced ingestion job. Limits are 32 MiB, 600 pages, 100,000 citation atoms, 20,000 children and a 7,200-second durable ingestion budget. Unsupported glyphs/layouts fail explicitly.
-
-Authorized inspection is available at `/v1/versions/{version_id}/structure`, `/structure/nodes` and `/structure/children` (paged). Structural Ask is not enabled in this batch; legacy readers explicitly reject structural-child indexes. Existing citations and the legacy parser keep their original identity. Rebuilds read frozen structure rather than reparse a PDF.
-
-Fetch the independently acquired official sources with `python scripts/fetch_public_telecom.py`; see `docs/data/public_telecom_sources.md`. Download success does not imply parser acceptance or a completed engineering gate.
+Prepare a reviewed local source candidate with `python scripts/public_candidate.py --stage-only`. It uses an explicit documentation allowlist, rejects active credentials/private machine paths and scans with locally installed Gitleaks. It does not publish, tag, copy Git history or redistribute runtime evidence. No public repository URL exists yet. Preserve third-party rights and notices; source scans are not a legal or security certification.

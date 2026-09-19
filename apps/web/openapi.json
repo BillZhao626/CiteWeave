@@ -1992,6 +1992,178 @@
           }
         }
       }
+    },
+    "/v1/versions/{version_id}/structure/nodes/{node_id}": {
+      "get": {
+        "summary": "Context",
+        "operationId": "context_v1_versions__version_id__structure_nodes__node_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Version Id"
+            }
+          },
+          {
+            "name": "node_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Node Id"
+            }
+          },
+          {
+            "name": "artifact_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Artifact Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 40,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeContext"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/evaluations/{eval_id}/cases/{case_id}/runtime": {
+      "get": {
+        "summary": "Case Runtime",
+        "operationId": "case_runtime_v1_evaluations__eval_id__cases__case_id__runtime_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "eval_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Eval Id"
+            }
+          },
+          {
+            "name": "case_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Case Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseRuntime"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/broker": {
+      "get": {
+        "summary": "Broker",
+        "operationId": "broker_v1_runtime_broker_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrokerView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -2189,6 +2361,94 @@
           "score_scope"
         ],
         "title": "BranchHit"
+      },
+      "BrokerView": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "ping": {
+            "type": "boolean",
+            "title": "Ping",
+            "default": false
+          },
+          "authority": {
+            "type": "string",
+            "title": "Authority",
+            "default": "PostgreSQL"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role",
+            "default": "Redis transports Celery notifications; PostgreSQL owns task state."
+          },
+          "task_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Task Names"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "BrokerView"
+      },
+      "CaseRuntime": {
+        "properties": {
+          "phases": {
+            "items": {
+              "$ref": "#/components/schemas/PhaseView"
+            },
+            "type": "array",
+            "title": "Phases"
+          },
+          "dispatches": {
+            "items": {
+              "$ref": "#/components/schemas/DispatchView"
+            },
+            "type": "array",
+            "title": "Dispatches"
+          },
+          "retry_state": {
+            "type": "string",
+            "title": "Retry State"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Observed At"
+          },
+          "authority": {
+            "type": "string",
+            "title": "Authority",
+            "default": "PostgreSQL"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "phases",
+          "dispatches",
+          "retry_state",
+          "observed_at"
+        ],
+        "title": "CaseRuntime"
       },
       "ChildView": {
         "properties": {
@@ -2429,6 +2689,42 @@
           "split_policy"
         ],
         "title": "DatasetSummary"
+      },
+      "DispatchView": {
+        "properties": {
+          "dispatch_generation": {
+            "type": "integer",
+            "title": "Dispatch Generation"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "send_count": {
+            "type": "integer",
+            "title": "Send Count"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dispatch_generation",
+          "state",
+          "send_count",
+          "task_id"
+        ],
+        "title": "DispatchView"
       },
       "Document": {
         "properties": {
@@ -3422,6 +3718,40 @@
         ],
         "title": "Login"
       },
+      "NodeContext": {
+        "properties": {
+          "node": {
+            "$ref": "#/components/schemas/NodeView"
+          },
+          "ancestors": {
+            "items": {
+              "$ref": "#/components/schemas/NodeView"
+            },
+            "type": "array",
+            "title": "Ancestors"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/components/schemas/Citation"
+            },
+            "type": "array",
+            "title": "Spans"
+          },
+          "total_spans": {
+            "type": "integer",
+            "title": "Total Spans"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node",
+          "ancestors",
+          "spans",
+          "total_spans"
+        ],
+        "title": "NodeContext"
+      },
       "NodeView": {
         "properties": {
           "id": {
@@ -3508,6 +3838,11 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Details"
+          },
+          "is_parent": {
+            "type": "boolean",
+            "title": "Is Parent",
+            "default": false
           }
         },
         "type": "object",
@@ -3641,6 +3976,108 @@
           "budget_after"
         ],
         "title": "PackSpan"
+      },
+      "PhaseView": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "phase": {
+            "type": "string",
+            "title": "Phase"
+          },
+          "phase_attempt": {
+            "type": "integer",
+            "title": "Phase Attempt"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "query_run_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Run Id"
+          },
+          "dispatched_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dispatched At"
+          },
+          "reserved_yuan": {
+            "type": "number",
+            "title": "Reserved Yuan"
+          },
+          "estimated_yuan": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Yuan"
+          },
+          "result_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Hash"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "phase",
+          "phase_attempt",
+          "state",
+          "outcome",
+          "query_run_id",
+          "dispatched_at",
+          "reserved_yuan",
+          "estimated_yuan",
+          "result_hash",
+          "error_code"
+        ],
+        "title": "PhaseView"
       },
       "QueryCreate": {
         "properties": {

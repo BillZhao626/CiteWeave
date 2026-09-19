@@ -553,6 +553,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/versions/{version_id}/structure/nodes/{node_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Context */
+        get: operations["context_v1_versions__version_id__structure_nodes__node_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/evaluations/{eval_id}/cases/{case_id}/runtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Case Runtime */
+        get: operations["case_runtime_v1_evaluations__eval_id__cases__case_id__runtime_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/broker": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Broker */
+        get: operations["broker_v1_runtime_broker_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -638,6 +689,49 @@ export interface components {
             raw_score: number;
             /** Score Scope */
             score_scope: string;
+        };
+        /** BrokerView */
+        BrokerView: {
+            /** Status */
+            status: string;
+            /** Version */
+            version?: string | null;
+            /**
+             * Ping
+             * @default false
+             */
+            ping: boolean;
+            /**
+             * Authority
+             * @default PostgreSQL
+             */
+            authority: string;
+            /**
+             * Role
+             * @default Redis transports Celery notifications; PostgreSQL owns task state.
+             */
+            role: string;
+            /** Task Names */
+            task_names?: string[];
+        };
+        /** CaseRuntime */
+        CaseRuntime: {
+            /** Phases */
+            phases: components["schemas"]["PhaseView"][];
+            /** Dispatches */
+            dispatches: components["schemas"]["DispatchView"][];
+            /** Retry State */
+            retry_state: string;
+            /**
+             * Observed At
+             * Format: date-time
+             */
+            observed_at: string;
+            /**
+             * Authority
+             * @default PostgreSQL
+             */
+            authority: string;
         };
         /** ChildView */
         ChildView: {
@@ -746,6 +840,17 @@ export interface components {
             target_case_count?: number | null;
             /** Holdout Status */
             holdout_status?: string | null;
+        };
+        /** DispatchView */
+        DispatchView: {
+            /** Dispatch Generation */
+            dispatch_generation: number;
+            /** State */
+            state: string;
+            /** Send Count */
+            send_count: number;
+            /** Task Id */
+            task_id: string | null;
         };
         /** Document */
         Document: {
@@ -1153,6 +1258,16 @@ export interface components {
              */
             token: string;
         };
+        /** NodeContext */
+        NodeContext: {
+            node: components["schemas"]["NodeView"];
+            /** Ancestors */
+            ancestors: components["schemas"]["NodeView"][];
+            /** Spans */
+            spans: components["schemas"]["Citation"][];
+            /** Total Spans */
+            total_spans: number;
+        };
         /** NodeView */
         NodeView: {
             /**
@@ -1191,6 +1306,11 @@ export interface components {
             details: {
                 [key: string]: unknown;
             };
+            /**
+             * Is Parent
+             * @default false
+             */
+            is_parent: boolean;
         };
         /** Operation */
         Operation: {
@@ -1242,6 +1362,34 @@ export interface components {
             budget_after: number;
             /** Covered By */
             covered_by?: string[];
+        };
+        /** PhaseView */
+        PhaseView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Phase */
+            phase: string;
+            /** Phase Attempt */
+            phase_attempt: number;
+            /** State */
+            state: string;
+            /** Outcome */
+            outcome: string;
+            /** Query Run Id */
+            query_run_id: string | null;
+            /** Dispatched At */
+            dispatched_at: string | null;
+            /** Reserved Yuan */
+            reserved_yuan: number;
+            /** Estimated Yuan */
+            estimated_yuan: number | null;
+            /** Result Hash */
+            result_hash: string | null;
+            /** Error Code */
+            error_code: string | null;
         };
         /** QueryCreate */
         QueryCreate: {
@@ -2845,6 +2993,94 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    context_v1_versions__version_id__structure_nodes__node_id__get: {
+        parameters: {
+            query?: {
+                artifact_id?: string | null;
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                version_id: string;
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeContext"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    case_runtime_v1_evaluations__eval_id__cases__case_id__runtime_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eval_id: string;
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseRuntime"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    broker_v1_runtime_broker_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrokerView"];
                 };
             };
         };

@@ -59,3 +59,13 @@ The scripts clear the answer key and have no answer/judge execution path.
 Existing BLOCKED artifacts are retained outside new output subdirectories.
 This change does not authorize Holdout, performance benchmarks, answer quality
 or final candidate promotion. Source-support metric definitions are unchanged.
+# Phase 2 evaluator input-contract correction
+
+Development revision 1 fixes an evaluator-only defect: legacy profiles were
+given structural `single`/`compare` evidence modes, so `QueryCreate` rejected
+even eligible questions before provider dispatch. Evaluation now passes `auto`
+for legacy profiles and retains the existing structural mode selection. The
+160-character legacy limit, frozen questions, retrieval, evidence packs and
+Answer/Judge prompts remain unchanged. Focused tests cover legacy acceptance,
+the 161-character rejection, and both structural modes. This requires no schema
+migration. The pre-revision failed attempt remains in the private audit ledger.

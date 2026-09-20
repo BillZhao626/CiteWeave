@@ -70,7 +70,9 @@ async def execute_case(eval_id, case_id, owner):
                     kb_id=evaluation.kb_id,
                     question=spec["question"],
                     profile=evaluation.runtime_config.get("query_profile", "m2"),
-                    evidence_mode="compare" if spec["question_type"] == "comparison" else "single",
+                    evidence_mode=("compare" if spec["question_type"] == "comparison" else "single")
+                    if evaluation.runtime_config.get("query_profile", "m2") == "telecom-structural-v1"
+                    else "auto",
                 ),
                 f"eval:{eval_id}:{case_id}:{saved.execution_attempt}",
                 captured_bindings=evaluation.runtime_config["index_bindings"],

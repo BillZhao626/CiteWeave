@@ -111,7 +111,16 @@ def branches(snapshot, builds, question, dense, query=qdrant_branch):
 
 
 class StructuralRetriever:
-    def __init__(self, snapshot, model=None, repository=None, branch_query=qdrant_branch):
+    def __init__(
+        self,
+        snapshot,
+        model=None,
+        repository=None,
+        branch_query=qdrant_branch,
+        *,
+        parent_expansion=True,
+        capture_selection=False,
+    ):
         self.snapshot = StructuralSnapshot.model_validate(snapshot)
         self.model = model or ModelGateway()
         self.repository = repository or StructuralRepository(self.snapshot)
@@ -119,6 +128,9 @@ class StructuralRetriever:
         self.pack = None
         self.candidates = []
         self.binding_remaining = 2.0
+        self.parent_expansion = parent_expansion
+        self.capture_selection = capture_selection
+        self.selection_inputs = None
 
     def retrieve(self, question, version_ids):
         if set(version_ids) != {b.version_id for b in self.snapshot.bindings}:
@@ -250,6 +262,17 @@ class StructuralRetriever:
                     degraded = "degraded_reranker_unavailable"
             else:
                 binding_spent += time.monotonic() - binding_started
+            if self.capture_selection:
+                self.selection_inputs = dict(
+                    ordered=list(ordered),
+                    candidates={i: c.model_copy(deep=True) for i, c in candidates.items()},
+                    children={i: children[i] for i in ordered},
+                    repository=self.repository,
+                    tokenizer=ContextTokenizer(self.model),
+                    degraded=degraded,
+                    reason=reason,
+                    seed_atoms=atoms,
+                )
             binding_started = time.monotonic()
             with (
                 bounded_stage(2 - binding_spent),
@@ -264,6 +287,7 @@ class StructuralRetriever:
                     degraded,
                     reason,
                     seed_atoms=atoms,
+                    parent_expansion=self.parent_expansion,
                 )
             self.binding_remaining = 2 - binding_spent - (time.monotonic() - binding_started)
             return chunks, [c.model_dump(mode="json") for c in candidates.values()]

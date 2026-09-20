@@ -13,6 +13,25 @@ class Counter:
         return [{"bge": len(t) // 4 + 1} for t in texts]
 
 
+def test_evaluation_seed_only_preserves_healthy_seeds_and_default_parent():
+    from copy import deepcopy
+
+    ordered, candidates, children, repo, _ = fixture(sources=1)
+    args = (ordered, deepcopy(candidates), children, repo, Counter())
+    _, default = select_evidence(*args)
+    _, explicit = select_evidence(
+        ordered, deepcopy(candidates), children, repo, Counter(), parent_expansion=True
+    )
+    _, seed = select_evidence(
+        ordered, deepcopy(candidates), children, repo, Counter(), parent_expansion=False
+    )
+    assert default.model_dump() == explicit.model_dump()
+    assert seed.seed_child_ids == default.seed_child_ids
+    assert seed.degraded is None and seed.added_chars == 0
+    assert all(s.origin == "seed" for s in seed.spans)
+    assert default.added_chars > 0
+
+
 def fixture(confidence="VERIFIED_RULE", sources=2, text_size=30):
     atoms, children, neighbors, candidates = {}, {}, {}, {}
     bindings = [

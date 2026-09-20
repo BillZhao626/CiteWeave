@@ -76,7 +76,16 @@ def seed_order(ordered, candidates, snapshot):
 
 
 def select_evidence(
-    ordered, candidates, children, repository, tokenizer, degraded=None, reason=None, seed_atoms=None
+    ordered,
+    candidates,
+    children,
+    repository,
+    tokenizer,
+    degraded=None,
+    reason=None,
+    seed_atoms=None,
+    *,
+    parent_expansion=True,
 ):
     snapshot = repository.snapshot
     # Reuse this run's already verified seed atoms. Read expansion atoms only
@@ -189,7 +198,7 @@ def select_evidence(
         if str(parent.id) not in seen and len(anchors) < 3:
             seen.add(str(parent.id))
             anchors.append(identity)
-    if not degraded:
+    if not degraded and parent_expansion:
         neighbors = repository.neighbors([children[i] for i in anchors])
         all_children.update(neighbors)
         added_ids = {i for c in neighbors.values() for i in c["span_ids"]}

@@ -49,7 +49,7 @@ def transition_allowed(old: JobStatus, new: JobStatus):
     return NEXT.get(old) == new or (old in ACTIVE and new in {JobStatus.RETRY_WAIT, JobStatus.FAILED_FINAL})
 
 
-def chunk_blocks(blocks: list[Block], max_chars: int = 160) -> list[dict]:
+def chunk_blocks(blocks: list[Block], max_chars: int = 160, *, max_chunks: int = 1000) -> list[dict]:
     if not 1 <= max_chars <= 160:
         raise ValueError("invalid_chunk_limit")
     result = []
@@ -67,6 +67,6 @@ def chunk_blocks(blocks: list[Block], max_chars: int = 160) -> list[dict]:
                     "evidence": evidence.model_dump(mode="json"),
                 }
             )
-    if not result or len(result) > 1000:
+    if not result or len(result) > max_chunks:
         raise ValueError("chunk_count_out_of_range")
     return result

@@ -74,7 +74,7 @@ def candidate_cutoff(ranked, traces, limit, deduplicate):
     return selected
 
 
-def expand_context(seeds, pool, profile):
+def expand_context(seeds, pool, profile, *, accept=None):
     """Bounded neighboring ORIGINAL spans; no synthesized quote or changed identity."""
 
     def page_key(chunk):
@@ -113,6 +113,8 @@ def expand_context(seeds, pool, profile):
                     len(chosen) >= profile["max_evidence_spans"]
                     or chars + len(chunk.text) > profile["max_evidence_chars"]
                 ):
+                    continue
+                if accept is not None and not accept([*chosen.values(), chunk]):
                     continue
                 chosen[identity], origins[identity] = chunk, str(seed.id)
                 chars += len(chunk.text)

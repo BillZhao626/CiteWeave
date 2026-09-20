@@ -20,7 +20,7 @@ class Retriever(Protocol):
 
 
 class HybridRetriever:
-    def __init__(self, index=None, model=None, index_bindings=None, profile="m2"):
+    def __init__(self, index=None, model=None, index_bindings=None, profile="m2", *, capture_selection=False):
         self.index = index or QdrantIndex()
         self.index_bindings = index_bindings
         self.profile = query_profile(profile)
@@ -28,6 +28,8 @@ class HybridRetriever:
         if self.profile.get("embedding_key") and not index_bindings:
             raise ValueError("embedding_index_bindings_required")
         self.rerank_limit = self.profile.get("rerank_limit", 20)
+        self.capture_selection = capture_selection
+        self.selection_inputs = None
 
     def retrieve(self, question, version_ids):
         with transaction() as db:
@@ -152,6 +154,10 @@ class HybridRetriever:
                             )
                         )
                     )
+                if self.capture_selection:
+                    from copy import deepcopy
+
+                    self.selection_inputs = (list(selected), pool, deepcopy(traces))
                 if self.profile.get("context_strategy") == "geometry-paragraph-v1":
                     selected, origins, parents = expand_parents(selected, pool, self.profile)
                     info["parent_contexts"] = parents

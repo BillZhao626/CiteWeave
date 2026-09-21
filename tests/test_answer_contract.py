@@ -21,11 +21,40 @@ def isolated_circuit(monkeypatch):
 def test_citation_formatter_rejects_invented_missing_and_accepts_refusal():
     citation = SimpleNamespace(label="E1")
     assert validate_citations("结论 [E1]。重复 [E1]", [citation]) == [citation]
-    for answer in ("无引用的结论", "结论 [E2]", "结论 [E1] 和 [fake]"):
+    # [fake] migrated from the old broad-bracket negative to ordinary prose.
+    assert validate_citations("结论 [E1] 和 [fake]", [citation]) == [citation]
+    for answer in ("无引用的结论", "结论 [E2]", "结论 [E1] 和 [E999]", "结论 [E1] 和 [Efoo]"):
         with pytest.raises(ValueError):
             validate_citations(answer, [citation])
     assert validate_citations(REFUSAL, [citation]) == []
     assert fingerprint({"a": 1, "b": 2}) == fingerprint({"b": 2, "a": 1})
+
+
+@pytest.mark.parametrize(
+    "ordinary",
+    ["[RFC7252]", "[HTTP]", "[MQTT-3.1.2-18]", '[ ":" port ]', "[ordinary prose]", "[fake]"],
+)
+def test_reference_brackets_do_not_change_evidence_identity(ordinary):
+    first, second = SimpleNamespace(label="E1"), SimpleNamespace(label="E2")
+    assert validate_citations(f"{ordinary} [E2][E1][E2]", [first, second]) == [second, first]
+    with pytest.raises(ValueError, match="invalid_or_missing_citation"):
+        validate_citations(ordinary, [first, second])
+
+
+@pytest.mark.parametrize(
+    "token", ["[Efoo]", "[E-1]", "[E0]", "[E01]", "[E１]", "[E1 ]", "[E]", "[E1", "[E\n1]"]
+)
+def test_reserved_namespace_malformed_even_with_valid_citation(token):
+    with pytest.raises(ValueError, match="malformed_evidence_citation"):
+        validate_citations(f"Valid [E1], malformed {token}", [SimpleNamespace(label="E1")])
+
+
+def test_refusal_exception_is_exact_and_positive_labels_are_not_renumbered():
+    assert validate_citations(f"  {REFUSAL}\n", []) == []
+    with pytest.raises(ValueError, match="invalid_or_missing_citation"):
+        validate_citations(REFUSAL + " additional explanation [fake]", [])
+    citation = SimpleNamespace(label="E17")
+    assert validate_citations("Answer [E17]", [citation]) == [citation]
 
 
 def test_conservative_ratecard_and_unknown_usage():

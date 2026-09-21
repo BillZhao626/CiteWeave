@@ -248,7 +248,15 @@ def citation_for(chunk, label):
 def validate_citations(answer, selected):
     if answer.strip() == REFUSAL:
         return []
-    labels = list(dict.fromkeys(re.findall(r"\[([^\[\]\n]+)\]", answer)))
+    # Only [E...] is reserved; technical/reference brackets remain ordinary text.
+    labels = []
+    for opening in re.finditer(r"\[E", answer):
+        token = re.match(r"\[E[1-9][0-9]*\]", answer[opening.start() :])
+        if token is None:
+            raise ValueError("malformed_evidence_citation")
+        label = token.group()[1:-1]
+        if label not in labels:
+            labels.append(label)
     available = {c.label: c for c in selected}
     if not labels or any(label not in available for label in labels):
         raise ValueError("invalid_or_missing_citation")

@@ -24,6 +24,7 @@ import {
 import { readAnswer } from "./stream";
 import { generationLabel, sectionPath } from "./product-facts";
 import { PdfEvidence } from "./pdf-evidence";
+import { citationForPart, citationParts } from "./citation-tokens";
 
 const statuses: Record<string, string> = {
   PENDING: "已排队",
@@ -233,8 +234,8 @@ function Workspace({ id }: { id: string }) {
     }
   };
   function answerContent(value: Answer) {
-    return value.text.split(/(\[E\d+\])/g).map((part, i) => {
-      const citation = value.citations.find((c) => `[${c.label}]` === part);
+    return citationParts(value.text).map((part, i) => {
+      const citation = citationForPart(part, value.citations);
       return citation ? (
         <button
           key={i}

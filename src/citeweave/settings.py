@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     workspace_id: UUID = uuid5(NAMESPACE_URL, "citeweave-personal-workspace")
     deepseek_api_key: SecretStr = Field(default=SecretStr(""), validation_alias="DEEPSEEK_API_KEY")
     deepseek_model: Literal["deepseek-flash"] = "deepseek-flash"
+    telecom_answer_prompt: Literal["answer-telecom-v1", "answer-telecom-consistency-v1"] = "answer-telecom-v1"
     lease_seconds: int = Field(default=30, ge=5, le=300)
     max_attempts: int = Field(default=3, ge=1, le=5)
     monthly_budget_yuan: float = Field(default=50, gt=0, le=50)

@@ -24,6 +24,8 @@ current_trace = ContextVar("query_trace", default=None)
 def runtime_config(profile=DEFAULT_PROFILE):
     config = settings()
     revision = query_profile(profile)
+    if revision.get("unit_kind") == "structural_child":
+        revision["answer_prompt"] = config.telecom_answer_prompt
     prompt = revision["answer_prompt"]
     embedding_override = {}
     base_profile = PROFILE

@@ -1,0 +1,631 @@
+{
+  "version": "synthetic-v1",
+  "cases": [
+    {
+      "id": "affirmative-en",
+      "coverage": [
+        "affirmative",
+        "english"
+      ],
+      "question": "May members borrow a tripod?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "Members may borrow one tripod."
+      },
+      "propositions": {
+        "member-borrow": "permitted"
+      },
+      "equivalence_group": "tripod-permission",
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Yes, members may borrow one tripod [E1].",
+              "claims": {
+                "member-borrow": "permitted"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "The borrowing permission covers one tripod per member [E1].",
+              "claims": {
+                "member-borrow": "permitted"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Members cannot borrow a tripod [E1].",
+              "claims": {
+                "member-borrow": "forbidden"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "Members may borrow one tripod [E1].",
+              "claims": {
+                "member-borrow": "permitted"
+              }
+            }
+          ],
+          "rationale": "The direct prohibition conflicts with the supported permission."
+        }
+      ]
+    },
+    {
+      "id": "affirmative-zh",
+      "coverage": [
+        "affirmative",
+        "chinese"
+      ],
+      "question": "会员可以借用三脚架吗？",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "会员可以借用一个三脚架。"
+      },
+      "propositions": {
+        "member-borrow": "permitted"
+      },
+      "equivalence_group": "tripod-permission",
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "可以，会员可借用一个三脚架 [E1]。",
+              "claims": {
+                "member-borrow": "permitted"
+              }
+            },
+            {
+              "role": "summary",
+              "text": "借用权限为每位会员一个三脚架 [E1]。",
+              "claims": {
+                "member-borrow": "permitted"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "会员不得借用三脚架 [E1]。",
+              "claims": {
+                "member-borrow": "forbidden"
+              }
+            },
+            {
+              "role": "summary",
+              "text": "会员可借用一个三脚架 [E1]。",
+              "claims": {
+                "member-borrow": "permitted"
+              }
+            }
+          ],
+          "rationale": "禁止与许可指向同一条件下的同一行为。"
+        }
+      ]
+    },
+    {
+      "id": "negative",
+      "coverage": [
+        "negative"
+      ],
+      "question": "May visitors enter the archive?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "Visitors are not permitted to enter the archive."
+      },
+      "propositions": {
+        "visitor-entry": "forbidden"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "No, visitors may not enter the archive [E1].",
+              "claims": {
+                "visitor-entry": "forbidden"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "The rule excludes visitors from entry [E1].",
+              "claims": {
+                "visitor-entry": "forbidden"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Visitors may enter [E1].",
+              "claims": {
+                "visitor-entry": "permitted"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "The archive prohibits visitor entry [E1].",
+              "claims": {
+                "visitor-entry": "forbidden"
+              }
+            }
+          ],
+          "rationale": "Permission and prohibition disagree without relying on Yes/No tokens."
+        }
+      ]
+    },
+    {
+      "id": "negative-question",
+      "coverage": [
+        "negatively_phrased"
+      ],
+      "question": "Isn't the west gallery open on Tuesdays?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "The west gallery opens every Tuesday."
+      },
+      "propositions": {
+        "tuesday-open": "open"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "The west gallery is open on Tuesdays [E1].",
+              "claims": {
+                "tuesday-open": "open"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "The gallery is closed on Tuesdays [E1].",
+              "claims": {
+                "tuesday-open": "closed"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "It opens every Tuesday [E1].",
+              "claims": {
+                "tuesday-open": "open"
+              }
+            }
+          ],
+          "rationale": "Question phrasing does not change the supported opening status."
+        }
+      ]
+    },
+    {
+      "id": "exception",
+      "coverage": [
+        "conditional_exception"
+      ],
+      "question": "Must staff sign in, including during evacuation?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "Staff must sign in during normal operations; during evacuation sign-in is optional."
+      },
+      "propositions": {
+        "normal-signin": "required",
+        "evacuation-signin": "optional"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Staff must sign in normally; during evacuation it is optional [E1].",
+              "claims": {
+                "normal-signin": "required",
+                "evacuation-signin": "optional"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Sign-in is required in normal operations and during evacuation [E1].",
+              "claims": {
+                "normal-signin": "required",
+                "evacuation-signin": "required"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "Evacuation makes sign-in optional [E1].",
+              "claims": {
+                "evacuation-signin": "optional"
+              }
+            }
+          ],
+          "rationale": "Different conditions may have different conclusions; the exception must survive restatement."
+        }
+      ]
+    },
+    {
+      "id": "partial",
+      "coverage": [
+        "multi_part",
+        "scoped_refusal"
+      ],
+      "question": "How many drawers does the cabinet have, and is it fireproof?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "The cabinet has four drawers. No fire rating is provided."
+      },
+      "propositions": {
+        "drawers": "4",
+        "fireproof": "unknown"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "The cabinet has four drawers [E1]. The evidence does not establish fire resistance.",
+              "claims": {
+                "drawers": "4",
+                "fireproof": "unknown"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "It has four drawers and is fireproof [E1].",
+              "claims": {
+                "drawers": "4",
+                "fireproof": "fireproof"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "Fire resistance is not established by this evidence.",
+              "claims": {
+                "fireproof": "unknown"
+              }
+            }
+          ],
+          "rationale": "A supported component must survive while an unsupported component stays unresolved."
+        },
+        {
+          "id": "over-refusal",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "证据不足，无法回答。",
+              "claims": {
+                "drawers": "unknown",
+                "fireproof": "unknown"
+              }
+            }
+          ],
+          "rationale": "Blanket refusal discards the supported drawer count."
+        }
+      ]
+    },
+    {
+      "id": "comparison",
+      "coverage": [
+        "comparison"
+      ],
+      "question": "Which crate is heavier, Amber or Blue?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "Amber weighs 8 kg; Blue weighs 5 kg."
+      },
+      "propositions": {
+        "heavier": "Amber"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Amber is heavier: 8 kg versus Blue's 5 kg [E1].",
+              "claims": {
+                "heavier": "Amber"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Blue is heavier [E1].",
+              "claims": {
+                "heavier": "Blue"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "Amber outweighs Blue by 3 kg [E1].",
+              "claims": {
+                "heavier": "Amber"
+              }
+            }
+          ],
+          "rationale": "The ordering disagrees even though no affirmative/negative prefix appears."
+        }
+      ]
+    },
+    {
+      "id": "table",
+      "coverage": [
+        "table_summary"
+      ],
+      "question": "What is the standard loan period? Summarize it in a table.",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "Standard loans last seven days."
+      },
+      "propositions": {
+        "loan-days": "7"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "The standard period is seven days [E1].",
+              "claims": {
+                "loan-days": "7"
+              }
+            },
+            {
+              "role": "table",
+              "text": "| Loan | Days |\n| --- | --- |\n| Standard | 7 [E1] |",
+              "claims": {
+                "loan-days": "7"
+              }
+            },
+            {
+              "role": "summary",
+              "text": "In summary, standard loans last seven days [E1].",
+              "claims": {
+                "loan-days": "7"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Standard loans last seven days [E1].",
+              "claims": {
+                "loan-days": "7"
+              }
+            },
+            {
+              "role": "table",
+              "text": "| Loan | Days |\n| --- | --- |\n| Standard | 14 [E1] |",
+              "claims": {
+                "loan-days": "14"
+              }
+            },
+            {
+              "role": "summary",
+              "text": "The standard period is seven days [E1].",
+              "claims": {
+                "loan-days": "7"
+              }
+            }
+          ],
+          "rationale": "A table cannot introduce a different value under the same scope."
+        }
+      ]
+    },
+    {
+      "id": "insufficient",
+      "coverage": [
+        "insufficient_evidence"
+      ],
+      "question": "What is the cabinet's fire rating?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "The cabinet has four drawers."
+      },
+      "propositions": {
+        "fire-rating": "unknown"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "证据不足，无法回答。",
+              "claims": {
+                "fire-rating": "unknown"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "It has a two-hour fire rating [E1].",
+              "claims": {
+                "fire-rating": "two-hours"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "The fire rating is not established.",
+              "claims": {
+                "fire-rating": "unknown"
+              }
+            }
+          ],
+          "rationale": "An unsupported rating conflicts with the scoped uncertainty."
+        }
+      ]
+    },
+    {
+      "id": "normative",
+      "coverage": [
+        "normative_strength"
+      ],
+      "question": "Are operators required to log inspections?",
+      "provenance": {
+        "kind": "independently_authored_synthetic",
+        "source": "post-holdout-hardening",
+        "historical_reuse": false
+      },
+      "evidence": {
+        "E1": "Operators SHOULD log inspections; logging is recommended, not mandatory."
+      },
+      "propositions": {
+        "log-duty": "recommended"
+      },
+      "equivalence_group": null,
+      "variants": [
+        {
+          "id": "consistent",
+          "expected": true,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Logging is recommended, not required [E1].",
+              "claims": {
+                "log-duty": "recommended"
+              }
+            }
+          ],
+          "rationale": "All asked propositions retain their supported scope and conclusion."
+        },
+        {
+          "id": "conflicting",
+          "expected": false,
+          "sections": [
+            {
+              "role": "direct",
+              "text": "Operators must log inspections [E1].",
+              "claims": {
+                "log-duty": "required"
+              }
+            },
+            {
+              "role": "explanation",
+              "text": "Logging is recommended rather than mandatory [E1].",
+              "claims": {
+                "log-duty": "recommended"
+              }
+            }
+          ],
+          "rationale": "A recommendation cannot become a requirement in the direct answer."
+        }
+      ]
+    }
+  ]
+}

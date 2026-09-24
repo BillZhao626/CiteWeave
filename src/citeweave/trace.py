@@ -64,6 +64,7 @@ def runtime_config(profile=DEFAULT_PROFILE):
         chunk_overlap=0,
         prompt_identity=prompt,
         prompt_sha256=hashlib.sha256((ROOT / "prompts" / (prompt + ".txt")).read_bytes()).hexdigest(),
+        **({"release_identity": config.release_identity} if config.release_identity else {}),
         provider="deepseek",
         model=config.deepseek_model,
         query_deadline_seconds=60 if target else config.query_deadline_seconds,

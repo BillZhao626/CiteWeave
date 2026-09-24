@@ -11,7 +11,7 @@ from citeweave.evaluation.service import reconcile as reconcile_evaluations
 from citeweave.ingestion_state import reconcile
 
 
-def main():
+def main(*, ingestion_only=False):
     logging.basicConfig(level=logging.WARNING, format="%(asctime)s %(levelname)s %(message)s")
     stop = threading.Event()
     child = subprocess.Popen(
@@ -24,8 +24,9 @@ def main():
             "worker",
             "--loglevel=WARNING",
             "--concurrency=1",
-            "--queues=cw-ingestion,cw-evaluation",
+            "--queues=cw-ingestion" if ingestion_only else "--queues=cw-ingestion,cw-evaluation",
             "--hostname=cw1-%h",
+            *(["--pool=solo"] if ingestion_only and sys.platform == "win32" else []),
         ]
     )
     for sig in (signal.SIGTERM, signal.SIGINT):
@@ -36,11 +37,12 @@ def main():
                 raise RuntimeError("celery_process_exited")
             try:
                 reconcile(lambda job: ingest.apply_async(args=[job], retry=False))
-                reconcile_evaluations(
-                    lambda eval_id, case, generation: evaluate_case.apply_async(
-                        args=[eval_id, case, generation], retry=False
+                if not ingestion_only:
+                    reconcile_evaluations(
+                        lambda eval_id, case, generation: evaluate_case.apply_async(
+                            args=[eval_id, case, generation], retry=False
+                        )
                     )
-                )
             except Exception as exc:
                 logging.error(
                     "recovery_loop_failed class=%s; next periodic check will retry", type(exc).__name__

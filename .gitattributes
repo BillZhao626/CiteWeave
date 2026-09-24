@@ -1,5 +1,9 @@
-# Preserve the post-Holdout prompt's byte hash across Windows checkouts.
-prompts/answer-telecom-consistency-v1.txt text eol=lf
-# Public documents and CI retain identical bytes across checkout platforms.
+# Public documentation is portable text.
 *.md text eol=lf
 .github/workflows/*.yml text eol=lf
+# Frozen identities hash raw bytes: do not translate line endings on any platform.
+prompts/*.txt -text
+evals/public-standards-v1.json -text
+evals/public-protocols-holdout-v1.json -text
+evals/citeweave-public-telecom-eval-v1.json -text
+corpus/public_telecom_manifest.json -text

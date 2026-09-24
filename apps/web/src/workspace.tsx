@@ -240,10 +240,12 @@ function Workspace({ id }: { id: string }) {
         <button
           key={i}
           className="inline-citation"
+          aria-pressed={selected?.evidence_id === citation.evidence_id}
+          title={`打开 ${citation.label} · ${citation.filename} 原文证据`}
           onClick={() => setSelected(citation)}
           aria-label={`查看引用 ${citation.label}`}
         >
-          {citation.label}
+          [{citation.label}]
         </button>
       ) : (
         part
@@ -254,7 +256,7 @@ function Workspace({ id }: { id: string }) {
     <section className="workspace">
       <div className="workspace-title">
         <div>
-          <p className="eyebrow">KNOWLEDGE SPACE</p>
+          <p className="eyebrow">ASK / EVIDENCE WORKSPACE</p>
           <h1>{kb.data?.name ?? "正在打开…"}</h1>
           <p className="muted">
             {kb.data?.description || "从文档获取答案，用原文验证答案。"}
@@ -263,6 +265,14 @@ function Workspace({ id }: { id: string }) {
         <Link className="ops-link" to={`/documents?kb=${id}`}>
           {ready} 份可用文档 · 检查结构 →
         </Link>
+      </div>
+      <div className="journey-bar" aria-label="证据链">
+        <span className="journey-current">01 提问 / Answer</span>
+        <span>→</span>
+        <span>02 引用 / Evidence</span>
+        <span>→</span>
+        <span>03 PDF 原文</span>
+        {runId && <Link to={`/runs/${runId}`}>运行记录 / Trace ↗</Link>}
       </div>
       {(kb.error || docs.error) && (
         <p className="error" role="alert">
@@ -356,67 +366,73 @@ function Workspace({ id }: { id: string }) {
             </h3>
             <span>{asked ? "固定来源版本" : "就绪 / idle"}</span>
           </div>
-          <div className="query-options">
-            <label>
-              下一次提问 · 检索路径
-              <select
-                aria-label="检索路径"
-                disabled={busy}
-                value={profile}
-                onChange={(e) => {
-                  setProfile(e.target.value as typeof profile);
-                  setScope([]);
-                }}
-              >
-                <option value="m3-context">兼容路径 · Legacy</option>
-                <option value="telecom-structural-v1">
-                  结构感知 · Telecom
-                </option>
-              </select>
-            </label>
-            {profile === "telecom-structural-v1" && (
-              <>
-                <label>
-                  来源模式
-                  <select
-                    aria-label="来源模式"
-                    disabled={busy}
-                    value={mode}
-                    onChange={(e) => setMode(e.target.value as typeof mode)}
-                  >
-                    <option value="auto">自动</option>
-                    <option value="single">单来源</option>
-                    <option value="compare">跨来源比较</option>
-                  </select>
-                </label>
-                <details>
-                  <summary>
-                    文档范围 ·{" "}
-                    {scope.length ? `${scope.length} 份` : "全部可用文档"}
-                  </summary>
-                  {docs.data
-                    ?.filter((d) => d.active_version_id)
-                    .map((d) => (
-                      <label className="scope-option" key={d.id}>
-                        <input
-                          type="checkbox"
-                          disabled={busy}
-                          checked={scope.includes(d.id)}
-                          onChange={(e) =>
-                            setScope(
-                              e.target.checked
-                                ? [...scope, d.id]
-                                : scope.filter((x) => x !== d.id),
-                            )
-                          }
-                        />
-                        {d.title}
-                      </label>
-                    ))}
-                </details>
-              </>
-            )}
-          </div>
+          <details className="query-settings">
+            <summary>
+              下一次提问设置 ·{" "}
+              {profile === "telecom-structural-v1" ? "结构感知" : "兼容路径"}
+            </summary>
+            <div className="query-options">
+              <label>
+                下一次提问 · 检索路径
+                <select
+                  aria-label="检索路径"
+                  disabled={busy}
+                  value={profile}
+                  onChange={(e) => {
+                    setProfile(e.target.value as typeof profile);
+                    setScope([]);
+                  }}
+                >
+                  <option value="m3-context">兼容路径 · Legacy</option>
+                  <option value="telecom-structural-v1">
+                    结构感知 · Telecom
+                  </option>
+                </select>
+              </label>
+              {profile === "telecom-structural-v1" && (
+                <>
+                  <label>
+                    来源模式
+                    <select
+                      aria-label="来源模式"
+                      disabled={busy}
+                      value={mode}
+                      onChange={(e) => setMode(e.target.value as typeof mode)}
+                    >
+                      <option value="auto">自动</option>
+                      <option value="single">单来源</option>
+                      <option value="compare">跨来源比较</option>
+                    </select>
+                  </label>
+                  <details>
+                    <summary>
+                      文档范围 ·{" "}
+                      {scope.length ? `${scope.length} 份` : "全部可用文档"}
+                    </summary>
+                    {docs.data
+                      ?.filter((d) => d.active_version_id)
+                      .map((d) => (
+                        <label className="scope-option" key={d.id}>
+                          <input
+                            type="checkbox"
+                            disabled={busy}
+                            checked={scope.includes(d.id)}
+                            onChange={(e) =>
+                              setScope(
+                                e.target.checked
+                                  ? [...scope, d.id]
+                                  : scope.filter((x) => x !== d.id),
+                              )
+                            }
+                          />
+                          {d.title}
+                        </label>
+                      ))}
+                  </details>
+                </>
+              )}
+            </div>
+          </details>
           <div className="conversation">
             {!asked && (
               <div className="chat-empty">
@@ -457,10 +473,8 @@ function Workspace({ id }: { id: string }) {
                             : "失败 / failed"}
                     </span>
                   </div>
-                  {trace.data && (
-                    <p className="replay-notice">
-                      {generationLabel(trace.data)}
-                    </p>
+                  {replay.data && !liveAsked && (
+                    <p className="replay-notice">历史回答 · 原始运行记录</p>
                   )}
                   {trace.data?.evidence_pack?.degraded && (
                     <p className="warning-banner">
@@ -521,16 +535,16 @@ function Workspace({ id }: { id: string }) {
                           </button>
                         ))}
                       </div>
-                      <p className="cost-note">
-                        {answer.usage ? "Token 用量已记录" : "Token 用量不可用"}{" "}
-                        · 估算 ¥{answer.estimated_yuan?.toFixed(6) ?? "不可用"}{" "}
-                        · 实际扣费不可用
-                      </p>
                     </>
                   )}
                   {trace.data && (
                     <details className="trace">
                       <summary>开发者记录 · {trace.data.status}</summary>
+                      <p>{generationLabel(trace.data)}</p>
+                      <p>
+                        估算 ¥{answer?.estimated_yuan?.toFixed(6) ?? "不可用"} ·
+                        实际扣费不可用
+                      </p>
                       <Link className="ops-link" to={`/runs/${runId}`}>
                         打开完整 Run Inspector →
                       </Link>
@@ -639,7 +653,7 @@ function Workspace({ id }: { id: string }) {
               <p className="error padded">{message(evidence.error)}</p>
             )}
             {selected && trace.data?.structural_candidates && (
-              <p className="padded muted">
+              <p className="evidence-section">
                 {sectionPath(
                   trace.data.structural_candidates.find(
                     (c) =>
@@ -690,26 +704,29 @@ function DocumentCard({ doc, onReplace }: { doc: Doc; onReplace: () => void }) {
           {pending && <LoaderCircle size={11} className="spin" />}
           {statuses[latest.job.status] ?? latest.job.status}
         </span>
-        <small>
-          尝试 {latest.job.attempt} / {latest.job.max_attempts}
-          {latest.version.chunk_count
-            ? ` · ${latest.version.chunk_count} 个片段`
-            : ""}
-        </small>
-        {latest.job.error_message && (
-          <p className="error">{latest.job.error_message}</p>
-        )}
-        {!!doc.active_version_id && latest.job.status !== "READY" && (
-          <small>先前完成的版本仍可提问。</small>
-        )}
-        {!pending && (
-          <button className="text-button" onClick={onReplace}>
-            上传新版本
-          </button>
-        )}
-        <Link className="text-button" to={`/documents/${doc.id}/versions`}>
-          查看版本与重建
-        </Link>
+        <details className="document-details">
+          <summary>版本与处理详情</summary>
+          <small>
+            尝试 {latest.job.attempt} / {latest.job.max_attempts}
+            {latest.version.chunk_count
+              ? ` · ${latest.version.chunk_count} 个片段`
+              : ""}
+          </small>
+          {latest.job.error_message && (
+            <p className="error">{latest.job.error_message}</p>
+          )}
+          {!!doc.active_version_id && latest.job.status !== "READY" && (
+            <small>先前完成的版本仍可提问。</small>
+          )}
+          {!pending && (
+            <button className="text-button" onClick={onReplace}>
+              上传新版本
+            </button>
+          )}
+          <Link className="text-button" to={`/documents/${doc.id}/versions`}>
+            查看版本与重建
+          </Link>
+        </details>
       </div>
     </article>
   );

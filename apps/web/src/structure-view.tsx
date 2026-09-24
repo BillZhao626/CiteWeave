@@ -47,10 +47,14 @@ export function DocumentsPage() {
               <div>
                 <strong>{d.title}</strong>
                 <small className="block-id">
-                  {v?.page_count ?? 0} 页 · Version {shortId(v?.id ?? "")} ·{" "}
-                  {v?.status ?? "未发布"}
+                  {v?.page_count ?? 0} 页 · v{v?.sequence ?? "—"} · 固定来源版本
                 </small>
               </div>
+              <span
+                className={`status ${v?.status === "READY" ? "ready" : ""}`}
+              >
+                {v?.status ?? "未发布"}
+              </span>
               {v && (
                 <Link className="ops-link" to={`/versions/${v.id}/structure`}>
                   检查结构 →
@@ -143,7 +147,7 @@ function Structure({ id }: { id: string }) {
   return (
     <section className="ops-page">
       <p className="eyebrow">IMMUTABLE DOCUMENT STRUCTURE</p>
-      <h1>Section / Clause → Parent → Child</h1>
+      <h1>文档结构 / Section & Clause</h1>
       <p className="muted ops-intro">
         检查冻结的文档结构与原文成员。这里只读，不重新解析或编辑文档。
       </p>
@@ -159,9 +163,12 @@ function Structure({ id }: { id: string }) {
         </p>
       )}
       {meta.data && (
-        <p className="ops-id">
-          Version {id} · Artifact {meta.data.id} · {meta.data.state}
-        </p>
+        <details className="source-details">
+          <summary>结构工件 · {meta.data.state} · 版本与身份</summary>
+          <p className="ops-id">
+            Version {id} · Artifact {meta.data.id} · {meta.data.state}
+          </p>
+        </details>
       )}
       <div className="structure-columns">
         <aside className="ops-panel structure-tree">
@@ -229,11 +236,14 @@ function Structure({ id }: { id: string }) {
                     </button>
                   ))}
                 </nav>
-                <p className="ops-id">{node}</p>
-                <p className="muted">
-                  Confidence {context.data.node.confidence} ·{" "}
-                  {context.data.node.reasons.join(", ") || "无降级原因"}
-                </p>
+                <details className="source-details">
+                  <summary>解析与节点详情</summary>
+                  <p className="ops-id">{node}</p>
+                  <p className="muted">
+                    结构解析 Confidence {context.data.node.confidence} ·{" "}
+                    {context.data.node.reasons.join(", ") || "无降级原因"}
+                  </p>
+                </details>
                 <h3>Parent / 节点原文上下文</h3>
                 <p className="muted">
                   {context.data.total_spans} 个原始

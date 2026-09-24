@@ -68,12 +68,18 @@ export function PdfEvidence({ citation }: { citation: Citation }) {
       }).promise;
       if (!stopped) {
         setReady(true);
-        requestAnimationFrame(() =>
-          anchor.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          }),
-        );
+        // Scroll only the PDF pane; opening evidence must not move the whole workspace.
+        requestAnimationFrame(() => {
+          if (scroll.current && anchor.current) {
+            scroll.current.scrollTo({
+              top: Math.max(
+                0,
+                anchor.current.offsetTop - scroll.current.clientHeight / 3,
+              ),
+              behavior: "smooth",
+            });
+          }
+        });
       }
     })().catch((e) => {
       if (!stopped) setError(e instanceof Error ? e.message : "PDF 显示失败");
@@ -94,12 +100,18 @@ export function PdfEvidence({ citation }: { citation: Citation }) {
         <strong>{citation.filename}</strong>
       </div>
       <p className="version-meta">
-        固定版本 {citation.document_version_id.slice(0, 8)} · 原始 PDF
-        <span className="block-id" title={citation.evidence_id}>
-          EvidenceSpan {citation.evidence_id}
-        </span>
+        引用 {citation.label} · PDF 第 {initial + 1} 页 · 固定来源版本
       </p>
       <blockquote>{citation.span.quote}</blockquote>
+      <details className="source-details">
+        <summary>来源与版本详情</summary>
+        <p className="version-meta">
+          固定版本 {citation.document_version_id}
+          <span className="block-id" title={citation.evidence_id}>
+            EvidenceSpan {citation.evidence_id}
+          </span>
+        </p>
+      </details>
       <div className="pdf-toolbar">
         <button
           aria-label="上一页"

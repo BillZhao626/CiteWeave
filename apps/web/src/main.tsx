@@ -30,6 +30,7 @@ import {
 } from "./operations";
 import { DocumentsPage, StructureView } from "./structure-view";
 import "./index.css";
+import "./product-polish.css";
 
 const client = new QueryClient({
   defaultOptions: {
@@ -131,17 +132,19 @@ function Layout() {
         <Link to="/" className="brand">
           <Layers /> CiteWeave <sup>α</sup>
         </Link>
-        <p className="workspace-label">PERSONAL WORKSPACE</p>
+        <p className="workspace-label">EVIDENCE WORKSPACE</p>
         <NavLink to="/" end className="nav-item">
           <BookOpen size={17} /> 知识库
         </NavLink>
-        <nav className="ops-nav" aria-label="开发与管理">
+        <nav className="ops-nav" aria-label="产品导航">
           <NavLink className="nav-item" to="/documents">
             文档 / 结构
           </NavLink>
           <NavLink className="nav-item" to="/runs">
             运行 / Trace
           </NavLink>
+        </nav>
+        <nav className="ops-nav secondary-nav" aria-label="开发与管理">
           <NavLink className="nav-item" to="/evaluations">
             评测
           </NavLink>
@@ -164,7 +167,7 @@ function Layout() {
           <p>
             <span className="online-dot" /> 本地工作空间
           </p>
-          <small>Independent engineering · Alpha</small>
+          <small>Portfolio alpha · Local runtime</small>
           <button
             className="text-button"
             onClick={async () => {
@@ -182,8 +185,11 @@ function Layout() {
       </aside>
       <div className="main">
         <header className="topbar">
-          <span>知识与证据 / 工作台</span>
-          <span className="chip">CITEWEAVE · LOCAL</span>
+          <span>
+            知识与证据 <span className="topbar-divider">/</span> Ask. Trace.
+            Verify.
+          </span>
+          <span className="chip">PORTFOLIO ALPHA</span>
         </header>
         <Outlet />
       </div>

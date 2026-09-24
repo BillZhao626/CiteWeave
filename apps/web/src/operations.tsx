@@ -233,6 +233,31 @@ export function RunInspector() {
             <Link className="ops-link" to={`/kb/${row.kb_id}?run=${row.id}`}>
               在 Ask 中查看答案 →
             </Link>
+            <dl className="runtime-summary">
+              <div>
+                <dt>Provider / Model</dt>
+                <dd>
+                  {text(row.runtime_config.provider)} /{" "}
+                  {text(row.runtime_config.model)}
+                </dd>
+              </div>
+              <div>
+                <dt>Prompt</dt>
+                <dd>{text(row.runtime_config.prompt_identity)}</dd>
+              </div>
+              <div>
+                <dt>Runtime</dt>
+                <dd>{text(row.runtime_config.release_identity)}</dd>
+              </div>
+              <div>
+                <dt>Citation linkage</dt>
+                <dd>
+                  {row.result?.citations
+                    .map((c) => `[${c.label}]`)
+                    .join(" · ") || "无可引用答案"}
+                </dd>
+              </div>
+            </dl>
             <div className="ops-metrics">
               <Metric label="文档版本" value={row.versions.length} />
               <Metric
@@ -264,7 +289,10 @@ export function RunInspector() {
             />
           </div>
           <div className="ops-panel">
-            <h2>阶段耗时</h2>
+            <h2>执行链路 / 阶段耗时</h2>
+            <p className="muted">
+              记录顺序 · 阶段可能嵌套，耗时不累加为总延迟。
+            </p>
             {!row.stages.length && (
               <p className="muted">这条历史记录未采集阶段耗时。</p>
             )}

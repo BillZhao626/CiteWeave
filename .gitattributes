@@ -1,2 +1,5 @@
 # Preserve the post-Holdout prompt's byte hash across Windows checkouts.
 prompts/answer-telecom-consistency-v1.txt text eol=lf
+# Public documents and CI retain identical bytes across checkout platforms.
+*.md text eol=lf
+.github/workflows/*.yml text eol=lf

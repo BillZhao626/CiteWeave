@@ -1,26 +1,9 @@
 # Independent development record
 
-Started: 2026-09-11. Owner: personal project creator (identity and legal review pending).
+CiteWeave is a personal independent implementation begun in September 2026. The implementation uses this project's specifications, original fixtures and public dependency APIs. Former employer/lab source, prompts, private documents, credentials, endpoints and Git objects are excluded from the public repository.
 
-The M0 implementation uses only the new CiteWeave specifications, public dependency APIs,
-public algorithms and newly authored synthetic fixtures. No previous project source,
-prompts, data, credentials, endpoints, git objects or configuration files are imported.
-The earlier review is local-only and excluded from the repository.
+An earlier planning review is part of the historical context; this is not represented as a formally isolated clean-room process. Current code and screenshots do not establish historical employment-period delivery or a migration of employer-owned code.
 
-This records provenance; it does not certify employment/research contractual ownership.
-Contractual review and the final project license remain pending before public release.
-Dependencies, fonts, model weights and source documents keep their own licenses.
+The project owner has selected MIT for original CiteWeave code and documentation. Third-party libraries, model references and document excerpts retain their own rights and notices. This provenance record is not a contractual ownership determination for historical projects.
 
-Synthetic corpus: authored for this project, clearly labeled as synthetic. Functional
-retrieval results on it are not evidence of accuracy on real standards or production data.
-Font files and downloaded models are not redistributed in the source repository.
-
-Allowed public source directories: src/, tests/, experiments/, deploy/, apps/, contracts/,
-docs/, scripts/, migrations/, prompts/ (excluding local/private material). Generated artifacts are exported individually
-after inspecting content; never publish the workspace with git add -f or recursive zip.
-
-M1 extension (2026-09-13/14): database migrations, durable ingestion, model/provider adapters,
-React product flow, PDF viewer, recovery tests and original observation-station handbook
-were authored within CiteWeave. Only this project's specifications, M0 code and public APIs
-were used as implementation inputs. The two-page handbook is a distributable candidate
-created by scripts/make_m1_fixture.py; it embeds no copied operating-system font file.
+The synthetic handbook and parser fixtures were independently authored here. Functional results on synthetic fixtures do not establish accuracy on arbitrary standards. Private planning material and local audit records are not distributed.

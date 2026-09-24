@@ -42,3 +42,31 @@ coverage/
 
 # Historical generated archive manifest was outside the C0 source allowlist.
 /docs/reports/m3-manifest.json
+
+# Public release: local evidence, databases, downloaded sources and generated assets.
+/docs/reports/
+/docs/STAGE_E_CLAIM_CONTRACT.md
+/apps/web/public/THIRD_PARTY_NOTICES.txt
+*.log
+*.dump
+*.rdb
+*.aof
+*.snapshot
+*.safetensors
+*.pt
+*.pth
+*.pem
+*.key
+*.p12
+*.pfx
+*.pdf
+!/apps/web/public/original-handbook.pdf
+/data/
+/logs/
+/backups/
+playwright-report/
+test-results/
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db

@@ -26,6 +26,7 @@ DIRECTORIES = {
     "evals",
     "corpus",
     "benchmarks",
+    ".github",
 }
 FILES = {
     ".dockerignore",
@@ -41,6 +42,8 @@ FILES = {
     "LICENSE",
     "CONTRIBUTING.md",
     "THIRD_PARTY.md",
+    "THIRD_PARTY_NOTICES.md",
+    ".gitattributes",
 }
 EXCLUDED_DOCS = {
     "docs/01_调研论证与合规边界.md",
@@ -49,10 +52,23 @@ EXCLUDED_DOCS = {
     "docs/04_官方参考资料.md",
 }
 REPORT = "docs/reports/m3-manifest.json"
+PUBLIC_REVIEW_FIXTURES = {
+    "evals/reviews/m1-baseline-human.json",
+    "evals/reviews/m2-dev-24/M2_Dev24_人工复核.md",
+    "evals/reviews/m2-dev-24/M2_Dev24_人工复核_已填写.md",
+    "evals/reviews/m2-dev-24/M2_Dev24_人工复核_标签.json",
+    "evals/reviews/m2-dev-24/m2-dev-24-review-template.json",
+}
 FORBIDDEN = {".git", ".runtime", ".cache", ".venv", "node_modules", "dist", "__pycache__", "审计私有"}
 
 # Explicit reviewed documentation, never an automatic recursive docs publication.
 PUBLIC_DOCS = {
+    "docs/README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/QUICKSTART.md",
+    "docs/CORPUS.md",
+    "docs/images/answer-evidence.png",
+    "docs/images/pdf-location.png",
     "docs/CURRENT_ARCHITECTURE.md",
     "docs/CURRENT_OPERATIONS.md",
     "docs/ADR_C5_PRODUCT_INSPECTION.md",
@@ -97,7 +113,9 @@ def candidate_files():
         relative = Path(name)
         if relative.parts[0] == "docs" and name not in PUBLIC_DOCS:
             continue
-        if name.startswith(("evals/results/", "evals/reviews/")):
+        if name.startswith("evals/results/") or (
+            name.startswith("evals/reviews/") and name not in PUBLIC_REVIEW_FIXTURES
+        ):
             continue
         if name in EXCLUDED_DOCS or relative.name.endswith("CHECKPOINT.md"):
             continue

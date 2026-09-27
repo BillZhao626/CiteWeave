@@ -1,8 +1,10 @@
 # AI Development Playbook
 
-Status: **PROPOSED / awaiting Human Review** · 2026-09-27
+Status: **ACCEPTED — Human Review incorporated** · 2026-09-27
 
-本提案须经人工接受后生效；当前不授权 v0.2 实现。工程不变量见 [AGENTS](../AGENTS.md)，产品范围见 [Blueprint](V02_BLUEPRINT.md)，合并 / 发布证据见[工程治理](ENGINEERING_GOVERNANCE.md)。
+本方法已按 [PR #1](https://github.com/BillZhao626/CiteWeave/pull/1) Human Review 决议接受；当前不授权 v0.2 实现。工程不变量见 [AGENTS](../AGENTS.md)，产品范围见 [Blueprint](V02_BLUEPRINT.md)，合并 / 发布证据见[工程治理](ENGINEERING_GOVERNANCE.md)。
+
+开发主线：Blueprint → Foundation → Architecture → Feature Spec → Vertical Slice → Eval / Regression → Pull Request → Release Audit → Tag / GitHub Release。各阶段分别明确范围、技术理由、职责、行为、真实产品路径、质量证据、审阅单元与发行资格；按变更类型裁剪，不为小编辑增加整套仪式。
 
 ## 按问题选择方法
 
@@ -21,9 +23,13 @@ Status: **PROPOSED / awaiting Human Review** · 2026-09-27
 
 Blueprint 接受、重要架构责任边界、Feature Spec 行为、新的长期 ADR、发布标准变更必须人工决定；对外 release promotion 也须显式接受。记录格式：决策主题、审阅的文档版本 / commit、接受 / 拒绝 / 有条件接受、条件、决策人、日期及 PR / issue / 已授权对话记录链接。若决定来自本地对话，维护者确认后在 PR 记载可公开的摘要，不公开整段私人会话。
 
-AI 可以建议，不能代替人填写 Accepted。CI 通过、无回复、普通 commit、合并导航文档都不构成上述决定。接受基线后，正常编辑、受影响测试、调试和逻辑完整的提交无需逐步请示；push / PR 等动作依照该任务已授权范围执行。越过已接受范围或遇到必须由人决定的冲突时，先完成可审阅提案再停在相应门禁。
+AI 可以建议并按明确人工决议记录接受状态，不能自行作出 Accepted 决定。CI 通过、无回复、普通 commit、合并导航文档都不构成上述决定。接受基线后，正常编辑、受影响测试、调试和逻辑完整的提交无需逐步请示；push / PR 等动作依照该任务已授权范围执行。越过已接受范围或遇到必须由人决定的冲突时，先完成可审阅提案再停在相应门禁。
 
 实施循环：Plan → Edit → Test → Observe → Repair → Update status → Continue。直到已接受里程碑的 Done 满足或遇到真实阻塞；不因一次测试成功跳过验收，也不重复无变化的 preflight。诊断先读当前错误及相关源文件，不默认重读历史评测档案。
+
+## Goal 与 Human Gate
+
+以未来人工接受为成功条件的提案任务使用有界普通 prompt，不使用持续 Codex Goal。例如“产出可审阅的架构提案、权衡与验收条件，在 Human Architecture Review 停止”，而不是让 AI 持续追求它无权决定的“建立已接受的架构”。持续 Goal 适用于实现、调试、迁移、评测 / benchmark、release hardening / audit 等可自主执行且完成条件可由证据核验的工作；任务重要本身不是使用 Goal 的理由。到达人工门禁交付审阅材料后停止，不循环等待新的人工决定。
 
 ## 只加载相关上下文
 

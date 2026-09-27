@@ -1,8 +1,8 @@
 # v0.2 Product / Roadmap Blueprint
 
-Status: **PROPOSED / awaiting Human Review** · 2026-09-27
+Status: **ACCEPTED — Human Review incorporated** · 2026-09-27
 
-本页描述待接受的产品方向，不代表已发布能力，也不授权实现。当前公开基线为 `main` / `v0.1.0`，实际能力与限制仍以 [README](../README.md) 和[当前架构](ARCHITECTURE.md)为准。技术取舍见 [Foundation](V02_FOUNDATION.md)，交付门禁见[工程治理](ENGINEERING_GOVERNANCE.md)。
+本页描述已接受的产品方向，不代表已发布能力，也不授权实现。Product Owner 对 [PR #1](https://github.com/BillZhao626/CiteWeave/pull/1) 提案提交 `c3da2e4` 作出 APPROVED WITH REQUIRED CHANGES，本页已落实该决议；接受范围不包括未来 Architecture、Feature Specs、Evaluation Spec 或 ADR。当前公开基线为 `main` / `v0.1.0`，实际能力与限制仍以 [README](../README.md) 和[当前架构](ARCHITECTURE.md)为准。技术取舍见 [Foundation](V02_FOUNDATION.md)，交付门禁见[工程治理](ENGINEERING_GOVERNANCE.md)。
 
 ## 北极星与用户问题
 
@@ -19,6 +19,8 @@ CiteWeave 是面向技术文档的证据问答工作台：用户连续讨论一�
 - 有界 token / 上下文与摘要更新；可检查原问题、改写、选中历史、状态版本与文档证据的关系。正常 UI 保留简洁会话与引用操作，诊断细节进入 Runs / Trace。
 - 显式多轮行为评测和既有单轮证据路径回归。
 
+Topic Shift 是一等产品行为：Conversation State 不能无限继承旧话题或实体假设，旧上下文不得污染实质不同的新问题。状态重置、部分重置、实体替换、约束失效及按新话题限定记忆选择均是可能机制，具体方案留给 Architecture Design。
+
 上述是能力与数据依赖，不是冻结的串行流水线。Topic Shift、Coreference、Rewrite 可以组合、跳过或用确定性逻辑完成；是否需要模型调用必须由评测、错误代价和预算支持。相关记忆可参与消解和改写，不能机械地只放在知识检索之后；准确阶段次序留给 Architecture Design。
 
 会话内容只提供意图、约束与历史线索。过去的模型回答与摘要不成为新的知识来源；延续事实主张需要重新检查授权、当前查询范围及原始证据身份。历史引用可以回看，但不能自动授权在新范围中使用。
@@ -33,7 +35,7 @@ v0.3 的候选方向是 Tool / Function Calling Runtime，可能提供 search_do
 
 | 阶段 | 目标与退出证据 | 人工门禁 |
 | --- | --- | --- |
-| 本轮 Blueprint + Foundation + Governance | 文档审计、明确范围与候选门槛、纯文档提交、Draft PR | Product Owner 接受或逐项要求修改；本轮到此停止 |
+| 本轮 Blueprint + Foundation + Governance | 人工决议已落实、文档提交推送、最新 PR CI 通过，供 owner 最终合并审阅 | 基线已接受；本轮不合并或开始架构设计 |
 | v0.2 Architecture Design | 责任、状态生命周期、失败边界、迁移影响与备选方案；列出所需 ADR | 重要责任边界与长期决策获明确接受 |
 | Feature Spec / Eval protocol | 每个切片的用户行为、异常行为、非目标、测试、数据与预算预注册 | 行为和发布门槛在实现、调参前接受 |
 | Vertical Slice | 一个可运行的端到端用户结果，同时包含持久化、API、UI、Trace 与验收；逐步增加复杂度 | 普通实现按已接受范围自主推进，范围变化回门禁 |
@@ -47,11 +49,11 @@ v0.3 的候选方向是 Tool / Function Calling Runtime，可能提供 search_do
 
 在对应 PR / Spec 记录：引用本 Blueprint 的接受版本与决定链接；该切片服务的用户问题；新增 / 排除范围；是否保留来源身份、检索范围与 Relevance-first；成本、隐私或基础设施是否改变；验收是否仍与冻结 protocol 一致。无变化记一段结论即可；有变化先更新提案并走相应 Human Gate，不把实现事实当作范围批准。
 
-## 需要本次 Human Review 的决定
+## 已落实的 Human Review 决议
 
 1. 接受 session-scoped Conversational RAG 和上述非目标；接受对流水线顺序与“每个能力独立调用模型”的挑战。
 2. 接受 Foundation 的责任方向，但详细 schema / API / 生命周期留待架构审阅。
-3. 接受工程治理的测试范围、Git 生命周期、人工接受记录和**拟议**评测门槛；不同意的门槛须在实现 / 调参前修订。
-4. 单独决定是否随后配置 main 保护。本 PR 不改变远端设置。
+3. 接受工程治理的测试范围、Git 生命周期与人工接受记录；冻结评测维度、失败分类和硬不变量。最终概率性质量门槛由后续 Evaluation Spec 在数据、指标与 baseline 方法明确后论证，并在使用评测结果进行实现决策 / 调参前冻结。
+4. 接受 main 保护方向，实际配置另行决定。本 PR 不改变远端设置。
 
 三项最大风险：摘要和历史回答污染事实依据；相关性选择与改写漂移而丢失用户限制；多轮状态在取消、并发、重试和刷新中出现不一致且难以重放。对应的发布否决项与验证安排见[工程治理](ENGINEERING_GOVERNANCE.md)。

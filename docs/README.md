@@ -10,7 +10,7 @@
 
 ## v0.2 规划与工程治理
 
-以下内容均为 **PROPOSED / awaiting Human Review**，不代表已接受决策或已发布功能。当前里程碑及下一人工门禁见 [HANDOFF](../HANDOFF.md)。
+以下 Blueprint / Foundation / Governance 基线与 Playbook 为 **ACCEPTED — Human Review incorporated**，不代表已发布功能。未来 v0.2 Architecture、Feature Specs、Evaluation Spec 和候选 ADR 尚未接受；实现为 NOT_STARTED。当前状态及下一阶段见 [HANDOFF](../HANDOFF.md)。
 
 | 当前任务 | 按需阅读 |
 | --- | --- |

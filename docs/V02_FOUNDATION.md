@@ -1,8 +1,10 @@
 # v0.2 Technical Foundation
 
-Status: **PROPOSED / awaiting Human Review** · 2026-09-27
+Status: **ACCEPTED — Human Review incorporated** · 2026-09-27
 
-这是责任与选型提案，不是 Architecture Design、Feature Spec 或 Accepted ADR。不定义表、字段、路由、事件格式或新运行时。已实现职责以 [ARCHITECTURE](ARCHITECTURE.md) 为准；产品范围见 [Blueprint](V02_BLUEPRINT.md)。
+这是已接受的责任与选型方向，不是已接受的 Architecture Design、Feature Spec、Evaluation Spec 或 ADR。不定义表、字段、路由、事件格式或新运行时。接受记录见 [Blueprint](V02_BLUEPRINT.md) 与 [PR #1](https://github.com/BillZhao626/CiteWeave/pull/1)。已实现职责以 [ARCHITECTURE](ARCHITECTURE.md) 为准。
+
+持久信任原则：Conversation memory 是上下文状态，不是 documentary Evidence。历史 assistant 回答、摘要、推断实体与 memory item 可以帮助理解意图、指代、有效约束和话题变化，但不能无有效原文 Evidence 而成为技术事实依据。Relevance first, Recency second 不冻结具体评分公式，也不要求新的数据库或服务；相关 ADR 仍只是候选。
 
 ## 保留的基础与重新评估条件
 

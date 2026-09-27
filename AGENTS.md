@@ -17,4 +17,4 @@
 - Start with [current milestone](HANDOFF.md) and the [documentation map](docs/README.md); read only the current task's relevant Spec / ADR, not complete historical archives.
 - Current implementation / operations: [architecture](docs/ARCHITECTURE.md) and [quickstart](docs/QUICKSTART.md).
 - v0.2 scope / foundation: [Blueprint](docs/V02_BLUEPRINT.md) and [Foundation](docs/V02_FOUNDATION.md). Development / delivery: [Playbook](docs/AI_DEVELOPMENT_PLAYBOOK.md) and [Governance](docs/ENGINEERING_GOVERNANCE.md).
-- These v0.2 documents are **PROPOSED / awaiting Human Review**, not accepted rules or implementation authorization. Human gates and candidate ADRs must not be silently promoted to Accepted.
+- The v0.2 Blueprint / Foundation / Governance baseline is **ACCEPTED — Human Review incorporated**. Future Architecture, Feature Specs, Evaluation Spec and candidate ADRs remain unaccepted; implementation is NOT_STARTED. Follow the Playbook's bounded-task / Human Gate policy; baseline acceptance does not authorize implementation.

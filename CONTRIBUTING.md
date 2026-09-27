@@ -6,6 +6,8 @@
 
 按 [QUICKSTART](docs/QUICKSTART.md) 安装依赖，运行 `uv run --frozen python scripts/check_release.py`。涉及数据库或任务行为时，在隔离服务中补充相应集成验证；报告真实失败与跳过项。离线 CI 不验证真实提供商质量或生产容量。
 
+v0.2 的范围与交付治理正在 [Draft proposal](docs/ENGINEERING_GOVERNANCE.md) 中审阅，状态为 **PROPOSED / awaiting Human Review**；开发方法见 [Playbook](docs/AI_DEVELOPMENT_PLAYBOOK.md)。本轮纯文档提案按用户授权执行链接、差异与公开文件检查，远端仍运行既有双平台离线 CI，不重复执行本地完整 runtime 测试矩阵。提案中的后续受影响验证政策只有在人工接受后生效。
+
 评测参数只在开发数据上调整；保留冻结集合与来源标注，不以回归或未见数据反复选参。自动 Judge 和合成样本存在边界，不将其结果表述为独立人工认证。
 
 分享前检查待提交文件与 Git 历史，确保 `.env`、`.runtime`、本地报告、下载文档和缓存未进入提交。禁止全局 Docker 清理；只操作明确属于本项目的隔离资源。

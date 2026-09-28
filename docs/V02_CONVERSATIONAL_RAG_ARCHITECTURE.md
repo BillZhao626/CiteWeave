@@ -1,8 +1,8 @@
-# v0.2 Conversational RAG Architecture Proposal
+# v0.2 Conversational RAG Architecture
 
-Status: **PROPOSED / awaiting Human Architecture Review** · 2026-09-28
+Status: **ACCEPTED — Human Review incorporated** · 2026-09-28
 
-本提案采用 SDD + Architecture Design Review + Human Gate。它提出可审阅的责任与生命周期契约，不授权实现，也不是 Accepted ADR。v0.2 实现为 **NOT_STARTED**。接受依据为 [Blueprint](V02_BLUEPRINT.md)、[Foundation](V02_FOUNDATION.md)、[Playbook](AI_DEVELOPMENT_PLAYBOOK.md) 与 [Governance](ENGINEERING_GOVERNANCE.md)；本轮不修改这些基线。实际已实现架构继续由 [ARCHITECTURE](ARCHITECTURE.md) 描述。
+本架构采用 SDD + Architecture Design Review + Human Gate。Product Owner 于 **2026-09-28** 对提案提交 **`9e6e75baa26f230fd62d30919a1c29fac10434e8`** 作出 **APPROVED** 决议；来源为本次明确授权的 Human Architecture Review 指令，公开接受摘要及交付记录见 [PR #2](https://github.com/BillZhao626/CiteWeave/pull/2)。责任与生命周期契约已接受，**不授权实现，也不代表未来 ADR 文本已接受**。v0.2 实现为 **NOT_STARTED**。方向依据为 [Blueprint](V02_BLUEPRINT.md)、[Foundation](V02_FOUNDATION.md)、[Playbook](AI_DEVELOPMENT_PLAYBOOK.md) 与 [Governance](ENGINEERING_GOVERNANCE.md)；本轮不修改这些基线。实际已实现架构继续由 [ARCHITECTURE](ARCHITECTURE.md) 描述。
 
 设计起点已通过 fetch 核实：`main`、`origin/main`、起始 HEAD 同为 `242982abc1c2d03a083ba6d5b51aa42b30ca0550`，工作树干净，公开仓库默认分支 main；公开实现仍为 v0.1.0。分支为 `docs/v0.2-conversational-rag-architecture`。文档布局审计后只新增本页，更新 HANDOFF 与文档地图；不增加伴随文档、历史报告或独立 ADR 文件。
 
@@ -30,7 +30,7 @@ Status: **PROPOSED / awaiting Human Architecture Review** · 2026-09-28
 | [trace.py](../src/citeweave/trace.py)、[structural-trace.tsx](../apps/web/src/structural-trace.tsx) | profile / prompt hash、阶段、候选、调用与错误摘要已有入口；不记录隐藏思维链或原始 provider 错误体 |
 | [workspace.tsx](../apps/web/src/workspace.tsx)、[stream.ts](../apps/web/src/stream.ts) | Ask 的问题、草稿、答案是当前页面状态；可通过 Run 链接回看；每次提交新建随机幂等键，AbortController 与连接绑定。不是持久多轮历史 |
 
-新提案需要增加会话 admission / commit 协调、持久历史与解释记录、独立于 SSE 的执行生命周期、恢复入口。现有单轮路由及其取消语义保持兼容；这些扩展只用于显式选择的会话路径。下文所有新增行为均为 PROPOSED。
+已接受的架构需要增加会话 admission / commit 协调、持久历史与解释记录、独立于 SSE 的执行生命周期、恢复入口。现有单轮路由及其取消语义保持兼容；这些扩展只用于显式选择的会话路径。下文新增行为的架构契约已接受，具体 Feature / Evaluation Spec 与实现仍未开始。
 
 ## 3. 目标架构及责任
 
@@ -160,7 +160,7 @@ Topic Shift 决定哪些旧假设仍有效；Coreference 把当前指代绑定�
 
 Summary 是可选的、版本化的有损历史视图，保存其覆盖 Turn 集合/边界、来源内容身份、生成 profile/model 身份及有效性。新摘要不覆盖旧摘要，不删除唯一原始轮次。它压缩上下文，不压缩掉唯一可恢复的业务历史；历史数据库增长与数据保留政策是另一个问题。
 
-首版先支持无摘要也能运行的有界相关历史路径。确有 compaction 收益时，可在请求准备阶段按固定的已接受历史前缀按需生成，并在严格预算内同步完成；也可复用此前合格版本。无需每轮生成、无需阻塞每次最终回答提交、无需一开始增加 Celery job。摘要缺失/过时/失败时退回原始来源的有界选择；若仍无法容纳关键限制，澄清/明确溢出失败，不以错误摘要继续。
+**首个 conversational vertical slice 必须在没有 Summary 时也能运行；Summary 不是首个切片的前提。** 确有 compaction 收益时，可在请求准备阶段按固定的已接受历史前缀按需生成，并在严格预算内同步完成；也可复用此前合格版本。未经后续证据及已审阅 Feature Spec，不创建自动逐轮摘要或 Celery summary jobs。无需每轮生成、无需阻塞每次最终回答提交、无需一开始增加 Celery job。摘要缺失/过时/失败时退回原始来源的有界选择；若仍无法容纳关键限制，澄清/明确溢出失败，不以错误摘要继续。
 
 摘要发布是独立的派生视图写入，不能改变 accepted head。输出必须对应捕获的历史前缀和 profile；较旧前缀生成完毕后仍可作为该前缀的摘要，不能标成已经覆盖新轮次。话题返回与新用户修正要求重新校验其适用性。损坏、实体/否定遗漏、源被删除或修正时，将摘要标为不可用于新 Run，重新读取原文并生成新版本；历史 Run 保留其实际用过的摘要及后续发现的问题，不回写历史。
 
@@ -176,7 +176,7 @@ assembler 接收当前原文、解释结果、近期轮次、选中相关历史/
 - 允许压缩/剔除非关键历史，不能静默切掉否定、范围或必要指代前提；不能截断引用 quote 后仍沿用旧 offsets，也不能为给 memory 腾空间静默破坏既有 EvidencePack 的覆盖契约。
 - 如旧检索 profile 的完整 EvidencePack 加最小对话条件仍不适配，显式 overflow / clarification / failure；需要改变证据预算时提出新的 profile 与回归审阅，不偷改旧排名和 pack 语义。
 
-Feature Spec 冻结优先级、截断单位、用户可见 overflow/fallback；Feature 与 Evaluation Spec 在实现前共同冻结各阶段 token、输出、调用次数、整会话成本/延迟预算及计量方法。本轮不给 token 数、阈值或性能承诺。
+Feature Spec 冻结优先级、截断单位、用户可见 overflow/fallback；Evaluation Spec 在实现前论证并冻结各阶段 token、输出、调用次数、整会话成本/延迟预算及计量方法，Feature Spec 引用该预算契约。本轮不给 token 数、阈值或性能承诺。
 
 ## 8. 有效轮次、并发、重试与取消
 
@@ -312,7 +312,7 @@ v0.2 会话的“断线后仍执行、显式取消才停止”与旧单轮 strea
 
 ## 13. 重要取舍与重评条件
 
-以下都是待审阅建议；已接受的信任/基础设施方向不重开，比较用于解释最小实现边界。
+以下推荐方向已获 Human Architecture Review 接受；保留替代方案及重评条件用于解释最小实现边界，不在本次决议落实中重开架构决定。
 
 | 决策 | 推荐与为何适合 v0.2 | 认真考虑的替代及代价 | 重评条件 |
 | --- | --- | --- | --- |
@@ -332,16 +332,16 @@ v0.2 会话的“断线后仍执行、显式取消才停止”与旧单轮 strea
 
 ## 14. Foundation ADR 候选处置
 
-本轮不创建 Accepted ADR，也不增加重复的候选文件。本页已包含候选的建议、替代、后果和迁移影响，足以作为 Human Review 表面。获得针对精确文档版本的接受记录后，再创建长期 ADR。
+Human Architecture Review 确认以下四个领域值得形成长期 ADR，并授权在**下一规划阶段起草**。架构决定已接受，但未来 ADR 的具体文本尚未接受，必须分别经过自己的 Human Gate。**本轮不创建 ADR，也不将任何 ADR 标记为 Accepted。** 本页保留其替代、后果与迁移影响供后续起草引用。
 
-| Foundation 候选 | 建议处置 | 应记录的长期边界 / 本轮不固化内容 |
+| Foundation 候选 | 已确认的起草安排（非 ADR 接受） | 应记录的长期边界 / 本轮不固化内容 |
 | --- | --- | --- |
-| 会话状态权威及有效轮次提交 | **Human Review 后创建**；把并发/取消/fence/SSE 恢复合入同一候选 | 第 4、8、11 节的持久身份、原子接受、retry 及恢复；迁移须新增关联与约束，不冻结 DDL |
-| 记忆与文档证据的信任及范围边界 | **Human Review 后独立创建** | 第 9 节的 Memory 非 Evidence、scope、历史查看/撤权、引用依赖保留；信任边界不与调参算法混写 |
-| 有界上下文、摘要与相关历史选择契约 | **Human Review 后创建**；保持三个主题在同一 ADR，不拆成三份 | 第 6、7 节的可恢复原文、有界输入、相关性优先与派生 summary；具体阈值、排名与 prompt **defer** 到 Spec |
-| 对话 profile / trace 的版本语义 | **Human Review 后独立创建** | 第 10、11 节的旧 Run 不重解释、输入/输出版本与 reader；不与状态 ADR 合并，以覆盖跨策略诊断和兼容读者 |
+| 会话状态权威及有效轮次提交 | **下一阶段起草，另经 ADR Human Gate**；把并发/取消/fence/SSE 恢复合入同一候选 | 第 4、8、11 节的持久身份、原子接受、retry 及恢复；迁移须新增关联与约束，不冻结 DDL |
+| 记忆与文档证据的信任及范围边界 | **下一阶段独立起草，另经 ADR Human Gate** | 第 9 节的 Memory 非 Evidence、scope、历史查看/撤权、引用依赖保留；信任边界不与调参算法混写 |
+| 有界上下文、摘要与相关历史选择契约 | **下一阶段起草，另经 ADR Human Gate**；保持三个主题在同一 ADR，不拆成三份 | 第 6、7 节的可恢复原文、有界输入、相关性优先与派生 summary；具体阈值、排名与 prompt **defer** 到 Spec |
+| 对话 profile / trace 的版本语义 | **下一阶段独立起草，另经 ADR Human Gate** | 第 10、11 节的旧 Run 不重解释、输入/输出版本与 reader；不与状态 ADR 合并，以覆盖跨策略诊断和兼容读者 |
 
-四项候选均有独立长期后果，暂不 drop；不为每个实现类增加 ADR。若 Human Review 缩减 v0.2 范围，可合并/延后具体内容，但不能自行宣告接受。
+四项候选的起草价值已确认，不在本任务合并或取消；不为每个实现类增加 ADR，也不因架构接受而自行宣告 ADR 文本接受。
 
 ## 15. 明确延期到后续阶段的决定
 
@@ -349,7 +349,7 @@ v0.2 会话的“断线后仍执行、显式取消才停止”与旧单轮 strea
 | --- | --- |
 | Feature Spec：会话生命周期与恢复 | 创建/命名/删除/保留 UX，scope 默认及切换交互，澄清与证据不足展示，冲突/retry/cancel 按钮，断线恢复、状态刷新、SSE 事件契约；架构上的 durable head / 原子提交 / 失效 fencing 不推迟 |
 | Feature Spec：解释与历史上下文 | topic/coreference/rewrite 的具体可观察行为、保真/支持验证与 fallback、候选/排序/去重规则、约束有效期与纠错、Summary 触发、截断/overflow，用户可见记忆行为 |
-| Feature + Evaluation Spec：预算 | 所有阶段 token 上限、输出预留、调用数、整会话费用与时延边界、有限 retry、计量版本；数字须有依据，不能实现后再选 |
+| Evaluation Spec：预算（Feature Spec 引用） | 所有阶段 token 上限、输出预留、调用数、整会话费用与时延边界、有限 retry 的预算、计量版本；数字须有依据，不能实现后再选；具体 retry 行为仍属 Feature Spec |
 | Evaluation Spec | 数据集组成/许可/分组 split、case 数、baseline 实验、Recent-Turn-only 对照、指标实现及分母、失败/N/A 分类、Judge rubric、人工复核、概率质量数值门槛、单轮容忍度与最终发布 gate；完整 protocol 在结果用于决策/调参前冻结 |
 | Implementation design（须已有接受范围） | 表/列/索引/唯一性表达、Alembic、精确 Pydantic payload/路由、生成 TS 类型、React 组件、进程任务与取消实现、锁顺序/恢复扫描、最终 prompts、评分公式及 tokenizer 代码 |
 
@@ -378,16 +378,18 @@ v0.2 会话的“断线后仍执行、显式取消才停止”与旧单轮 strea
 
 ## 17. Human Architecture Review 决策与最大风险
 
-未发现与已接受 Blueprint/Foundation/Governance 冲突；无需改写基线。下面是本提案真正需要 Product Owner 接受/修改的架构选择，不是开始写提案前的阻塞问题：
+未发现与已接受 Blueprint/Foundation/Governance 冲突；无需改写基线。Product Owner 已于 **2026-09-28** 对提案提交 **`9e6e75baa26f230fd62d30919a1c29fac10434e8`** 作出 **APPROVED** 决议，以下四组架构选择均已接受，记录见 [PR #2](https://github.com/BillZhao626/CiteWeave/pull/2)：
 
-| 决策 | 推荐默认；若不接受的影响 |
+| 决策 | 已接受的 v0.2 边界 |
 | --- | --- |
-| 同一会话并发交互 | 接受一个活动轮次 + 明确冲突，不自动队列/分支；若要求并行，必须先定义父状态与用户选择行为 |
-| 断线与重启保证 | 新会话断线继续、显式取消；重启保证历史与终态可恢复，不保证自动续算；若要求后台必达，需重新审阅执行机制 |
+| 同一会话并发交互 | 每 Conversation 一个活动 Turn / Run；并发独立提交返回明确可恢复冲突，不静默排队、重定基、合并或创建分支。这是 v0.2 复杂度边界，不排除未来经审阅支持并行 |
+| 断线与重启保证 | SSE 只观察；新会话断线后可执行到有界期限，重连读取持久状态，不保证逐 token replay；后端重启保留历史与终态，不保证 provider 自动续算，中断经 reconciliation 收敛并可能需用户显式 retry；不为强化承诺引入 Celery 会话执行 |
 | 有效控制结果与原子状态 | 接受澄清/证据不足也可形成有效轮次，但不承认新的文档事实；最终结果与状态原子提交 |
-| 历史/摘要与兼容 | 接受 A+B 首版、Summary 可选有损且保留原文、会话 opt-in、旧 Run 不重解释；向量记忆与自动摘要任务须后续证据 |
+| 历史/摘要与兼容 | 接受 A+B 首版、Relevance first、找回旧而相关并排除新而无关；Summary 可选有损、版本化、派生且可重建，保留原始 accepted Turn 历史，首个切片不依赖 Summary；会话 opt-in、旧 Run 不重解释，向量记忆与自动摘要任务须后续证据及相应审阅 |
 
-数据保留/实际擦除的产品政策与具体澄清/范围 UX 尚未确定，属于实现前的 Feature Human Gate，不妨碍当前架构审阅；本提案已规定删除不能悄悄破坏有效引用或授权，不能以该延期作为上线授权。
+本次同时接受第 3–11 节的其余责任边界：PG 持久权威、Conversation/Turn/Run 与历史状态身份；失败/取消/stale/无效 Run 不推进 accepted state；Topic Shift / Coreference / Rewrite 可共用调用但结果与校验分离，自足问题确定性跳过、歧义澄清；Memory 非 Evidence、当前授权来源与有类型的有界上下文；可检查 Trace 且不存隐藏思维链，历史查看/输入重建/新 Run 重执行分离；v0.1 opt-in 兼容、未来 Alembic 与恢复验证；Redis/Celery/Qdrant/LocalBlobStore 职责不扩张。详细契约保持原文，不重新设计。
+
+数据保留/实际擦除的产品政策与具体澄清/范围 UX 尚未确定，仍属于实现前的 Feature Human Gate；删除不能悄悄破坏有效引用或授权。第 15 节 Feature / Evaluation / Implementation 延期边界保持有效，架构接受不冻结这些细节，也不授权上线或实现。
 
 最大的三个风险：
 
@@ -395,4 +397,6 @@ v0.2 会话的“断线后仍执行、显式取消才停止”与旧单轮 strea
 2. **原子接受与执行恢复不一致**：SSE、取消、PG 提交、provider 迟到可能不同步。以单活动槽、expected head、Run fence、PG 事务和 deadline reconciliation 限制有效结果；实现必须做真实持久竞态/重启测试。
 3. **有界选择丢关键旧约束或压缩失真**：简单 A+B 可能漏同义旧任务，Summary 可能丢否定。保留原文、选择/截断/摘要身份和对照钩子，安全失败/澄清，并按第 6、7 节的证据触发升级，不声称无需进一步评测。
 
-Human Review 应针对 Draft PR 的精确 commit 记录决策主题、接受/拒绝/有条件接受、条件、决策人及日期，遵循 Playbook。CI 成功、Draft PR 存在、没有回复均不等于接受。**在 Human Architecture Review 门禁停止；不等待决议，不创建 Accepted ADR，不开始 Feature 实现，不 merge / tag / Release。**
+下一规划阶段为 **v0.2 Feature / Evaluation Specification and ADR Drafting**。由下一次人类引导的规划确定首个 vertical slice、首先冻结哪个 Feature Spec、初始 Evaluation Spec 结构，以及实现前必需的 ADR 草案；不把全部 Spec 合成一个巨型任务。首个产品切片建议优先最小有用链路：Conversation → durable Turn → relevant history → coreference/query interpretation → existing RAG → evidence-grounded answer → accepted state；Summary、向量记忆、长期记忆与 Tool Runtime 均不是前提。
+
+**本任务仅落实已完成的 Human Architecture Review；下一规划阶段尚未开始，v0.2 实现仍为 NOT_STARTED，未获实现授权。** 文档提交推送且最新 PR CI 通过后将 PR #2 置为 Ready for Review，供 owner 最终合并审阅；保持 PR 开放，不等待另一次 Human Review，不开始 Feature Spec / ADR 起草或实现，不 merge / tag / Release。架构接受来自上述明确人工决议，不来自 CI 或 PR 状态。

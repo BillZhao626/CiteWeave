@@ -1,12 +1,12 @@
 # ADR 0008: bounded context, relevant history and optional Summary
 
-Status: **PROPOSED / awaiting ADR Human Review** · 2026-09-28
+Status: **ACCEPTED — Human ADR Review incorporated** · 2026-09-28
 
 ## Context and accepted constraints
 
 [Accepted Architecture](../V02_CONVERSATIONAL_RAG_ARCHITECTURE.md), sections 6–7, accepts A+B history and Relevance first, Recency second. The [first Feature](../specs/07_V02_First_Conversational_Slice.md) must work without Summary. Candidate retrieval, state and actual generation context are different bounded inputs; a bounded EvidencePack alone does not bound the whole prompt.
 
-## Proposed decision
+## Accepted decision
 
 Use recent accepted Turns and structured state (A), plus PostgreSQL-backed retrieval/filtering over the searchable accepted history of the same Conversation (B). Bound reads and candidate materialization without restricting searchable history to a recent window. Keep original Turn provenance and supersession relations so an old topic remains findable after leaving active state. No vector conversation index or new memory database.
 
@@ -36,4 +36,4 @@ N/C/K, lexical/metadata branches, deduplication, rule priority, recency tie-brea
 
 Durable selected contexts, state provenance or derived lookup metadata may require Alembic; concrete schema/index design is deferred. Rebuilding lookup/state creates new versions and must not replace inputs actually used by old Runs. No vector migration or Summary table/job is required for this slice. Test true model accounting, boundary payloads, old-relevant/new-noise, correction dependencies, scope changes and incomplete searches; proxy tokenizer fixtures cannot establish provider limits.
 
-Reevaluate vector retrieval only after controlled evidence isolates A+B recall gaps and simpler metadata/lexical changes fail within accepted budgets. Reevaluate Summary only after measured necessary-history pressure survives better selection/deduplication and a controlled source-preserving compression proposal can justify its risk/cost. Both require new Feature/Evaluation review. Acceptance record: **none; Human ADR Review required**.
+Reevaluate vector retrieval only after controlled evidence isolates A+B recall gaps and simpler metadata/lexical changes fail within accepted budgets. Reevaluate Summary only after measured necessary-history pressure survives better selection/deduplication and a controlled source-preserving compression proposal can justify its risk/cost. Both require new Feature/Evaluation review. Acceptance record: **APPROVED**, 2026-09-28, by the maintainer through the explicitly authorized Human ADR Review instruction, for the exact ADR text at **`aa5755cbf70e552827f03211d2770a4dcff3626f`**; public record: [PR #3](https://github.com/BillZhao626/CiteWeave/pull/3). This records acceptance without expanding scope or authorizing implementation/experiments; empirical choices remain UNSELECTED pending Evaluation freezes.

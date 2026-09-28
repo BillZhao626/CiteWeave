@@ -1,12 +1,14 @@
 # v0.2 First Conversational Slice — Feature Spec
 
-Status: **PROPOSED — awaiting Human Feature Review** · 2026-09-28
+Status: **ACCEPTED — Human Feature Review incorporated** · 2026-09-28
 
 Implementation: **NOT_STARTED** · 不授权实现、模型实验或发布。
 
-本轮为有界 SDD + Feature / Evaluation co-design。基线经 fetch 核实：本地 main、origin/main、HEAD 均为 `0ccb4fc6cbaf6024a10096cf2a9df04bfdef2925`，起始工作树干净；[PR #2](https://github.com/BillZhao626/CiteWeave/pull/2) 已于 2026-09-28 合并。[架构](../V02_CONVERSATIONAL_RAG_ARCHITECTURE.md)状态为 **ACCEPTED — Human Review incorporated**，接受记录与实现状态不变。
+Human Feature Review：维护者于 **2026-09-28** 对提交 **`aa5755cbf70e552827f03211d2770a4dcff3626f`** 的本 Feature 原设计作出 **APPROVED** 决议，包含首版无自动 TTL/删除的保留政策；来源为本次明确授权的 Human Review 指令，公开接受记录见 [PR #3](https://github.com/BillZhao626/CiteWeave/pull/3)。接受行为设计不授权实现、校准、provider 评测或调参。
 
-本文只拥有首个切片的可观察行为；[Evaluation Spec](08_V02_Conversational_Evaluation.md)拥有数据、指标、实验与参数冻结记录。已有 Blueprint / Foundation / Governance 不改写；SQL 表、React 组件、精确路由名、最终 prompt 与数值预算均非本次定稿。文中的“必须”区分下列 A 类既有不变量与待接受的 Feature 行为，不能把 PROPOSED 文本当成已获授权。
+原设计采用有界 SDD + Feature / Evaluation co-design。基线经 fetch 核实：本地 main、origin/main、HEAD 均为 `0ccb4fc6cbaf6024a10096cf2a9df04bfdef2925`，起始工作树干净；[PR #2](https://github.com/BillZhao626/CiteWeave/pull/2) 已于 2026-09-28 合并。[架构](../V02_CONVERSATIONAL_RAG_ARCHITECTURE.md)状态为 **ACCEPTED — Human Review incorporated**，接受记录与实现状态不变。
+
+本文只拥有首个切片的可观察行为；[Evaluation Spec](08_V02_Conversational_Evaluation.md)拥有数据、指标、实验与参数冻结记录。已有 Blueprint / Foundation / Governance 不改写；SQL 表、React 组件、精确路由名、最终 prompt 与数值预算均非本次定稿。文中的“必须”区分下列 A 类既有不变量与本次已接受的 Feature 行为；B 类经验选择仍为 UNSELECTED，设计接受不能替代执行冻结与实现授权。
 
 ## 1. 最小有用结果与范围
 
@@ -35,7 +37,7 @@ Implementation: **NOT_STARTED** · 不授权实现、模型实验或发布。
 | B / P3 | Rewrite 激活、确定性 skip 判据、合并/拆分解释、有限补取/修复 | Evaluation E9–E12；不能试验取消 I1–I8 |
 | B / P4 | 每轮调用/重试/期限/费用、整会话资源预算、candidate I/O 上限 | 先测量与冻结预算表；无无限 retry，无 UNKNOWN 自动付费重发 |
 
-## 3. 用户与 API 可观察契约（提案）
+## 3. 用户与 API 可观察契约（已接受）
 
 使用显式会话 API 入口族，与 `/v1/queries` 分开；Pydantic/OpenAPI 定义，前端生成类型。下表是操作语义，不冻结路径拼写/DTO/HTTP 数字/SSE enum。
 
@@ -54,7 +56,7 @@ Implementation: **NOT_STARTED** · 不授权实现、模型实验或发布。
 | 最小 retry | 仅无 accepted result、无其他活动执行、原 head/scope/profile 前提仍适用时显式创建同 Turn 的新 Run。retry 操作自身幂等；历史 Run 不覆盖。head 已前进要求新 Turn。UNKNOWN 提示费用可能发生，绝不自动重发 |
 | Trace/旧引用 | 可查看本轮原文、改写、范围、输入来源、状态、证据、结果及失败原因；旧引用保留旧身份并检查当前查看权限。历史可读不意味着可用于新查询 |
 
-保留政策提案（必须随 Feature Review 接受）：本地 Conversation 原始提交、accepted 结果、失败执行记录、Run 使用过的 snapshot/context/profile 与引用依赖在首版无自动 TTL/擦除；UI 明示会保存在本地。关闭页面不删除。查询/Trace 有界不等于磁盘无限承诺；容量不足时明确拒绝新写入，不清除依赖来伪造成功。真正擦除、自动保留期或清理需另一个有撤回与引用依赖处理的 Feature Human Gate。现有文档 retirement 不破坏旧引用；原文件丢失/撤权时明确 unavailable/restricted，不能把不可解析结果继续声明为有效。首版不新增权限管理产品，但每个读取/提交仍应用既有 workspace/来源访问边界；不宣称已有完整动态 RBAC。
+首版保留政策（已随本次 Feature Review 接受）：本地 Conversation 原始提交、accepted 结果、失败执行记录、Run 使用过的 snapshot/context/profile 与引用依赖在首版无自动 TTL/擦除；UI 明示会保存在本地。关闭页面不删除。查询/Trace 有界不等于磁盘无限承诺；容量不足时明确拒绝新写入，不清除依赖来伪造成功。真正擦除、自动保留期或清理需另一个有撤回与引用依赖处理的 Feature Human Gate。现有文档 retirement 不破坏旧引用；原文件丢失/撤权时明确 unavailable/restricted，不能把不可解析结果继续声明为有效。首版不新增权限管理产品，但每个读取/提交仍应用既有 workspace/来源访问边界；不宣称已有完整动态 RBAC。
 
 用户纠正是新 Turn：显式指明替换的实体/约束/旧回答，建立 supersession/invalidation 来源关系；只在该 Turn accepted 时发布新 state。旧文本和当时接受记录保留，未来选择排除已失效假设。无法定位纠正对象则澄清；不从 assistant prose 反向提取事实。内部发现的状态损坏禁用投影并从可验证原文重建新版本；无法恢复时明确失败。评测发现的历史关键违规仍是 blocker，不能用失效标记抹除。
 
@@ -111,8 +113,8 @@ Trace 至少包含：Conversation/Turn/Run/retry、输入 head/state、输入/�
 | crash/reconnect | admission 后未启动、provider UNKNOWN、commit 前/后进程失效、final 丢失、PG outcome 不明均收敛 | 有界 reconciliation + 持久重启 |
 | scope/source/legacy | 当前范围不借历史扩大，权限/源缺失明确；旧 Ask/Run/Citation/PDF 行为不变 | 现有检索固定对照、版本迁移与 reader 回归 |
 
-实施前必须完成：Human Feature Review（含保留/范围/纠正/overflow UX）、Human Evaluation Review，以及四份 ADR 各自 Human Review：[0006 状态提交](../adr/0006-conversation-state-and-effective-commit.md)、[0007 信任边界](../adr/0007-memory-and-documentary-evidence.md)、[0008 上下文](../adr/0008-bounded-conversational-context.md)、[0009 profile/Trace](../adr/0009-conversation-profile-and-trace.md)。四个领域都直接约束此切片，不能推迟到业务代码之后。
+本次已完成 Human Feature Review（含保留/范围/纠正/overflow UX）、Human Evaluation Methodology Review，以及四份 ADR 各自 Human Review：[0006 状态提交](../adr/0006-conversation-state-and-effective-commit.md)、[0007 信任边界](../adr/0007-memory-and-documentary-evidence.md)、[0008 上下文](../adr/0008-bounded-conversational-context.md)、[0009 profile/Trace](../adr/0009-conversation-profile-and-trace.md)。四个领域都直接约束此切片，不能推迟到业务代码之后。
 
-同时须填完 Evaluation 的 pre-implementation budget/protocol freeze 表；尚缺测量时仅可在另行授权的校准任务中采样，不启动产品实现/调参。本规划包可进入审阅，不等于数值完整的执行协议已接受。未来实现使用 Alembic，验证 v0.1 PG/blobs 备份升级、旧 reader、新状态、重启及恢复；不承诺无损 downgrade。具体 schema/锁表达、React 组件、prompt/接口代码和基准 harness 延后。
+同时须填完 Evaluation 的 pre-implementation budget/protocol freeze 表；尚缺测量时仅可在另行授权的校准任务中采样，不启动产品实现/调参。下一授权规划阶段为 **v0.2 Calibration Plan Freeze**；校准本身需单独有界授权，取得证据后再经独立 **Comparison Protocol Freeze Human Gate** 接受具体实验值。方法论接受不等于数值完整的执行协议已接受。未来实现使用 Alembic，验证 v0.1 PG/blobs 备份升级、旧 reader、新状态、重启及恢复；不承诺无损 downgrade。具体 schema/锁表达、React 组件、prompt/接口代码和基准 harness 延后。
 
-Blueprint drift check：本切片服务持久技术追问；保留 PG/Qdrant/Redis/Celery/LocalBlobStore 职责、来源身份、scope、相关性优先和 opt-in 兼容；没有新基础设施或性能声明。Summary/向量/长期记忆/工具不被引入。以上 Feature 行为仍等待人类接受，当前停止于规划交付。
+Blueprint drift check：本切片服务持久技术追问；保留 PG/Qdrant/Redis/Celery/LocalBlobStore 职责、来源身份、scope、相关性优先和 opt-in 兼容；没有新基础设施或性能声明。Summary/向量/长期记忆/工具不被引入。以上 Feature 行为已获人类接受；本轮仅落实审阅记录，不开始下一阶段规划、校准或实现。

@@ -1,12 +1,12 @@
 # ADR 0009: conversation profile and Trace version semantics
 
-Status: **PROPOSED / awaiting ADR Human Review** · 2026-09-28
+Status: **ACCEPTED — Human ADR Review incorporated** · 2026-09-28
 
 ## Context and accepted constraints
 
 [Accepted Architecture](../V02_CONVERSATIONAL_RAG_ARCHITECTURE.md), sections 10–11, preserves historical Run interpretation and separates conversation policy from documentary retrieval. [Current readers](../../src/citeweave/query_evidence.py) already distinguish `legacy-v1` and `structural-trace-v1`. Controlled first-slice experiments need reproducible inputs rather than labels referring to mutable defaults.
 
-## Proposed decision
+## Accepted decision
 
 Introduce a distinct versioned conversation profile resolved and captured at admission, alongside unchanged retrieval/index profile identities. Capture interpretation/history/state/context strategies, prompt content hash plus resolvable version, provider/model identity, tokenizer/accounting revision, all stage/output/resource budgets and experimental variant identity. No current default silently changes an already admitted Run.
 
@@ -34,4 +34,4 @@ Actual profile/schema names, DTOs, serialization and frontend Trace components a
 
 If durable schema expands, use Alembic and explicit conversation reader revisions; keep v0.1 readers and optional new Run association. Do not backfill fabricated conversation state or reinterpret legacy evidence fields. Backup/restore must include retained prompt/template/input artifacts and PG/blobs together; format changes need a reader compatibility test. Test old reader display, hash/content mismatch, input-versus-output state, budget/profile capture, same input reconstruction, current authorization on reexecution and unavailable-source diagnostics.
 
-Reevaluate representation only if measured combinations or storage cost become unmaintainable, using a new version/migration while keeping historical readers. This fourth ADR remains separate because it spans all strategies, evaluation and v0.1 compatibility rather than only commit transactions. Acceptance record: **none; Human ADR Review required**.
+Reevaluate representation only if measured combinations or storage cost become unmaintainable, using a new version/migration while keeping historical readers. This fourth ADR remains separate because it spans all strategies, evaluation and v0.1 compatibility rather than only commit transactions. Acceptance record: **APPROVED**, 2026-09-28, by the maintainer through the explicitly authorized Human ADR Review instruction, for the exact ADR text at **`aa5755cbf70e552827f03211d2770a4dcff3626f`**; public record: [PR #3](https://github.com/BillZhao626/CiteWeave/pull/3). This records acceptance without expanding scope or authorizing implementation/experiments; empirical choices remain UNSELECTED pending Evaluation freezes.

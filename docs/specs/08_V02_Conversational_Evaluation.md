@@ -1,14 +1,18 @@
 # v0.2 Conversational RAG — Initial Evaluation Spec
 
-Status: **PROPOSED — awaiting Human Evaluation Review** · 2026-09-28
+Status: **ACCEPTED — Human Evaluation Methodology Review incorporated** · 2026-09-28
 
-Protocol: **DESIGNED, NOT EXECUTABLE UNTIL FREEZE** · 未执行 provider 评测，未选择获胜策略。
+Protocol: **NOT EXECUTABLE — Calibration Plan Freeze and Comparison Protocol Freeze pending** · 未执行 provider 评测，未选择获胜策略。
 
-范围为[首个 Feature 切片](07_V02_First_Conversational_Slice.md)。本页拥有参数、数据、量表、比较与选择协议，不定义产品 SQL/API。遵守[已接受架构](../V02_CONVERSATIONAL_RAG_ARCHITECTURE.md)和[Governance](../ENGINEERING_GOVERNANCE.md)；硬不变量继承 Feature I1–I8，新的实验方法为提案。既有分数、历史 holdout 和本页草案都不构成 v0.2 质量证据。
+Human Evaluation Review：维护者于 **2026-09-28** 对提交 **`aa5755cbf70e552827f03211d2770a4dcff3626f`** 作出 **APPROVED AS METHODOLOGY / NOT YET EXECUTION-FROZEN** 决议；来源为本次明确授权的 Human Review 指令，公开记录见 [PR #3](https://github.com/BillZhao626/CiteWeave/pull/3)。接受范围为维度/分母、失败分类、数据类别/schema 方向与 split 分工、baseline 角色、E1–E12 结构及控制变量、Bad Case 根因流程、hard-gate-first/Pareto 选择、禁止事后设阈值及向量 Memory/Summary 重评条件。
+
+**UNFROZEN / UNSELECTED**：N/C/K、候选范围、history/state/input/output caps、candidate I/O limits、样本量、quality/noninferiority margins、repeats、provider latency/cost budgets，以及需校准证据的 E1–E12 精确 arm 清单/配置。方法论接受不授权产品实现、候选比较、provider/model 评测或参数调优，也不授权直接执行校准。
+
+范围为[首个 Feature 切片](07_V02_First_Conversational_Slice.md)。本页拥有参数、数据、量表、比较与选择协议，不定义产品 SQL/API。遵守[已接受架构](../V02_CONVERSATIONAL_RAG_ARCHITECTURE.md)和[Governance](../ENGINEERING_GOVERNANCE.md)；硬不变量继承 Feature I1–I8，实验方法论已获接受，但具体执行值未冻结。既有分数、历史 holdout 和本文的方法论接受都不构成 v0.2 质量证据。
 
 ## 1. 决策顺序与冻结门禁
 
-每个经验选择遵循：问题 → baseline → 合理备选 → 预先定义评测维度 → 控制比较/消融 → Bad Cases → 质量/延迟/成本/复杂度权衡 → 决策记录 → 重评触发。本轮冻结的是供审阅的维度/协议草案，**不虚构最终概率性发布阈值，不把候选结果用来倒推门槛**。
+每个经验选择遵循：问题 → baseline → 合理备选 → 预先定义评测维度 → 控制比较/消融 → Bad Cases → 质量/延迟/成本/复杂度权衡 → 决策记录 → 重评触发。本轮仅落实方法论接受，具体执行协议仍待冻结，**不虚构最终概率性发布阈值，不把候选结果用来倒推门槛**。
 
 采用两次签署点，解除“没有多轮数据却要先选 token 值”的循环：
 
@@ -26,7 +30,7 @@ Protocol: **DESIGNED, NOT EXECUTABLE UNTIL FREEZE** · 未执行 provider 评测
 | 总体/关键分层质量、完成率、非劣效容忍度、material similarity 定义与选择规则 | 产品错误代价 + rubric 尺度 + baseline calibration；在候选结果可见前书面接受 |
 | Regression/后续 confirmation 开启条件、操作者/保管者、候选 freeze SHA/profile、失败后处置 | 不用 Regression 调参；后续发布标准单独获接受 |
 
-历史 `-0.03` 配对容忍度在本协议中**不继承，待替换**：不同多轮人群、缺失分母与 rubric 不支持直接迁移。这里的决定是禁用该数值，新的 margin 需按上表接受后才能作比较结论。任何未填项阻断实验选型与实现授权；不会因为本文可审阅或 CI 成功而隐式补值。
+历史 `-0.03` 配对容忍度在本协议中**不继承，待替换**：不同多轮人群、缺失分母与 rubric 不支持直接迁移。这里的决定是禁用该数值，新的 margin 需按上表接受后才能作比较结论。任何未填项阻断实验选型与实现授权；不会因为方法论获批或 CI 成功而隐式补值。
 
 ## 2. 当前仓库证据与参数校准
 
@@ -202,6 +206,6 @@ Summary 的后续证据门槛：相关性与去重已改善仍频繁无法装入
 
 ## 9. 审阅与限制
 
-本包已有维度、类别、分母、baseline、消融、失败规则、冻结顺序与 Review 问题的明确归属，可进入 Human Feature/Evaluation Review。数据/数值/样本量/质量 margin/真实计量仍待校准，**不是可直接执行的已接受 Evaluation protocol**。下一任务须先批准校准方案并填冻结记录，然后才能授权业务实现和比较。
+本包的 Feature、四份 ADR 和 Evaluation 方法论已完成相应 Human Review；数据/数值/样本量/质量 margin/真实计量仍待校准，**不是可直接执行的已接受 Evaluation protocol**。下一授权规划阶段为 **v0.2 Calibration Plan Freeze**，定义精确有界的校准任务：N/C/K 候选范围所需分布、真实 tokenizer/context 计量、history/state/input/output 预算候选、candidate I/O limits、必要的 baseline 方差、样本量理由及以后另行授权的 provider 测量范围/费用。校准本身仍须自己的有界授权；有校准证据后，再由独立 **Comparison Protocol Freeze Human Gate** 接受具体实验值，才可另行授权候选比较。本次不授权实现、provider/model 评测或调参。
 
 合成/原创小文档适合可控身份、否定、竞态和预算风险，不代表真实技术会话分布；公开可见 benchmark 有选择偏差，有限 gold 不穷尽合法支持；Judge 可错、单人复核不等于独立评审。离线 CI 验证现有工程，不是多轮模型质量或生产容量证据。本轮没有 paid/provider 调用、harness 实现、数据集封存或 release threshold 决定。

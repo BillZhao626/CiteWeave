@@ -1,14 +1,16 @@
 # v0.2 Conversational RAG — Cost-Aware Calibration Plan
 
-Status: **PROPOSED — awaiting Human Calibration Plan Review** · 2026-09-29
+Status: **ACCEPTED — Human Calibration Plan Review incorporated** · 2026-09-29
 
-Implementation: **NOT_STARTED** · 本次规划 provider calls / spend = **0 / 0**。
+Implementation: **NOT_STARTED** · Calibration execution: **NOT AUTHORIZED** · Provider authorized: **0 calls / 0 CNY** · 有限 CNY 额度：**NONE / PENDING**。
 
-本文冻结的是供审阅的计划版本，不是 AI 宣告人工接受。方法为 Evaluation-Driven Development、Cost-Aware Experimental Design、Controlled Ablation Planning、Human Evaluation Gate。没有测量结果、候选胜者或已选择的 N/C/K。接受本计划后仍须另行授权有界校准执行；候选比较另经 Comparison Protocol Freeze；产品实现另行授权。
+Human Calibration Plan Review：Product Owner 于 **2026-09-29** 对提交 **`a4bc54be8411e867fff11c173d75f92498fa602d`** 作出 **APPROVED — with Owner-selected Lean configuration** 决议；来源为本次明确授权的 Human Review 指令，公开记录见 [PR #4](https://github.com/BillZhao626/CiteWeave/pull/4)。成本感知方法与计划结构已接受，选定 **LEAN** 为当前首切片 campaign 默认最大资源框架；Recommended 未预授权，Maximum / Ceiling 仅参考、未授权。选定 Lean 不开放任何即时执行或全部资源。
+
+接受姿态为 **LOCAL-FIRST / PROVIDER-OFF-BY-DEFAULT**。方法为 Evaluation-Driven Development、Cost-Aware Experimental Design、Controlled Ablation Planning、Human Evaluation Gate。没有测量结果、候选胜者或已选择的 N/C/K。校准执行仍须另行有界授权；baseline-only provider pilot **NOT AUTHORIZED YET**；Comparison Protocol Freeze 仍 pending 且为独立 Human Gate；产品实现另行授权。
 
 ## 1. 起点、依据与文档归属
 
-2026-09-29 经 `git fetch origin` 核实：本地 main / origin/main / HEAD 均为 `7e5b952b2effc32bfa096dfd5297354a0dda5893`，工作树干净；[PR #3](https://github.com/BillZhao626/CiteWeave/pull/3) 已于 2026-09-28T14:06:27Z 合并。Feature 与 ADR 0006–0009 已接受，Evaluation 仅方法论已接受、执行未冻结；HANDOFF 授权下一规划阶段为 Calibration Plan Freeze。AGENTS 旧导航中“尚未接受”的状态落后于这些接受记录，本次仅同步导航。
+原计划起点：2026-09-29 经 `git fetch origin` 核实：本地 main / origin/main / HEAD 均为 `7e5b952b2effc32bfa096dfd5297354a0dda5893`，工作树干净；[PR #3](https://github.com/BillZhao626/CiteWeave/pull/3) 已于 2026-09-28T14:06:27Z 合并。Feature 与 ADR 0006–0009 已接受，Evaluation 仅方法论已接受、执行未冻结；HANDOFF 授权下一规划阶段为 Calibration Plan Freeze。AGENTS 旧导航中“尚未接受”的状态落后于这些接受记录，原规划同步了该导航；本次审阅落实从干净的 `a4bc54be8411e867fff11c173d75f92498fa602d` 沿用 PR #4 分支。
 
 契约来源：[Feature](specs/07_V02_First_Conversational_Slice.md)、[Evaluation](specs/08_V02_Conversational_Evaluation.md)、[架构](V02_CONVERSATIONAL_RAG_ARCHITECTURE.md)、[ADR 0006](adr/0006-conversation-state-and-effective-commit.md) / [0007](adr/0007-memory-and-documentary-evidence.md) / [0008](adr/0008-bounded-conversational-context.md) / [0009](adr/0009-conversation-profile-and-trace.md)。不改变其行为、分母、S 选择规则或零容忍边界。工程与人工门禁遵循 [Playbook](AI_DEVELOPMENT_PLAYBOOK.md) 和 [Governance](ENGINEERING_GOVERNANCE.md)。
 
@@ -32,8 +34,8 @@ Implementation: **NOT_STARTED** · 本次规划 provider calls / spend = **0 / 0
 
 ## 2. 三个边界与必须解锁的决定
 
-1. **本次 Plan Review**：接受测量方法、覆盖和资源上限提案；选择 tier，决定是否允许单独 baseline-only pilot。当前一律不能执行。
-2. **未来 Calibration execution**：仅采集标签分布、确定性计量、单一固定 baseline 的 usage/方差（若明确授权），提出少量范围。不能用候选最终答案作选择，不能在此实现会话 runtime。非现成能力记 unavailable；只能在另行授权的小型计量适配器预算内补齐。
+1. **已完成 Plan Review**：方法与结构已接受，Lean 为选定上限框架，普通成功初始抽样/mandatory review、Lean 工程上限、RES 结构与早停策略已接受；校准和 baseline-only pilot 均未授权。下一阶段仅准备本地执行规划/授权，当前一律不能执行。
+2. **未来 Calibration execution**：先另行授权本地标签分布与确定性计量，提出少量范围；单一固定 baseline 的 usage/方差须在本地证据证明必要后，再取得独立 provider 授权。不能用候选最终答案作选择，不能在此实现会话 runtime。非现成能力记 unavailable；只能在另行授权的小型计量适配器预算内补齐。
 3. **Comparison Protocol Freeze → 另行实现/比较授权**：填齐数值与身份后才做 L1 产品正确性、L2 候选 proxy 淘汰、L3–L5 真实候选比较。L0 标注分布可推导不可行范围，不能冒称某 selector 已赢。需要真实会话 PG 的验证须等已授权实现，不把它设成实施前校准的循环依赖。
 
 决策登记见下一表。`Dxx` 与 `Ex` 是同一决策的索引；不是十二个必跑实验。每一实验启动单还须填：决策当前阻塞项、可改变选择的结果分支、最便宜证据、receipt 需求、VOI、stage/experiment/arm 分账、最大成本向量、停止条件。填不出可改变的选择则取消实验。
@@ -85,7 +87,7 @@ Implementation: **NOT_STARTED** · 本次规划 provider calls / spend = **0 / 0
 
 ### 4.3 可选 baseline-only provider pilot
 
-只有官方身份/计量、固定输入、费用上界和持久预算准入均具备后，另行明确授权。每档至多选 **4 / 6 / 9 个固定 Calibration target，各两次相同输入**，因此 8 / 12 / 18 次物理调用。选择覆盖短/长、single/compare、自足/语义依赖可用输入，不能挑候选表现差的题临时补测。第二次只估 baseline 不稳定性；不默认三次以上，不运行候选多臂。
+**NOT AUTHORIZED YET**。只有本地 Calibration 证据表明 baseline provider 测量是解锁 output reserve、真实 usage、finish/truncation、随机方差或 repeat-count 等 Comparison Protocol 决定所必需时，才可提议独立有界 pilot。支付授权前必须具备：核验的 provider/model 身份、当前官方 context limits、可验证 tokenizer/accounting 路径或明确接受的计量限制、官方 rate-card 来源与访问日、有限最坏 token/费用计算、明确的 Product Owner 有限 CNY ceiling，以及固定输入和持久预算准入。计量限制的接受不豁免有限上界或 Context Assembler 硬门禁。Lean pilot 容量只是 ceiling proposal，不是派发许可。每档至多选 **4 / 6 / 9 个固定 Calibration target，各两次相同输入**，因此 8 / 12 / 18 次物理调用。选择覆盖短/长、single/compare、自足/语义依赖可用输入，不能挑候选表现差的题临时补测。第二次只估 baseline 不稳定性；不默认三次以上，不运行候选多臂。
 
 优先复用现有 V0 `telecom-structural-v1` 的固定 generation 请求，output=1024，只测此 baseline 的使用量、finish reason、截断与时延；参考多轮 serializer 的 token 数可以离线测，不能因此声称测到会话端到端延迟。若某语义解释 baseline 尚不存在，记缺口，不能写产品 runtime 来完成 pilot；确需直接请求的单一测量适配须另行登记 prompt/契约、工程工时与 owner 许可，且取代既有 pilot slots，不加总额。校准不跑 paid Judge，人工审核 rubric 与 critical；不能混两个 baseline 的方差。
 
@@ -154,15 +156,15 @@ Campaign 下设 **CAL → DEV → HARD → REG** 的顺序门禁及独立 **RES*
 - UNKNOWN：次数、未知 token/charge、保守保留值单列；和已知小计相加形成预算占用，不算免费。
 - 签署的人民币 ceiling 必须 `M_t ≤ min(公式最坏总额, owner 所选现金上限, 当时全局剩余额度)`；若该值买不起全部 slots，减少未来可派发量，不能超支。全局余额必须在执行时私下核验，不能从源码 50 推断还有 50 元。
 
-本次三档人民币估计均 **PENDING 官方价格/身份**，不是零元；下面给出的相异公式就是三档 total monetary ceiling 的提案，最终需 Human 签署有限金额。现有源码 50 元/月是额外硬界，不能自动提高；所有 token 公式必须代入可核验值并签署才能派发。调用 ceiling 不依赖价格，token ceiling 不依赖费率，现金不足时进一步缩小。
+当前有限 CNY 授权为 **NONE / PENDING**，即现阶段允许支出 **0 CNY**，没有已接受的付费金额；Product Owner 明确接受有限 CNY ceiling 前禁止派发付费请求。三档人民币估计均 **PENDING 官方价格/身份**，不是零元估价；下面给出的相异公式就是三档 total monetary ceiling 的提案，最终需 Human 签署有限金额。现有源码 50 元/月是额外硬界，不能自动提高；所有 token 公式必须代入可核验值并签署才能派发。调用 ceiling 不依赖价格，token ceiling 不依赖费率，现金不足时进一步缩小。
 
 ## 8. 三档容量：从覆盖和候选数推导
 
-以下数字均是**owner-selectable 上限提案**，不是观测结果、置信保证或支付授权。三档共同保留全部硬不变量，差异是能够解决的 ordinary 取舍范围。一次 comparison target execution 的保守账本单位最多 **3 个 physical calls**：至多 combined interpretation + generation + 可选 Judge。跳过任一 phase 省下额度留在原账，不能自动增加目标或 arms。对单轮 V0 配对，自足 skip 省下解释 slot，可放一个 V0 generation；最多一个 Judge，baseline/争议人工审阅，不能漏计重建 baseline。若需第二 Judge/额外 phase，须先减少本批其它 slots 并重新预登记，超已批准语义则新 Gate。
+以下 **Lean 已选为默认最大资源框架**；Recommended **未预授权**，Maximum / Ceiling **仅参考、未授权**。选定 Lean 不授权任何即时校准、provider 调用或全部资源，仍须逐阶段有界授权；这些数字不是观测结果、置信保证或支付授权。三档共同保留全部硬不变量，差异是能够解决的 ordinary 取舍范围。一次 comparison target execution 的保守账本单位最多 **3 个 physical calls**：至多 combined interpretation + generation + 可选 Judge。跳过任一 phase 省下额度留在原账，不能自动增加目标或 arms。对单轮 V0 配对，自足 skip 省下解释 slot，可放一个 V0 generation；最多一个 Judge，baseline/争议人工审阅，不能漏计重建 baseline。若需第二 Judge/额外 phase，须先减少本批其它 slots 并重新预登记，超已批准语义则新 Gate。
 
 ### 8.1 provider 容量与总上界
 
-| Stage / 推导 | Minimum / Lean | Recommended | Maximum / Ceiling |
+| Stage / 推导 | Minimum / Lean（选定框架） | Recommended（未预授权） | Maximum / Ceiling（仅参考、未授权） |
 | --- | ---: | ---: | ---: |
 | CAL：固定 baseline targets × 2 | 4×2 = **8 calls** | 6×2 = **12** | 9×2 = **18** |
 | DEV：最多 configs × targets/config × 3 | 2×12×3 = **72** | 3×16×3 = **144** | 3×24×3 = **216** |
@@ -183,7 +185,7 @@ DEV targets/config 是所有 E 共享的总容量，不是每个 E 再分配 12/
 
 ### 8.2 时间、local/PG、人审和工程分账
 
-表中向量均为 Lean / Recommended / Ceiling；分钟与工时是资源治理提案，不是测得性能。人审一个 unit 是一个 target 标签核验、一个输出审核或一次争议/复审，重复审查另计；复杂 case 超 unit 预留时间时按实际分钟停止，不强迫 reviewer 赶工。
+表中向量均为 Lean / Recommended / Ceiling；Lean 的时间、人审容量和工程上限框架已接受，其余档位未授权；不是测得性能，也不开放即时执行。人审一个 unit 是一个 target 标签核验、一个输出审核或一次争议/复审，重复审查另计；复杂 case 超 unit 预留时间时按实际分钟停止，不强迫 reviewer 赶工。
 
 | Stage | setup / recovery 分钟上限 | 本地机器运行分钟上限 | review units 上限 | engineering hours 上限 |
 | --- | --- | --- | --- | --- |
@@ -214,11 +216,11 @@ review 预估 ordinary 4 分钟、critical/争议 8 分钟，预算按全为 8 �
 
 继承 Evaluation 更严格的人工要求：**所有 candidate critical 输出、critical guard failure、Development 硬例和全部失败、影响选择的 Judge 分歧、Regression 全部预定义 critical Turns/全部失败/分歧/零容忍案例均复核**，不是仅抽 representative failure。另为每个主要失败类建立代表 Bad Case 及首因；这可以复用既有复核 receipt，不重复花钱。关键标签必须在候选前 human-reviewed，普通 AI 草稿仍 provisional。
 
-普通成功只做分层抽样：冻结 seed 后每 arm×primary_category 至少取一个可用成功项，并取该层其余成功的 10%（向上取整）；配对输出盲化 arm 身份并保持相同抽样范围。Judge 缺失/不可靠、普通抽样发现 material 错漏则冻结该层发布结论，预登记扩大复核或缩小结论，不临时把成功率当事实。10% 是可审阅工作量提案，不是可靠率保证；Comparison Gate 可在看候选前调整。
+普通成功只做分层抽样：冻结 seed 后每 arm×primary_category 至少取一个可用成功项，并取该层其余成功的 10%（向上取整）；配对输出盲化 arm 身份并保持相同抽样范围。Judge 缺失/不可靠、普通抽样发现 material 错漏则冻结该层发布结论，预登记扩大复核或缩小结论，不临时把成功率当事实。该规则已获接受，为初始工作量政策，不是统计保证；只能在后续 Comparison Protocol Freeze、候选结果被用于阈值选择之前修改。人审采用 Lean 容量框架（156 units / 1248 分钟），不表示本轮授权执行。
 
 首次派发前同时预留其可能触发的 mandatory review units/minutes。剩余容量不能覆盖已知 critical/全失败最坏待审队列时停止新生成；优先完成在途 critical，不丢弃队列、不延迟登记到下一 stage。若 unexpected disagreement 导致额度不足，标 incomplete 并启动 RES gate 或结束；不能默默让 Judge 裁决。记录 unique cases、review events、Judge disagreement 数、owner critical adjudication 数、repeat reviews、估计/实际分钟。
 
-工程预算覆盖数据整理、计量适配、可复用小 harness/config/replay/receipt、故障诊断和报告，不包含产品实现授权或“顺便”改架构。CAL 最多一个本地计量适配入口，DEV 复用一个参数化执行入口；每个 arm 启动前列出新增文件/代码职责、provider phases、failure modes、configuration、调试/维护/Trace 负担和工时估算。初始范围：无新基础设施、无 Conversation schema、无新 provider phase 类型（只有已接受 combined interpretation / generation / 可选既有 Judge），无自动恢复/repair 循环。
+Lean 工程上限框架已接受（总计 16 小时，分 stage 见 §8.2），不表示本轮授权实现 harness。工程预算覆盖数据整理、计量适配、可复用小 harness/config/replay/receipt、故障诊断和报告，不包含产品实现授权或“顺便”改架构。CAL 最多一个本地计量适配入口，DEV 复用一个参数化执行入口；每个 arm 启动前列出新增文件/代码职责、provider phases、failure modes、configuration、调试/维护/Trace 负担和工时估算。初始范围：无新基础设施、无 Conversation schema、无新 provider phase 类型（只有已接受 combined interpretation / generation / 可选既有 Judge），无自动恢复/repair 循环。
 
 若任何 arm 需要新 schema、独立调度器、大量一次性 harness 或跨重启恢复语义才能测，先延期，附最便宜替代证据和新的 Human 工程授权请求；即使现金还有也不能继续。产品实现后可复用其真实 PG 测试接口，不把小型假实现包装成通过产品硬门禁。达到 hours cap 停止，完成现有 receipt/缺口报告；不能为完成实验无上限造基础设施。
 
@@ -240,9 +242,11 @@ Regression 首次固定协议终态即报告；critical 或质量 gate 失败不
 
 RES 为 §8 单独封存的 calls/tokens/cash/time/review/engineering，不是其它 stage 的自动 overflow。最多三次用途：**一个意外 Bad Case family、一个确定性缺陷导致的协议纠正、一个本来 INCONCLUSIVE 的 focused measurement**；每类至多一次，默认调用上限分别 6/8/12（按 tier），总额仍18/24/36。纯本地纠正不需要 provider 时不能为用尽该类余额而生成。
 
-每次先记录：原预算为何不足、D ID、可改变哪项决定、最便宜方案、触发证据、exact cases/arms/phase、各维预留及使用后的剩余量、受影响协议 revision。owner 书面批准释放后才动用；不得用候选已见结果重选阈值或把新 family 塞进旧 Regression。大架构变化与 E11/模型 repair 不因有 RES 自动获授权。
+每次先记录：原预算为何不足、D ID、可改变哪项决定、最便宜方案、触发证据、exact cases/arms/phase、各维预留及使用后的剩余量、受影响协议 revision。owner 书面批准释放后才动用；不得用候选已见结果重选阈值或把新 family 塞进旧 Regression。不因结果令人失望而延长实验；RES 不得授权 E11、模型 repair loops、Summary、vector Memory 或其它延期架构。Lean RES 结构已接受，但任何容量都不自动开放，每次释放均须 Product Owner 明确批准。
 
-只有 HIGH 信息、关键不确定性阻塞且额外证据能改变决定、所有硬门禁可满足、人工/工程资源均承受时才值得申请更多。RES 耗尽或任何 accepted parent ceiling 扩张，必须新的 Human Gate；agent 不得调整上限，余额未用完也不能自行扩大协议。
+从 Lean 扩至 Recommended 必须经过独立 **Human Budget Expansion Gate**，同时证明：Lean 证据仍 INCONCLUSIVE；未解不确定性阻塞首切片工程决定；追加证据有 HIGH VOI；需求并非源于未修复的确定性缺陷或协议错误；新增支出明确关联其可能改变的具体 Decision ID。所有硬门禁及人工/工程承受能力仍须满足。Maximum / Ceiling 仍仅参考、未授权。
+
+RES 耗尽或任何 accepted parent ceiling 扩张，必须新的 Human Gate；agent 不得调整上限，余额未用完也不能自行扩大协议。已接受 hard-invariant、dominance、futility、budget、information/no-change stop、序贯淘汰与先廉价证据原则；界内证据不足返回 **INCONCLUSIVE**，不自动增加样本、调用、repeats 或 tier。
 
 ## 12. 未来 Calibration 的精确交付契约
 
@@ -278,10 +282,12 @@ CAL 成功可以是“本地范围已知、paid/计量不足”，但须标 **PA
 10. 已签署候选实现范围及真实 L1 验证计划（实施/运行需另行授权）；进入任何付费候选评测前有真实服务幂等/fence/scope/identity/overflow 等通过证据，非现成 fake 的替代证明。
 11. 唯一候选如何冻结进入 Regression、失败如何返回 Dev/新协议、后续 release confirmation/产品发布另行 Gate；无 winner 时保持 INCONCLUSIVE。
 
-## 14. 待 Product Owner 决定与本次交付边界
+## 14. 下一阶段与本次审阅落实边界
 
-Human Calibration Plan Review 需选择或修改：tier（Lean/Recommended/Ceiling）；各 stage calls/coverage/arms、人审和工程容量；是否另授权 baseline-only pilot（未选默认不调用）；是否接受 official pricing/tokenizer PENDING 的本地先行路线；有限人民币 ceiling/official identity 补齐流程；ordinary review 抽样与 mandatory 容量；日历窗口和可用工时；RES 逐次释放权。修改提案后须保留版本化记录，不能在观察候选结果后重写理由。
+下一精确阶段为 **v0.2 Bounded Local-First Calibration Execution Planning / Authorization**。只准备 M01–M07 中无需产品实现即可执行的本地测量有界任务：依赖距离、候选/来源组分布、重复与纠正链、state/history/pack/framing 大小、可验证离线 tokenizer/accounting、现有能力支持的有界 PG 测量、确定性边界/契约核验。能力不可用须报告 unavailable，不为可测性实现 Conversational RAG。
+
+该下一阶段不包含 provider pilot、候选比较、产品实现、调参或 winner selection，本轮不开始该阶段也不授权校准执行。待补齐本地任务精确输入、可用能力、子预算、日历/工时及独立执行授权；若本地证据以后证明 provider baseline 必需，按 §4.3 另行申请明确授权及有限 CNY ceiling。保留版本化决策记录，不在观察候选结果后重写阈值理由；§13 Comparison Protocol Freeze 独立门禁完整保留。
 
 本次只提交本文和必要导航状态同步。Feature、ADR 与 Evaluation 已接受方法论不改。Git 显式发布 allowlist：`AGENTS.md`、`HANDOFF.md`、`docs/README.md`、本文；现有历史 source-candidate 打包脚本的旧 allowlist 不在本任务扩张，也不运行它生成 release 包。校准、provider、全量多轮数据、harness、schema/migration、N/C/K 选择、winner、vector Memory、Summary、Tool Runtime、tag/release/merge 均不发生。
 
-交付完成于一条文档 commit 推送、Draft PR 和当次 Windows/Linux CI 到终态、工作树干净；停止供 Human Review，不等待/轮询人工决议，不把本 Plan 标记 ACCEPTED。
+本次审阅落实追加一条文档 commit 至现有 PR #4；当次 Windows/Linux CI 到终态且通过后，将 PR #4 标为 Ready for Review，供 owner 最终合并审阅，保持工作树干净。不 merge/tag/release，不等待另一 Human Review。Plan 的 ACCEPTED 来自上述明确人工决议，不来自 CI、PR Ready 或 merge。

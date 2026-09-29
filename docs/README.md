@@ -20,9 +20,10 @@
 | 选择开发方法、AI 自主边界与人工接受 | [AI Development Playbook](AI_DEVELOPMENT_PLAYBOOK.md) |
 | 提交、PR、CI、评测门槛、版本与发布审计 | [Engineering Governance](ENGINEERING_GOVERNANCE.md) |
 | 首个多轮切片行为、范围、保留/恢复、Context Assembler | [First Conversational Slice Feature Spec](specs/07_V02_First_Conversational_Slice.md)：ACCEPTED — Human Feature Review incorporated |
-| 数据、指标、baseline、消融、预算/候选范围冻结 | [Conversational Evaluation Spec](specs/08_V02_Conversational_Evaluation.md)：ACCEPTED — Human Evaluation Methodology Review incorporated；Calibration Plan Freeze / Comparison Protocol Freeze pending，执行仍不可用 |
+| 数据、指标、baseline、消融、预算/候选范围冻结 | [Conversational Evaluation Spec](specs/08_V02_Conversational_Evaluation.md)：ACCEPTED — Human Evaluation Methodology Review incorporated；Calibration Plan 已接受（记录见下），Comparison Protocol Freeze pending，执行仍不可用 |
 | 首个切片实现前所需长期决定 | [ADR 0006 状态提交](adr/0006-conversation-state-and-effective-commit.md)、[0007 Memory/Evidence](adr/0007-memory-and-documentary-evidence.md)、[0008 有界上下文](adr/0008-bounded-conversational-context.md)、[0009 profile/Trace](adr/0009-conversation-profile-and-trace.md)：均 ACCEPTED — Human ADR Review incorporated，经验参数仍 UNSELECTED |
-| 下一授权规划阶段：v0.2 Calibration Plan Freeze | 定义精确有界的校准任务：N/C/K 范围所需分布、真实 tokenizer/context 计量、history/state/input/output 候选预算、candidate I/O limits、必要 baseline 方差、样本量理由及以后另行授权的 provider 测量范围/费用；参见 Evaluation Spec 冻结门禁 |
+| 当前：Human Calibration Plan Review 已落实 | [Cost-Aware Calibration Plan](V02_CONVERSATIONAL_CALIBRATION_PLAN.md)：ACCEPTED · 2026-09-29，[PR #4](https://github.com/BillZhao626/CiteWeave/pull/4)；Lean 选定，Recommended 未预授权，Ceiling 仅参考、未授权；LOCAL-FIRST / PROVIDER-OFF-BY-DEFAULT。校准执行 NOT AUTHORIZED，provider 0 calls，有限 CNY NONE/PENDING，baseline pilot 未授权 |
+| 下一阶段：v0.2 Bounded Local-First Calibration Execution Planning / Authorization | 只准备 M01–M07 可执行的本地有界任务；不可用能力记 unavailable。不得夹带 provider pilot、候选比较、产品实现、调参或胜者选择；provider pilot 以后另行明确授权 |
 | 后续执行与实现 | 校准本身另需有界授权；证据具备后，独立 Comparison Protocol Freeze Human Gate 须接受具体实验值。当前不授权产品实现、候选比较、provider/model 评测或调参 |
 
 本页复用为文档地图，不另建同义 index。AGENTS 只保留规则和导航；HANDOFF 只保留当前状态；Blueprint 管产品范围；Foundation 管取舍；ARCHITECTURE 管实际职责，版本架构页按标明状态记录设计及接受边界；Spec 管单功能行为；治理文档管跨切片约束；ADR 记录经各自 Human Gate 接受的长期决定，候选源于 Foundation、起草授权见 v0.2 架构；一次性 Plan 不替代长期知识。

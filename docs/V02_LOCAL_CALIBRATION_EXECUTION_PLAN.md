@@ -1,14 +1,14 @@
 # v0.2 — Bounded Local-First Calibration Execution Plan
 
-Status: **PROPOSED — awaiting Human Local Calibration Execution Review** · 2026-09-29
+Status: **ACCEPTED — Human Local Calibration Execution Review incorporated** · 2026-09-29
 
-Calibration execution: **NOT AUTHORIZED** · Provider: **0 calls / 0 CNY** · 有限 CNY 授权：**NONE / PENDING** · Baseline pilot: **NOT AUTHORIZED** · Implementation: **NOT_STARTED**。
+Future local execution: **ONE local-first-01 AUTHORIZED, subject to recorded start conditions** · Execution: **NOT STARTED** · Provider: **0 calls / 0 CNY** · 有限 CNY 授权：**NONE / PENDING** · Baseline pilot: **NOT AUTHORIZED** · Implementation: **NOT_STARTED**。
 
-本文只申请下一次本地批次，不包含执行结果。v0.2 仍为 DESIGNED；不声称 IMPLEMENTED、VERIFIED 或 RELEASED。方法：Calibration Planning、Cost-Aware Experimental Design、Evidence-First Scope Reduction、Speed-to-Vertical-Slice Optimization、Human Execution Gate。
+Human Review：Product Owner 于 2026-09-29 对 PR #5 提案提交 `751ba783fa86b538519ea116f4802e85dee3b2c8` 作出 **APPROVED WITH REQUIRED CLARIFICATIONS**；依据为本次明确的人审指令，接受记录见 [PR #5](https://github.com/BillZhao626/CiteWeave/pull/5)。本提交落实 65536 bytes 与每族 ≤16 历史 Turns 的工作量边界澄清，并纳入修订计划下恰好一次未来本地执行授权；接受的修订 commit 由该 PR 记录，启动记录见 §9。本次不执行、不创建 manifest/测量产物、不实现适配器，不包含执行结果。v0.2 仍为 DESIGNED；不声称 IMPLEMENTED、VERIFIED 或 RELEASED。方法：Calibration Planning、Cost-Aware Experimental Design、Evidence-First Scope Reduction、Speed-to-Vertical-Slice Optimization、Human Execution Gate。
 
 ## 1. 已核实基线与边界
 
-2026-09-29，起始分支 `main`，工作树干净；本地 main、origin/main、HEAD 与 `git ls-remote origin refs/heads/main` 均为 `671dfac0c5f0b56c7ef27a2c49062988c2686a64`（`docs(v0.2): accept cost-aware calibration plan (#4)`）。[Calibration Plan](V02_CONVERSATIONAL_CALIBRATION_PLAN.md) 已 ACCEPTED；Lean 是选定的最大 campaign 框架，**不是目标或执行授权**。保持 LOCAL-FIRST / PROVIDER-OFF-BY-DEFAULT 及上述全部授权状态。
+原规划基线：2026-09-29，起始分支 `main`，工作树干净；本地 main、origin/main、HEAD 与 `git ls-remote origin refs/heads/main` 均为 `671dfac0c5f0b56c7ef27a2c49062988c2686a64`（`docs(v0.2): accept cost-aware calibration plan (#4)`）。[Calibration Plan](V02_CONVERSATIONAL_CALIBRATION_PLAN.md) 已 ACCEPTED；Lean 是选定的最大 campaign 框架，**不是目标或执行授权**。保持 LOCAL-FIRST / PROVIDER-OFF-BY-DEFAULT 及上述全部授权状态。
 
 唯一工程目标：
 
@@ -41,14 +41,14 @@ Calibration execution: **NOT AUTHORIZED** · Provider: **0 calls / 0 CNY** · �
 
 M01/M03/M07-pre 的 MUST 仅指最低限度的人审结构证据，避免不完整来源单位或错误依赖责任进入首版；不是测质量率。M05 不选 SAFE 的理由是当前无法论证正数的真实输出容量；用任意字符或旧输出值代替会违反 assembler 契约。其缺失不阻塞本地批次，但真实生成仍受计量与授权门禁约束。
 
-SAFE 的具体保守起点（均为待接受的初始工程提议，非调优值）：
+SAFE 的保守原则与本地工作量边界（不冻结产品参数）：
 
 - M02：模糊/语义去重合并次数 **0**，自动 refetch/模型修复次数 **0**；相同原始身份可合并引用但保留所有来源关系。显式来源与 mandatory 无法完整恢复就澄清/失败并记录缺口，不把缺口伪称召回。真实切片出现可恢复 miss 或重复负担时重评；N/C/K 的精确值仍须另行冻结。
-- M04：建议首版输入的额外传输保护上限为 **65536 UTF-8 bytes / 完整序列化输入**，解释与生成分别检查；这只是有限内存/封套保护，不是模型容量。mandatory + 完整 pack 超界则明确失败，不截 pack/否定。生成 `ready` 还必须通过已接受的 `tokens(full messages) ≤ min(input cap, model context − output reserve)`；计量/容量/reserve 未验证时派发上限 **0**、fail closed。真实 serializer、较大完整 pack/mandatory、语言/模型变化触发重评。若本批完整必要输入已超此界，报告该提议不可行，停止而不扩界。
+- M04：**65536 UTF-8 bytes 仅是 `local-first-01` 测量 / fixture 工作量安全上限**，适用于每 view 的完整参考封套。它不是 v0.2 产品输入 cap、Context Assembler cap、模型/token limit 或 Comparison candidate，也不是运行时应在 65536 bytes 发生 overflow 的证据。必要 Calibration payload 超过此本地上限时，记录测量 limited / incomplete；不推断产品 overflow、不截 mandatory/pack、不静默扩界。未来产品侧 byte breakpoint 只能依据 M04 证据提出，并经 Comparison Protocol Freeze 接受。真实生成仍须满足已接受的 `tokens(full messages) ≤ min(input cap, model context − output reserve)`；计量/容量/reserve 未验证时 fail closed，与此本地 byte ceiling 无关。
 
 ## 3. 唯一推荐批次：6 个族，10 个 target views
 
-Phase A：一个原创 Calibration manifest，以下六个不同实体/任务/模板/来源族，共十个目标视图；同族配对不算独立样本。每族最多 16 个 accepted 历史 Turns，每族仅一个材料包；全部 Calibration split，不读取或创建 Development、Regression、sealed confirmation。AI 辅助草稿标 provisional，关键标签经 owner 复核后才称 human-reviewed。历史是人工参考前缀，不是真实 accepted 运行结果。
+Phase A：一个原创 Calibration manifest，以下六个不同实体/任务/模板/来源族，共十个目标视图；同族配对不算独立样本。**每族 ≤16 个历史 Turns 仅是本地场景编写 / 人审工作量上限**，不是观测到的依赖距离上界、N、C，也不能证明 16 轮以外的依赖不必要。作者只用表达目标风险边界所需的最少 Turns，禁止填充到 16；必要场景无法在此上限内表达时，记录 scope limitation / INCONCLUSIVE，停止该范围并返回 Human Review，不将工作量上限解释为产品证据。每族仅一个材料包；全部 Calibration split，不读取或创建 Development、Regression、sealed confirmation。AI 辅助草稿标 provisional，关键标签经 owner 复核后才称 human-reviewed。历史是人工参考前缀，不是真实 accepted 运行结果。
 
 | 族 / views | 为什么独立存在；覆盖 | 改变的设计输入 / 可暴露的失败 |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ Phase A：一个原创 Calibration manifest，以下六个不同实体/任务/�
 | F5 / 1 | 两个同等适用实体的 ambiguous reference | unresolved/澄清最小信息；暴露凭最近实体猜答，不能由 F1 的唯一指代证明 |
 | F6 / 2 | 否定/version/time + 本轮 scope 收缩配对，后者无足够当前 Evidence；在同一 payload 上核对容量边界 | Rewrite 禁变断言、历史不升级 Evidence、mandatory + 完整 pack；暴露 scope 扩张、旧答案充证据、把 overflow 误称证据不足 |
 
-六族是六种不能互相代替的责任边界，十 views 来自四组必要对照加两个单视图，不为凑整扩样。F3 距离按实际前缀计算；不增加噪声只为拉长尾部。F6 容量边界是对相同完整 payload 长度 `L-1 / L / L+1` 的静态不等式核对，不增加三组产品运行或调用，不伪装为产品 overflow 测试。
+六族是六种不能互相代替的责任边界，十 views 来自四组必要对照加两个单视图，不为凑整扩样。F3 距离按实际前缀计算；不增加噪声只为拉长尾部。F6 容量边界是对相同完整 payload 长度 `L-1 / L / L+1` 的静态不等式核对，不增加三组产品运行或调用，不伪装为产品 overflow 测试；这里的符号边界不使用 65536 作为产品阈值。
 
 Phase B（必做）：M01、M03、M04 可执行字节/码点部分、M07-pre。Phase C 只有一个允许项：M02 的标签/reference lookup，复用同一份输入、≤5 分钟且能改变来源字段或 cutoff 诊断时执行；否则带理由 skip。M05/M06 不纳入批次，M07-runtime 延期。不得追加族、views、候选 arms、模型调用或重复运行来补空字段。
 
@@ -67,7 +67,7 @@ Phase B（必做）：M01、M03、M04 可执行字节/码点部分、M07-pre。P
 
 ## 4. 测量方法与唯一小适配器
 
-只提议下一授权执行时创建一个标准库文件 `scripts/measure_v02_local_calibration.py`，读取显式指定的 manifest，校验/计数/散列并输出单一 receipt；创建与调试 ≤20 工程分钟。它复用已接受的来源类型和组件边界，**不定义产品 DTO、prompt、selector、state 更新或 assembler 决策**。不导入会初始化 settings/provider/DB 的产品入口，不联网、不启动服务、不下载 tokenizer、不修改 fixture 或 pack。
+仅在未来已授权批次满足 §9 启动记录后创建一个标准库文件 `scripts/measure_v02_local_calibration.py`，读取显式指定的 manifest，校验/计数/散列并输出单一 receipt；创建与调试 ≤20 工程分钟。它复用已接受的来源类型和组件边界，**不定义产品 DTO、prompt、selector、state 更新或 assembler 决策**。不导入会初始化 settings/provider/DB 的产品入口，不联网、不启动服务、不下载 tokenizer、不修改 fixture 或 pack。
 
 | 测量 | 固定方法与限制 |
 | --- | --- |
@@ -81,7 +81,7 @@ Phase B（必做）：M01、M03、M04 可执行字节/码点部分、M07-pre。P
 
 ## 5. 下一执行的最小产物与可追溯性
 
-下一次获授权才创建 `.artifacts/v02-calibration/local-first-01/` 中四个文件；本次不创建目录或数据。保持该目录已被忽略，默认不公开原始材料。将 accepted Plan §12 的逻辑产物合并为以下物理文件，不丢其适用字段：
+未来已授权批次满足 §9 启动记录后才创建 `.artifacts/v02-calibration/local-first-01/` 中四个文件；本次不创建目录或数据。保持该目录已被忽略，默认不公开原始材料。将 accepted Plan §12 的逻辑产物合并为以下物理文件，不丢其适用字段：
 
 | 文件 | 合并内容 |
 | --- | --- |
@@ -94,14 +94,14 @@ Phase B（必做）：M01、M03、M04 可执行字节/码点部分、M07-pre。P
 
 ## 6. 精确子预算与零 provider 合约
 
-唯一申请的 CAL 子账为 `local-first-01`，包含全部阶段与可选 M02；不借 DEV/HARD/REG/RES，不使用 Lean 剩余额度自动扩张。
+唯一已授权的未来 CAL 子账为 `local-first-01`，包含全部阶段与可选 M02；不借 DEV/HARD/REG/RES，不使用 Lean 剩余额度自动扩张。
 
 | 资源 | 硬上限及分配 |
 | --- | --- |
 | 活跃执行总 elapsed | **240 分钟**，从 owner 指定启动时刻计至收据封存，等待/暂停/恢复均计入；到期停止。同一连续工作块，不跨多日继续旧授权 |
 | 工程 | **120 分钟**：setup 10、材料/标注草稿 25、M01 10、M03 15、适配器 20、M04 计量 10、M07-pre 10、可选 M02 5、报告/恢复 15。恢复 ≤10 分钟且包含在最后 15 分钟内；无未分配追加工时 |
 | Human review | **12 units / 96 分钟**，任一先到即停：十个 target 各完整复核一次，最多两个争议/复核事件；每 unit 预留 8 分钟。所有 critical 标签和失败均须复核，不能抽样代替。第 11/12 次不是增加 target；未完成 mandatory review 时不宣告成功 |
-| Local compute | **15 分钟进程 wall / 900 CPU-seconds / 峰值 RSS 512 MiB**；一个串行进程，无 GPU、PG、容器或云资源。manifest ≤1 MiB、所有输入合计 ≤2 MiB，最多 6×16 个历史 Turns、10 views、每 view 参考封套 ≤65536 bytes。超界保留错误收据，不能截语义组 |
+| Local compute | **15 分钟进程 wall / 900 CPU-seconds / 峰值 RSS 512 MiB**；一个串行进程，无 GPU、PG、容器或云资源。manifest ≤1 MiB、所有输入合计 ≤2 MiB，10 views、每族历史 Turns ≤16（仅编写/人审上限，禁止补齐）、每 view 参考封套 ≤65536 UTF-8 bytes（仅测量/fixture 上限）。超界按 §2–3 记录 limited / incomplete 或 scope limitation / INCONCLUSIVE，不截语义组、不推断产品 overflow 或依赖上界、不静默扩额 |
 | 执行次数 | 同一固定 manifest **1 次**静态测量，无 arms/repeats/cold-warm。适配器输入校验失败也占次数；修复需在报告说明并重新请求授权，不自动重跑。适配器开发只用微型格式/Unicode检查，不生成额外场景 |
 | Provider / 支出 | **0 次物理发送 / 0 CNY**；generation、Rewrite、Judge、DeepSeek、baseline pilot、账单查询全部 0；付费适配器与 RES 使用量 0；cloud rental 0。本地电力成本未计量，不能声称全部机器成本为零 |
 
@@ -113,13 +113,13 @@ Phase B（必做）：M01、M03、M04 可执行字节/码点部分、M07-pre。P
 
 沿 accepted Plan §5 的 L/P/H 法提出每参数最多三个有证据的不同点；没有真实计量或成本横轴就只报观测断点/PENDING，不伪造 P/H。每个断点必须回链原 target/group/计数字段，reference input 相同只代表该封套相同，不代表运行时等效。按 critical 完整性先过滤，不用总体平均掩盖关键缺口。没有自然会话质量估计、统计泛化或实验 winner。
 
-**仍 UNFROZEN**：最终 N/C/K、selector、Rewrite 策略、state/history/input/interpretation token caps、context-token budget、output reserve、候选 I/O、产品 deadlines/retry/会话总额、latency target、quality/noninferiority/material-similarity thresholds、repeats、比较 arms。上述临时 byte 保护与零自动扩展策略不是最终优化值或 Comparison 签署。
+**仍 UNFROZEN**：最终 N/C/K、selector、Rewrite 策略、state/history/input/interpretation token caps、context-token budget、output reserve、候选 I/O、产品 deadlines/retry/会话总额、latency target、quality/noninferiority/material-similarity thresholds、repeats、比较 arms。上述本地 byte/Turns 工作量上限不是产品候选或证据；零自动扩展策略也不是最终优化值或 Comparison 签署。
 
 停止并分类/延期：观测无法改变决定；需要 provider、产品行为、新 schema/migration/服务或大量 harness；实际切片可提供更好的证据；批次将超单工作块；材料许可/身份不明；hash 不匹配；mandatory 关系/标签争议未决。发现与已接受 Feature/Evaluation/ADR 的真实矛盾时停止并报告，不改已接受文本。如果必须扩大范围才可解决安全结构缺口，标 **BLOCKING_REQUIRES_HUMAN_DECISION**，只列该具体缺口，不泛称继续调查。
 
 ## 8. Local Calibration Exit Criteria 与后续门禁
 
-本批同时满足以下条件就结束前置本地校准，不因 provider/PG/运行时字段 PENDING 继续采样：
+本批同时满足以下条件就结束前置本地校准，准备独立 Comparison Protocol Freeze，不因 provider/PG/运行时字段 PENDING 继续采样。以下产品契约中的“超界”指未来按既有门禁冻结的产品预算，绝不指本地 65536 bytes 或每族 16 Turns 的工作量上限；七项退出条件保持不变：
 
 1. 已人审的十 views 无未决硬不变量冲突，全部来源/许可/hash 可追溯。
 2. 依赖和旧来源证据足以描述初始 A+B 所需行为，缺失来源/截断必须可见。
@@ -131,12 +131,12 @@ Phase B（必做）：M01、M03、M04 可执行字节/码点部分、M07-pre。P
 
 结论分开填写：本地批次可记 **LOCAL BATCH DONE / CAL PARTIAL / Comparison BLOCKED**，与 accepted Plan §12 保持一致。设计边界明确不等于真实能力 VERIFIED。
 
-**“After this local batch succeeds, can v0.2a Vertical Slice implementation start?” — NO：唯一当前阻塞是已接受的实现前 Comparison Protocol Freeze Human Gate 尚未完成（Feature §7 / Evaluation §1）。** 本文没有将其降为仅比较前门禁。可以推荐把 v0.2a 作为下一工程实现目标，但先提交该门禁所需的冻结/实现授权；这不是继续扩大本地 Calibration 的理由。provider/精确计量等缺项是否能以有依据的有限保守边界关闭，由该既有 Gate 接受；本批不宣称已关闭。如果 owner 希望先实现再补冻结，须独立审阅对已接受顺序的变更，当前授权请求不包含它。
+**“After this local batch succeeds, can v0.2a Vertical Slice implementation start?” — NO：唯一当前阻塞是已接受的实现前 Comparison Protocol Freeze Human Gate 尚未完成（Feature §7 / Evaluation §1）。** 本文没有将其降为仅比较前门禁。可以推荐把 v0.2a 作为下一工程实现目标，但先提交该门禁所需的冻结/实现授权；这不是继续扩大本地 Calibration 的理由。provider/精确计量等缺项是否能以有依据的有限保守边界关闭，由该既有 Gate 接受；本批不宣称已关闭。如果 owner 希望先实现再补冻结，须独立审阅对已接受顺序的变更，本次授权不包含它。
 
-## 9. 给 Product Owner 的唯一执行授权请求
+## 9. 已纳入的唯一未来执行授权与启动记录
 
 > 授权按本文件接受的 commit 执行一次 `local-first-01`：仅六个指定原创场景族、十个 target views；Phase B 的 M01/M03/M04 字节与码点计量/M07-pre，以及最多五分钟且能改变决定的 M02 reference lookup。允许一个标准库计量脚本和四个本地受控产物；elapsed ≤240 分钟、工程 ≤120 分钟、人审 ≤12 units/96 分钟、local compute ≤15 分钟/900 CPU-seconds/512 MiB，遵守输入/文件大小与一次测量上限。Provider 0 calls / 0 CNY，不实现产品、不运行 PG、不更改已接受语义、不动用 RES。到退出条件或任一上限立即结束，交付收据和报告后停止。
 
-Owner 只需接受/拒绝该批次，并在接受记录中填写审阅 commit、reviewer、日期和启动时刻；若批准时缺启动时刻，执行仍不开始。没有多档套餐选择。唯一另外的 owner 决定是之后的实现前 Comparison Protocol Freeze/实现授权，**不捆绑在本次接受中**。本提案接受、merge 或 CI 均不会自动执行。
+上述恰好一次未来批次授权随本次澄清落实纳入接受记录，不需重新选择方案；本次 review-incorporation 任务明确不执行。启动前仍须有完整的 accepted revised commit / reviewer / date / start-time 记录，且执行必须匹配该精确修订计划。Reviewer 为 Product Owner，人审日期 2026-09-29；修订 commit 的精确 SHA 记录于 PR #5，**start-time 尚未指定，因此未启动**。不把 CI、Ready 或 merge 当启动时间。成功后停止前置本地 Calibration，准备独立 Comparison Protocol Freeze；其仍为实现前 Human Gate，当前 pending，产品实现与 provider pilot 均未授权。不为清空 PENDING 继续校准，不在本轮等待另一 Human Review。
 
-本次文档发布 allowlist：本文、[HANDOFF](../HANDOFF.md)、[文档地图](README.md)、[AGENTS](../AGENTS.md) 的当前导航。无需 ADR/迁移：未改架构。只创建 Draft PR，等现有 Windows/Linux CI 到一次终态；不 merge/tag/release，不执行校准/provider/产品，不等待人工审阅。
+本次文档发布 allowlist：本文、[HANDOFF](../HANDOFF.md)、[文档地图](README.md)、[AGENTS](../AGENTS.md) 的当前导航。无需 ADR/迁移：未改架构。沿用 PR #5 分支，仅追加一个文档 commit；等现有 Windows/Linux CI 到一次终态且成功后将 PR #5 标为 Ready for Review，供 owner 最终合并审阅；不 merge/tag/release，不执行校准/provider/产品，不等待人工审阅。

@@ -24,10 +24,17 @@ from citeweave.conversation_contract import (
     Admission,
     CoreConflict,
     Execution,
+    HistoryRelation,
     ProducedResult,
+    ResolvedConversationDelta,
+    ResolvedSignals,
     Scope,
+    SourceRef,
     StateSnapshot,
+    StateValue,
 )
+from citeweave.conversation_history import HistoryQuery
+from citeweave.conversation_history_pg import LocalHistoryRead, read_history
 from citeweave.conversation_models import (
     ConversationAcceptanceRow as Accepted,
 )
@@ -439,3 +446,396 @@ def test_database_constraints_reject_second_slot_and_foreign_head(sample):
                     state=row.state,
                 )
             )
+
+
+# Implementation #2 L1 envelope: original synthetic fixtures only; <=512 Turns /
+# acceptances and <=1024 Runs in this UUID DB, 1000ms per history statement.
+# These finite test ceilings are enforced by the adapter, not product defaults.
+def history_accept(sample, *, signals=None, put=(), deactivate=(), relations=(), question=None):
+    workspace, conversation_id, body = sample
+    head = core.read_conversation(workspace, conversation_id).head
+    body = body.model_copy(
+        update={"expected_head": head.id if head else None, "question": question or body.question}
+    )
+    run = core.admit(workspace, conversation_id, uuid4().hex, body, execution())
+    delta = ResolvedConversationDelta(
+        source_turn_id=run.turn_id,
+        previous_snapshot_id=run.expected_head,
+        signals=signals or ResolvedSignals(),
+        put=put,
+        deactivate=deactivate,
+        relations=relations,
+    )
+    return core.accept(
+        *finish_args(sample, run),
+        ProducedResult(kind="clarification", text="Original control"),
+        StateSnapshot(source_turn_id=run.turn_id, previous_snapshot_id=run.expected_head),
+        delta=delta,
+    )
+
+
+def history_read(sample, head, **kwargs):
+    workspace, conversation_id, body = sample
+    return read_history(
+        workspace,
+        conversation_id,
+        HistoryQuery(expected_head=head.id if head else None, scope=body.scope, **kwargs),
+        permit=LocalHistoryRead(),
+    )
+
+
+@pytest.mark.parametrize("count", [0, 1, 2, 5])
+def test_history_recent_committed_only_and_stable(sample, count):
+    accepted = [history_accept(sample) for _ in range(count)]
+    head = accepted[-1] if accepted else None
+    result = history_read(sample, head)
+    assert result.failure is None
+    assert {r.acceptance_id for r in result.a_inputs} == {a.id for a in accepted[-2:]}
+    assert not result.selected  # Recent alone is not relevance.
+    assert result == history_read(sample, head)
+    assert result.round_trips == 6
+
+
+@pytest.mark.parametrize("status", ["FAILED", "CANCELLED", "UNKNOWN", "STALE", "ADMITTED", "INTERRUPTED"])
+def test_history_nonaccepted_runs_excluded(sample, status):
+    workspace, conversation_id, body = sample
+    run = core.admit(workspace, conversation_id, "noise", body, execution())
+    if status == "INTERRUPTED":
+        with transaction() as db:
+            db.get(Run, run.id).deadline = datetime.now(timezone.utc) - timedelta(seconds=1)
+        core.reconcile_expired(workspace, conversation_id)
+    elif status != "ADMITTED":
+        core.finish(*finish_args(sample, run), status)
+    result = history_read(sample, None, explicit=(SourceRef(acceptance_id=uuid4(), turn_id=run.turn_id),))
+    assert not result.a_inputs and not result.selected
+    assert result.failure == "mandatory_source_unavailable"
+
+
+def test_history_B_old_structured_matches_and_restart(sample):
+    signals = ResolvedSignals(
+        topic="original-topic", task="original-task", entities=("entity-1",), constraints=("not-version-2",)
+    )
+    old = history_accept(sample, signals=signals)
+    for _ in range(3):
+        head = history_accept(sample, signals=ResolvedSignals(topic="noise", task="noise"))
+    result = history_read(sample, head, signals=signals)
+    assert result.failure is None and result.selected[0].identity == (old.id,)
+    assert old.id not in {r.acceptance_id for r in result.a_inputs}
+    assert result.selected[0].reasons == ("entity_constraints", "task", "topic")
+    engine().dispose()
+    assert history_read(sample, head, signals=signals) == result
+    assert history_read(sample, head, explicit=(old.state.source,)).selected[0].identity == (old.id,)
+    assert not history_read(sample, head, signals=signals.model_copy(update={"task": "other"})).selected
+
+
+def test_history_correction_state_and_head_readback(sample):
+    first_item = StateValue(id=uuid4(), kind="constraint", key="limit", value="old")
+    first = history_accept(sample, put=(first_item,), signals=ResolvedSignals(topic="old"))
+    second_item = StateValue(
+        id=uuid4(), kind="constraint", key="limit", value="new", replaces=(first_item.id,)
+    )
+    second = history_accept(
+        sample,
+        put=(second_item,),
+        signals=ResolvedSignals(topic="new"),
+        relations=(HistoryRelation(target=first.state.source, kind="correction"),),
+    )
+    engine().dispose()
+    result = history_read(sample, second, explicit=(first.state.source,))
+    assert result.failure is None and len(result.selected) == 1
+    assert set(result.selected[0].identity) == {first.id, second.id}
+    assert result.selected[0].superseded == (first.state.source,)
+    assert [e.item.value for e in result.state_projection] == ["new"]
+    assert result.state_projection[0].introduced_by == second.state.source
+    assert not core.read_conversation(sample[0], sample[1]).head.state.entries[0].active
+    with pytest.raises(CoreConflict, match="head_conflict"):
+        history_read(sample, first)
+
+
+def test_history_atomic_visibility_and_stale_delta(sample):
+    first = history_accept(sample)
+    workspace, conversation_id, body = sample
+    run = core.admit(
+        workspace, conversation_id, "next", body.model_copy(update={"expected_head": first.id}), execution()
+    )
+    item = StateValue(id=uuid4(), kind="entity", key="resolved", value="synthetic")
+    delta = ResolvedConversationDelta(source_turn_id=run.turn_id, previous_snapshot_id=first.id, put=(item,))
+
+    def accept():
+        return core.accept(
+            *finish_args(sample, run),
+            ProducedResult(kind="clarification", text="Control"),
+            StateSnapshot(source_turn_id=run.turn_id, previous_snapshot_id=first.id),
+            delta=delta,
+        )
+
+    flushed, release = Event(), Event()
+
+    def pause(session, context):
+        if any(isinstance(row, Accepted) for row in session.new):
+            flushed.set()
+            assert release.wait(5)
+
+    event.listen(Session, "after_flush", pause)
+    try:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            writing = pool.submit(accept)
+            assert flushed.wait(5)
+            reading = pool.submit(history_read, sample, first)
+            # An independent statement cannot observe the uncommitted semantic state.
+            with engine().connect() as connection:
+                row = connection.execute(
+                    text("""
+                    SELECT c.head_id, count(a.id) FROM cw5_conversations c
+                    JOIN cw5_acceptances a ON a.conversation_id=c.id
+                    WHERE c.id=:id GROUP BY c.head_id
+                """),
+                    {"id": conversation_id},
+                ).one()
+                assert tuple(row) == (first.id, 1)
+            release.set()
+            second = writing.result(timeout=10)
+            with pytest.raises(CoreConflict, match="head_conflict"):
+                reading.result(timeout=10)
+    finally:
+        release.set()
+        event.remove(Session, "after_flush", pause)
+    assert [e.item.id for e in history_read(sample, second).state_projection] == [item.id]
+    next_run = core.admit(
+        workspace, conversation_id, "third", body.model_copy(update={"expected_head": second.id}), execution()
+    )
+    with pytest.raises(CoreConflict, match="head_conflict"):
+        core.accept(
+            *finish_args(sample, next_run),
+            ProducedResult(kind="clarification", text="Control"),
+            StateSnapshot(source_turn_id=next_run.turn_id, previous_snapshot_id=second.id),
+            delta=delta.model_copy(update={"source_turn_id": next_run.turn_id}),
+        )
+    assert core.read_conversation(workspace, conversation_id).head.id == second.id
+
+
+def test_history_scope_narrowing_and_revocation(sample):
+    workspace, conversation_id, body = sample
+    # A second immutable version on its own document, in the same KB.
+    document, version = uuid4(), uuid4()
+    with transaction() as db:
+        db.add(
+            DocumentRow(
+                id=document, kb_id=body.scope.kb_id, title="Second original", active_version_id=version
+            )
+        )
+        db.flush()
+        db.add(
+            VersionRow(
+                id=version,
+                document_id=document,
+                kb_id=body.scope.kb_id,
+                sequence=1,
+                filename="original.pdf",
+                license="original",
+                source_sha256="1" * 64,
+                blob_key="1" * 64,
+                status="READY",
+                profile={},
+                key=str(version),
+                fingerprint="1" * 64,
+            )
+        )
+    wide = body.model_copy(
+        update={"scope": Scope(kb_id=body.scope.kb_id, version_ids=body.scope.version_ids + (version,))}
+    )
+    wide_sample = workspace, conversation_id, wide
+    first = history_accept(
+        wide_sample,
+        put=(StateValue(id=uuid4(), kind="entity", key="e", value="e"),),
+        signals=ResolvedSignals(topic="old"),
+    )
+    second = history_accept(sample)
+    result = history_read(sample, second, signals=ResolvedSignals(topic="old"))
+    assert not result.selected and not result.state_projection
+    assert second.state.entries[0].change == "scope_narrowed"
+    assert (
+        history_read(sample, second, explicit=(first.state.source,)).failure == "mandatory_scope_unavailable"
+    )
+    with transaction() as db:
+        db.get(KnowledgeBaseRow, body.scope.kb_id).workspace_id = uuid4()
+    with pytest.raises(HTTPException):
+        history_read(sample, second)
+
+
+def test_history_cross_conversation_and_forged_provenance_rejected(sample):
+    accepted = history_accept(sample)
+    other = core.create(sample[0], "other-history")
+    other_sample = sample[0], other.id, sample[2]
+    result = history_read(other_sample, None, explicit=(accepted.state.source,))
+    assert result.failure == "mandatory_source_unavailable"
+    with pytest.raises(CoreConflict, match="accepted_provenance_unavailable"):
+        history_accept(
+            other_sample, relations=(HistoryRelation(target=accepted.state.source, kind="correction"),)
+        )
+
+
+def test_history_legacy_transition_and_no_silent_downgrade(sample):
+    workspace, conversation_id, body = sample
+    legacy = finalize(sample, core.admit(workspace, conversation_id, "v1", body, execution()))
+    assert history_read(
+        sample, legacy, explicit=(SourceRef(acceptance_id=legacy.id, turn_id=legacy.turn_id),)
+    ).selected
+    current = history_accept(sample)
+    assert current.state.previous_snapshot_id == legacy.id
+    run = core.admit(
+        workspace,
+        conversation_id,
+        "downgrade",
+        body.model_copy(update={"expected_head": current.id}),
+        execution(),
+    )
+    with pytest.raises(CoreConflict, match="state_revision_downgrade"):
+        finalize(sample, run)
+
+
+def test_history_real_branch_and_payload_limits(sample):
+    for _ in range(9):
+        head = history_accept(sample, signals=ResolvedSignals(topic="crowded"))
+    result = history_read(sample, head, signals=ResolvedSignals(topic="crowded"))
+    assert result.search_incomplete and "branch_cap" in result.cutoff and not result.selected
+    head = history_accept(sample, question="界" * 50000)
+    result = history_read(sample, head)
+    assert result.search_incomplete and "payload_cap" in result.cutoff
+    assert result.payload_bytes == 0 and result.materialized_rows == 0
+
+
+def test_history_runtime_disabled_without_explicit_l1_permit(sample):
+    result = read_history(sample[0], sample[1], HistoryQuery(expected_head=None, scope=sample[2].scope))
+    assert result.failure == "history_query_disabled"
+
+
+def test_history_real_group_row_and_projection_caps(sample):
+    previous = None
+    for i in range(65):
+        relations = (HistoryRelation(target=previous.state.source, kind="correction"),) if previous else ()
+        previous = history_accept(sample, relations=relations)
+        if i == 8:
+            result = history_read(sample, previous, explicit=(previous.state.source,))
+            assert result.failure == "group_member_cap" and result.search_incomplete
+    statements = []
+
+    def capture(connection, cursor, statement, parameters, context, executemany):
+        statements.append((statement, parameters))
+
+    event.listen(engine(), "before_cursor_execute", capture)
+    try:
+        result = history_read(sample, previous, explicit=(previous.state.source,))
+    finally:
+        event.remove(engine(), "before_cursor_execute", capture)
+    assert result.search_incomplete and "row_cap" in result.cutoff
+    assert result.materialized_rows == 0
+    statement, parameters = statements[-1]
+    with engine().connect() as connection:
+        connection.execute(text("SELECT set_config('statement_timeout', '1000', true)"))
+        plan = connection.exec_driver_sql(
+            "EXPLAIN (ANALYZE, FORMAT JSON) " + statement, parameters
+        ).scalar_one()[0]
+    originals = next(p for p in plan["Plan"]["Plans"] if p.get("Subplan Name") == "CTE originals")
+    assert originals["Actual Rows"] == 0  # Server-side original materialization is gated too.
+    other = core.create(sample[0], "projection-limit")
+    other_sample = sample[0], other.id, sample[2]
+    head = history_accept(
+        other_sample,
+        put=tuple(StateValue(id=uuid4(), kind="entity", key=str(i), value="original") for i in range(17)),
+    )
+    result = history_read(other_sample, head)
+    assert result.search_incomplete and "state_projection_cap" in result.cutoff
+
+
+def test_history_real_query_plan_and_round_trips(sample):
+    head = history_accept(sample, signals=ResolvedSignals(topic="plan-topic"))
+    statements = []
+
+    def capture(connection, cursor, statement, parameters, context, executemany):
+        statements.append((statement, parameters))
+
+    event.listen(engine(), "before_cursor_execute", capture)
+    try:
+        result = history_read(sample, head, signals=ResolvedSignals(topic="plan-topic"))
+    finally:
+        event.remove(engine(), "before_cursor_execute", capture)
+    assert result.failure is None and len(statements) == result.round_trips == 6
+    statement, parameters = statements[-1]
+    with engine().connect() as connection:
+        connection.execute(text("SELECT set_config('statement_timeout', '1000', true)"))
+        plan = connection.exec_driver_sql(
+            "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) " + statement, parameters
+        ).scalar_one()[0]
+    nodes = []
+
+    def walk(node):
+        nodes.append(node)
+        for child in node.get("Plans", []):
+            walk(child)
+
+    walk(plan["Plan"])
+    scans = [n for n in nodes if n.get("Relation Name", "").startswith("cw5_")]
+    examined = sum((n["Actual Rows"] + n.get("Rows Removed by Filter", 0)) * n["Actual Loops"] for n in scans)
+    assert scans and examined <= 2048 and plan["Execution Time"] < 1000
+    print(
+        f"L1 history plan: base scan tuple visits={examined}, execution_ms={plan['Execution Time']}, trips=6"
+    )
+
+
+def test_history_statement_deadline_is_explicit_bounded_failure(sample):
+    head = history_accept(sample)
+    with transaction() as db:
+        db.scalar(select(Conversation).where(Conversation.id == sample[1]).with_for_update())
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            result = pool.submit(history_read, sample, head).result(timeout=5)
+    assert result.search_incomplete and result.cutoff == ("statement_timeout",)
+
+
+def test_history_semantic_state_rolls_back_with_acceptance(sample):
+    first = history_accept(sample)
+
+    def abort(session):
+        raise RuntimeError("injected_semantic_precommit_failure")
+
+    # Admit before fault injection so this test fails the acceptance transaction.
+    workspace, conversation_id, body = sample
+    run = core.admit(
+        workspace,
+        conversation_id,
+        "rollback-state",
+        body.model_copy(update={"expected_head": first.id}),
+        execution(),
+    )
+    event.listen(Session, "before_commit", abort)
+    try:
+        with pytest.raises(RuntimeError, match="injected_semantic"):
+            core.accept(
+                *finish_args(sample, run),
+                ProducedResult(kind="clarification", text="Original"),
+                StateSnapshot(source_turn_id=run.turn_id, previous_snapshot_id=first.id),
+                delta=ResolvedConversationDelta(
+                    source_turn_id=run.turn_id,
+                    previous_snapshot_id=first.id,
+                    put=(StateValue(id=uuid4(), kind="topic", key="topic", value="uncommitted"),),
+                ),
+            )
+    finally:
+        event.remove(Session, "before_commit", abort)
+    result = history_read(sample, first)
+    assert not result.state_projection and result.head == first.id
+    assert core.read_run(workspace, conversation_id, "rollback-state").accepted is None
+
+
+def test_history_real_round_trip_guard_stops_before_ninth_statement(sample, monkeypatch):
+    original = core._scope
+
+    def extra_reads(db, *args, **kwargs):
+        original(db, *args, **kwargs)
+        for _ in range(3):
+            db.execute(text("SELECT 1"))
+
+    monkeypatch.setattr(core, "_scope", extra_reads)
+    result = history_read(sample, None)
+    assert result.search_incomplete and result.cutoff == ("round_trip_cap",)
+    assert result.round_trips == 8 and result.materialized_rows == 0

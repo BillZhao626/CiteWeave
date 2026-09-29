@@ -73,13 +73,71 @@ class StateSnapshot(DurableDTO):
     # No semantic projection: provenance alone is the minimal durable state.
 
 
+class SourceRef(DurableDTO):
+    acceptance_id: UUID
+    turn_id: UUID
+
+
+class ResolvedSignals(DurableDTO):
+    topic: str | None = None
+    task: str | None = None
+    entities: tuple[str, ...] = ()
+    constraints: tuple[str, ...] = ()
+
+
+class StateValue(DurableDTO):
+    id: UUID
+    kind: Literal["topic", "entity", "constraint", "ambiguity"]
+    key: str = Field(min_length=1)
+    value: str = Field(min_length=1)
+    replaces: tuple[UUID, ...] = ()
+
+
+class HistoryRelation(DurableDTO):
+    target: SourceRef
+    kind: Literal["correction", "dependency"]
+    # Empty means the whole source; otherwise correct only these state entries.
+    state_item_ids: tuple[UUID, ...] = ()
+
+
+class ResolvedConversationDelta(DurableDTO):
+    """Already resolved intent only. Never interpret text or assert evidence truth."""
+
+    source_turn_id: UUID
+    previous_snapshot_id: UUID | None
+    signals: ResolvedSignals = Field(default_factory=ResolvedSignals)
+    put: tuple[StateValue, ...] = ()
+    deactivate: tuple[UUID, ...] = ()
+    relations: tuple[HistoryRelation, ...] = ()
+
+
+class StateEntry(DurableDTO):
+    item: StateValue
+    introduced_by: SourceRef
+    scope: Scope
+    active: bool = True
+    changed_by: SourceRef | None = None
+    change: Literal["superseded", "deactivated", "scope_narrowed"] | None = None
+
+
+class WorkingState(DurableDTO):
+    revision: Literal["conversation-state-v2"] = "conversation-state-v2"
+    authority: Literal["contextual_intent_not_evidence"] = "contextual_intent_not_evidence"
+    source_turn_id: UUID
+    previous_snapshot_id: UUID | None
+    source: SourceRef
+    scope: Scope
+    entries: tuple[StateEntry, ...] = ()
+    delta: ResolvedConversationDelta
+
+
 class Acceptance(DurableDTO):
     id: UUID  # One immutable bundle identifies result, output snapshot and head.
     conversation_id: UUID
     turn_id: UUID
     run_id: UUID
     result: ProducedResult
-    state: StateSnapshot
+    state: Annotated[StateSnapshot | WorkingState, Field(discriminator="revision")]
     created_at: datetime
 
 

@@ -10,11 +10,11 @@
 
 ## v0.2 规划与工程治理
 
-以下 Blueprint / Foundation / Governance 基线、Playbook 与 v0.2 Conversational RAG Architecture 均为 **ACCEPTED — Human Review incorporated**，不代表已发布功能或实现授权。首个 Feature 与 ADR 0006–0009 原文本已获 APPROVED；Evaluation 方法论已接受，执行协议仍 **NOT EXECUTABLE**。Human Review 日期为 2026-09-28，审阅提交 `aa5755cbf70e552827f03211d2770a4dcff3626f`，记录见 [PR #3](https://github.com/BillZhao626/CiteWeave/pull/3)。另行授权的 Implementation #1 已实现内部 Conversation Core，离线验证通过、real-PG L1 NOT_RUN，等待 Human Implementation Review；v0.2a 未完成。当前状态及下一阶段见 [HANDOFF](../HANDOFF.md)。
+以下 Blueprint / Foundation / Governance 基线、Playbook 与 v0.2 Conversational RAG Architecture 均为 **ACCEPTED — Human Review incorporated**，不代表已发布功能或实现授权。首个 Feature 与 ADR 0006–0009 原文本已获 APPROVED；Evaluation 方法论已接受，执行协议仍 **NOT EXECUTABLE**。Human Review 日期为 2026-09-28，审阅提交 `aa5755cbf70e552827f03211d2770a4dcff3626f`，记录见 [PR #3](https://github.com/BillZhao626/CiteWeave/pull/3)。另行授权的 Implementation #1 已实现内部 Conversation Core，离线验证通过、real-PG L1 12 passed（隔离测试库），等待 Human Implementation Review；v0.2a 未完成。当前状态及下一阶段见 [HANDOFF](../HANDOFF.md)。
 
 | 当前任务 | 按需阅读 |
 | --- | --- |
-| 当前：Implementation #1 durable core 人审 | [实际 Architecture](ARCHITECTURE.md)、[ADR 0010 storage implementation record](adr/0010-conversation-core-storage.md)、[HANDOFF](../HANDOFF.md)：内部服务/四表迁移，无公开 API/模型；PG 验证缺口明示 |
+| 当前：Implementation #1 durable core 人审 | [实际 Architecture](ARCHITECTURE.md)、[ADR 0010 storage implementation record](adr/0010-conversation-core-storage.md)、[HANDOFF](../HANDOFF.md)：内部服务/四表迁移，无公开 API/模型；隔离 PG 已验证，应用库升级/备份恢复未验证 |
 | 产品范围、路线、里程碑与漂移检查 | [v0.2 Blueprint](V02_BLUEPRINT.md) |
 | 技术取舍、责任方向、后续架构问题 | [v0.2 Foundation](V02_FOUNDATION.md)，结合当前 [Architecture](ARCHITECTURE.md) |
 | 会话身份、状态生命周期、并发恢复与架构接受记录 | [Conversational RAG Architecture](V02_CONVERSATIONAL_RAG_ARCHITECTURE.md)：ACCEPTED — Human Review incorporated；[PR #2](https://github.com/BillZhao626/CiteWeave/pull/2) 为交付与审阅记录，非已实现架构 |

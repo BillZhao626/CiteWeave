@@ -22,11 +22,14 @@ from citeweave.conversation_contract import (
     Operation,
     ProducedResult,
     Readback,
+    ResolvedConversationDelta,
     RunStatus,
     RunView,
     Scope,
+    SourceRef,
     StateSnapshot,
     TurnView,
+    WorkingState,
     fingerprint,
     require_fence,
     require_head,
@@ -221,7 +224,16 @@ def retry(workspace, conversation_id, turn_id, prior_run_id, key, execution: Exe
 
 
 def accept(
-    workspace, conversation_id, turn_id, run_id, owner, fence, result: ProducedResult, state: StateSnapshot
+    workspace,
+    conversation_id,
+    turn_id,
+    run_id,
+    owner,
+    fence,
+    result: ProducedResult,
+    state: StateSnapshot,
+    *,
+    delta: ResolvedConversationDelta | None = None,
 ) -> Acceptance:
     with transaction() as db:
         conversation = _conversation(db, workspace, conversation_id)
@@ -236,8 +248,41 @@ def accept(
         )
         if state.source_turn_id != turn.id or state.previous_snapshot_id != turn.expected_head:
             raise CoreConflict("snapshot_identity_conflict")
+        acceptance_id = uuid4()
+        previous = db.get(Accepted, turn.expected_head) if turn.expected_head else None
+        if delta is not None:
+            from citeweave.conversation_history import reduce_state, within
+
+            scope = Admission.model_validate(turn.request).scope
+            targets = {r.target.acceptance_id for r in delta.relations}
+            if len(targets) > 64:
+                raise CoreConflict("relation_cap")
+            referenced = (
+                db.execute(
+                    select(Accepted.id, Accepted.turn_id, Turn.request["scope"])
+                    .join(Turn, Turn.id == Accepted.turn_id)
+                    .where(Accepted.conversation_id == conversation_id, Accepted.id.in_(targets))
+                ).all()
+                if targets
+                else []
+            )
+            refs = {SourceRef(acceptance_id=a, turn_id=t) for a, t, _ in referenced}
+            if any(r.target not in refs for r in delta.relations):
+                raise CoreConflict("accepted_provenance_unavailable")
+            if any(not within(Scope.model_validate(s), scope) for _, _, s in referenced):
+                raise CoreConflict("relation_scope_unavailable")
+            state = reduce_state(
+                Acceptance.model_validate(previous) if previous else None,
+                SourceRef(acceptance_id=acceptance_id, turn_id=turn.id),
+                scope,
+                delta,
+            )
+        elif previous and previous.state.get("revision") == "conversation-state-v2":
+            raise CoreConflict("state_revision_downgrade")
+        elif isinstance(state, WorkingState):
+            raise CoreConflict("resolved_delta_required")
         accepted = Accepted(
-            id=uuid4(),
+            id=acceptance_id,
             conversation_id=conversation_id,
             turn_id=turn_id,
             run_id=run_id,

@@ -8,6 +8,8 @@ from uuid import UUID
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator
 
 from citeweave.catalog import fingerprint as json_fingerprint
+from citeweave.query_evidence import EvidencePack, StructuralSnapshot
+from citeweave.schemas import Answer
 
 OperationKey = Annotated[str, Field(min_length=1, max_length=128)]
 
@@ -60,8 +62,8 @@ class RunStatus(StrEnum):
 
 
 class ProducedResult(DurableDTO):
-    # Already produced/validated control payloads only. Documentary answers require
-    # later EvidencePack/Citation integration and are deliberately rejected here.
+    # Legacy control payload only; documentary results use the separate typed
+    # bundle below and must pass the EvidencePack/Citation acceptance boundary.
     kind: Literal["clarification", "evidence_insufficient"]
     text: str = Field(min_length=1)
 
@@ -76,6 +78,32 @@ class StateSnapshot(DurableDTO):
 class SourceRef(DurableDTO):
     acceptance_id: UUID
     turn_id: UUID
+
+
+class DocumentaryTrace(DurableDTO):
+    original_question: str
+    proposed_rewrite: str | None
+    selected_query: str
+    interpretation_mode: Literal["USE_ORIGINAL", "USE_REWRITE"]
+    interpretation_identity: str
+    history_sources: tuple[SourceRef, ...]
+    state_item_ids: tuple[UUID, ...]
+    scope: Scope
+    retrieval_profile: Literal["telecom-structural-v1"] = "telecom-structural-v1"
+    evidence_identity: str
+    validation: Literal["CURRENT_PACK_PHYSICAL_ONLY"] = "CURRENT_PACK_PHYSICAL_ONLY"
+
+
+class DocumentaryResult(DurableDTO):
+    """Internal JSON bundle; existing control payloads remain readable unchanged."""
+
+    revision: Literal["conversation-documentary-v1"] = "conversation-documentary-v1"
+    kind: Literal["documentary_answer", "evidence_insufficient"]
+    text: str = Field(min_length=1, max_length=8192)
+    answer: Answer
+    snapshot: StructuralSnapshot
+    evidence_pack: EvidencePack
+    trace: DocumentaryTrace
 
 
 class ResolvedSignals(DurableDTO):
@@ -139,7 +167,7 @@ class Acceptance(DurableDTO):
     conversation_id: UUID
     turn_id: UUID
     run_id: UUID
-    result: ProducedResult
+    result: ProducedResult | DocumentaryResult
     state: Annotated[StateSnapshot | WorkingState, Field(discriminator="revision")]
     created_at: datetime
 

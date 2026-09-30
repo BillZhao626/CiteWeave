@@ -839,3 +839,204 @@ def test_history_real_round_trip_guard_stops_before_ninth_statement(sample, monk
     result = history_read(sample, None)
     assert result.search_incomplete and result.cutoff == ("round_trip_cap",)
     assert result.round_trips == 8 and result.materialized_rows == 0
+
+
+# Implementation #3 uses the same isolated database and finite L1 history permit.
+def interpretation_case(sample):
+    from citeweave.conversation_interpretation import (
+        IntentFact,
+        InterpretationDraft,
+        InterpretationInput,
+        ReferenceDraft,
+        TextSpan,
+        interpret,
+    )
+
+    item = StateValue(id=uuid4(), kind="entity", key="device", value="A")
+    first = history_accept(sample, put=(item,), signals=ResolvedSignals(entities=("A", "B")))
+    workspace, conversation_id, body = sample
+    body = body.model_copy(update={"expected_head": first.id, "question": "Which device?"})
+    run = core.admit(workspace, conversation_id, "interpret", body, execution())
+    context = InterpretationInput(
+        conversation_id=conversation_id,
+        turn_id=run.turn_id,
+        request=body,
+        previous=first,
+        history=history_read(sample, first, explicit=(first.state.source,)),
+    )
+    draft = InterpretationDraft(
+        topic_relation="continue",
+        dependency="required",
+        references=(
+            ReferenceDraft(
+                mention=TextSpan(start=0, end=5),
+                candidates=tuple(
+                    IntentFact(kind="entity", value=v, source=first.state.source) for v in ("A", "B")
+                ),
+            ),
+        ),
+    )
+    return run, context, draft, interpret(context, draft=draft)
+
+
+def interpretation_accept(sample, run, context, draft, result):
+    return core.accept(
+        *finish_args(sample, run),
+        result.control_result or ProducedResult(kind="evidence_insufficient", text="Synthetic control only"),
+        StateSnapshot(source_turn_id=run.turn_id, previous_snapshot_id=run.expected_head),
+        delta=result.delta,
+        interpretation=(context, draft),
+    )
+
+
+def test_interpretation_clarification_atomic_and_correction_durable(sample):
+    from citeweave.conversation_interpretation import (
+        AmbiguityBundle,
+        IntentFact,
+        InterpretationDraft,
+        InterpretationInput,
+        StateCorrection,
+        TextSpan,
+        interpret,
+    )
+
+    run, context, draft, result = interpretation_case(sample)
+    flushed, release = Event(), Event()
+
+    def pause(session, flush_context):
+        if any(isinstance(row, Accepted) for row in session.new):
+            flushed.set()
+            assert release.wait(5)
+
+    event.listen(Session, "after_flush", pause)
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(interpretation_accept, sample, run, context, draft, result)
+            assert flushed.wait(5)
+            with engine().connect() as connection:
+                row = connection.execute(
+                    text("""
+                    SELECT c.head_id, a.result, a.state, r.status
+                    FROM cw5_conversations c JOIN cw5_runs r ON r.conversation_id=c.id
+                    LEFT JOIN cw5_acceptances a ON a.run_id=r.id WHERE r.id=:run
+                """),
+                    {"run": run.id},
+                ).one()
+                assert tuple(row) == (context.previous.id, None, None, "ADMITTED")
+            release.set()
+            accepted = pending.result(timeout=10)
+    finally:
+        release.set()
+        event.remove(Session, "after_flush", pause)
+    engine().dispose()
+    truth = core.read_run(sample[0], sample[1], "interpret")
+    assert truth.accepted == accepted and truth.conversation.head == accepted
+    assert truth.run.status == "ACCEPTED" and truth.conversation.active is None
+    ambiguity = next(e for e in accepted.state.entries if e.item.kind == "ambiguity" and e.active)
+    assert AmbiguityBundle.model_validate_json(ambiguity.item.value).items[0].reason == "multiple_candidates"
+    assert [e.item.value for e in accepted.state.entries if e.active and e.item.kind == "entity"] == ["A"]
+
+    body = context.request.model_copy(update={"expected_head": accepted.id, "question": "Use X"})
+    next_run = core.admit(sample[0], sample[1], "resolve", body, execution())
+    next_context = InterpretationInput(
+        conversation_id=sample[1],
+        turn_id=next_run.turn_id,
+        request=body,
+        previous=accepted,
+        history=history_read(sample, accepted),
+    )
+    old_entity = next(e for e in accepted.state.entries if e.item.kind == "entity" and e.active)
+    next_draft = InterpretationDraft(
+        topic_relation="continue",
+        dependency="none",
+        facts=(IntentFact(kind="entity", value="X", span=TextSpan(start=4, end=5)),),
+        corrections=tuple(
+            StateCorrection(item_id=i, mention=TextSpan(start=0, end=5))
+            for i in (old_entity.item.id, ambiguity.item.id)
+        ),
+        put=(StateValue(id=uuid4(), kind="entity", key="device", value="X", replaces=(old_entity.item.id,)),),
+    )
+    next_result = interpret(next_context, draft=next_draft)
+    resolved = interpretation_accept(sample, next_run, next_context, next_draft, next_result)
+    engine().dispose()
+    assert core.read_run(sample[0], sample[1], "resolve").accepted == resolved
+    active = history_read(sample, resolved).state_projection
+    assert [(e.item.kind, e.item.value) for e in active] == [("entity", "X")]
+    assert not resolved.state.entries[0].active and not resolved.state.entries[1].active
+
+
+def test_interpretation_rollback_publishes_nothing(sample):
+    run, context, draft, result = interpretation_case(sample)
+
+    def abort(session):
+        raise RuntimeError("interpretation_precommit_loss")
+
+    event.listen(Session, "before_commit", abort)
+    try:
+        with pytest.raises(RuntimeError, match="interpretation_precommit_loss"):
+            interpretation_accept(sample, run, context, draft, result)
+    finally:
+        event.remove(Session, "before_commit", abort)
+    truth = core.read_run(sample[0], sample[1], "interpret")
+    assert truth.accepted is None and truth.conversation.head == context.previous
+    assert truth.run.status == "ADMITTED" and truth.conversation.active.id == run.id
+
+
+def test_interpretation_stale_input_cannot_publish(sample):
+    run, context, draft, result = interpretation_case(sample)
+    accepted = interpretation_accept(sample, run, context, draft, result)
+    body = context.request.model_copy(update={"expected_head": accepted.id})
+    next_run = core.admit(sample[0], sample[1], "stale-interpretation", body, execution())
+    with pytest.raises(CoreConflict, match="interpretation_input_conflict"):
+        interpretation_accept(sample, next_run, context, draft, result)
+    truth = core.read_run(sample[0], sample[1], "stale-interpretation")
+    assert truth.accepted is None and truth.conversation.head == accepted
+
+
+def test_interpretation_scope_change_invalidates_binding_at_commit(sample):
+    run, context, draft, result = interpretation_case(sample)
+    with transaction() as db:
+        db.get(VersionRow, sample[2].scope.version_ids[0]).status = "RETIRED"
+    with pytest.raises(CoreConflict, match="scope_changed"):
+        interpretation_accept(sample, run, context, draft, result)
+    with transaction() as db:
+        assert db.scalar(select(Accepted).where(Accepted.run_id == run.id)) is None
+        assert db.get(Conversation, sample[1]).head_id == context.previous.id
+        assert db.get(Run, run.id).status == "ADMITTED"
+
+
+@pytest.mark.parametrize("fault", ["fabricated", "pending", "failed", "UNKNOWN"])
+def test_interpretation_rechecks_actual_accepted_sources(sample, fault):
+    from citeweave.conversation_interpretation import interpret
+
+    run, context, draft, result = interpretation_case(sample)
+    if fault == "fabricated":
+        group = context.history.selected[0]
+        old = group.sources[0]
+        changed = old.model_copy(
+            update={"request": old.request.model_copy(update={"question": "fabricated accepted original"})}
+        )
+        group = group.model_copy(update={"sources": (changed,)})
+        context = context.model_copy(
+            update={"history": context.history.model_copy(update={"selected": (group,)})}
+        )
+        result = interpret(context, draft=draft)
+    else:
+        # Corrupt an accepted source's terminal status to test the trust boundary.
+        # Normal core commands cannot create this combination.
+        with transaction() as db:
+            if fault == "pending":
+                # Keep the database single-active invariant while simulating loss.
+                current = db.get(Run, run.id)
+                current.status = "CANCELLED"
+                current.completed_at = datetime.now(timezone.utc)
+                db.flush()
+            old = db.get(Run, context.previous.run_id)
+            old.status = {"pending": "ADMITTED", "failed": "FAILED"}.get(fault, fault)
+            if fault == "pending":
+                old.completed_at = None
+    with pytest.raises(CoreConflict, match="run_not_active|interpretation_durable_provenance_conflict"):
+        interpretation_accept(sample, run, context, draft, result)
+    with transaction() as db:
+        assert db.scalar(select(Accepted).where(Accepted.run_id == run.id)) is None
+        assert db.get(Conversation, sample[1]).head_id == context.previous.id

@@ -48,7 +48,7 @@ flowchart LR
 
 `conversations.py` 在短事务中锁定 Conversation，检查 workspace/显式 KB 与版本范围、幂等 fingerprint、expected head 和单活动执行。部分唯一索引限制活动 Run；单调 fence、owner 和显式 deadline 阻止迟到接受。同 key 同请求读回原身份，异内容冲突；独立请求 busy/head conflict，不排队或 rebase。显式 retry 保留原 Turn、产生新 Run；UNKNOWN 不重发。
 
-接受记录将已产出的控制结果与仅含来源 Turn/前驱的最小状态快照存为一个 bundle；其 ID 同时是 result/state/head 身份。插入 bundle、推进 head、关闭 Run、释放活动槽在一个事务内完成。当前只接受预先校验的 clarification/evidence-insufficient 文本，拒绝 documentary answer；Working State 扩展见 Implementation #2，仍无澄清策略或 Citation 接入。读回只判断 PG 真相，显式过期 reconciliation 最多处理一个活动 Run，没有自动续算。
+接受记录将已产出的控制结果与仅含来源 Turn/前驱的最小状态快照存为一个 bundle；其 ID 同时是 result/state/head 身份。插入 bundle、推进 head、关闭 Run、释放活动槽在一个事务内完成。当前只接受预先校验的 clarification/evidence-insufficient 文本，拒绝 documentary answer；Working State 扩展见 Implementation #2，内部澄清策略见 Implementation #3，仍无 Citation 接入。读回只判断 PG 真相，显式过期 reconciliation 最多处理一个活动 Run，没有自动续算。
 
 Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不提供破坏性 downgrade。理由、替代方案和恢复边界见 [ADR 0010 implementation record](adr/0010-conversation-core-storage.md)。离线验证已通过；既有 PostgreSQL 18.1 的独立 UUID 测试库完成 12 项真实 PG 测试，覆盖迁移/旧 reader、并发/幂等/fencing、原子可见性、回滚和回执丢失读回。应用数据库未迁移，实际应用数据兼容性和 backup restore **未验证**，当前计数见 [HANDOFF](../HANDOFF.md)。这不代表 v0.2a 完成或可启动 provider。
 
@@ -62,7 +62,19 @@ Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不�
 
 `accept(..., delta=...)` 在现有锁定事务中验证 delta 的前驱、来源与当前 scope，再由 reducer 产生带本次 Acceptance 身份的快照；result/state/head/Run 保持原子发布。v1 原有记录可读，后续可接受 v2；v2 后禁止 legacy finalize 静默清空状态。未增加迁移、表或新 ADR，沿用 ADR 0007/0008/0010 的职责与 JSON 演进空间。
 
-真实 history query 默认 disabled：协议中的生产扫描/期限绑定仍 DEFERRED。显式 `LocalHistoryRead` 仅开放隔离 UUID 测试库，整库最多512个 acceptance/Turn、1024个 Run，statement timeout 1000ms；这是 L1 资源界，不是产品容量。SQL 候选阶段只物化元数据，按完整组限制四个 B 分支，展开全部依赖后先检查64个来源行上限，再在 PG 物化完整原文；128 KiB UTF-8 history body 门禁在返回客户端前检查；加上授权/锁/准入实测6次往返，低于8次上限。任何搜索、成员、投影或期限超限均 fail closed；不通过分页/refetch 绕过。真实测试覆盖跨窗恢复、scope、原子可见性/回滚、重启及边界；计数和未验证范围见 [HANDOFF](../HANDOFF.md)。无公开 API、前端或现有 Evidence RAG 路径变更；Implementation #3 未开始，v0.2a 未完成。
+真实 history query 默认 disabled：协议中的生产扫描/期限绑定仍 DEFERRED。显式 `LocalHistoryRead` 仅开放隔离 UUID 测试库，整库最多512个 acceptance/Turn、1024个 Run，statement timeout 1000ms；这是 L1 资源界，不是产品容量。SQL 候选阶段只物化元数据，按完整组限制四个 B 分支，展开全部依赖后先检查64个来源行上限，再在 PG 物化完整原文；128 KiB UTF-8 history body 门禁在返回客户端前检查；加上授权/锁/准入实测6次往返，低于8次上限。任何搜索、成员、投影或期限超限均 fail closed；不通过分页/refetch 绕过。真实测试覆盖跨窗恢复、scope、原子可见性/回滚、重启及边界；计数和未验证范围见 [HANDOFF](../HANDOFF.md)。无公开 API、前端或现有 Evidence RAG 路径变更；Implementation #3 见下节；v0.2a 未完成。
+
+### v0.2a Interpretation / Rewrite / Clarification（Implementation #3）
+
+`conversation_interpretation.py` 消费现有 `HistorySelection` / Working State，以 typed draft 表示 topic continue/shift/return、当前原文 span 或 accepted 来源的 intent facts、指代候选、歧义、rewrite 和纠正。provider-neutral `Interpreter` 只有显式注入 seam 与确定性 fake；无生产 provider runtime、凭据加载、公开 API 或 prompt。
+
+无结构化草稿且无注入 interpreter 时返回 `interpretation_required`，不以代词正则/关键词判定自足性。草稿明确无依赖且无继承项时 USE_ORIGINAL；多个有效候选（同一 mention 的重复条目先合并）或 unresolved 意图时 CLARIFY；有依赖且全部来源/结构校验通过才 USE_REWRITE。来源必须在选中的完整组内，同会话、当前 scope、精确 Acceptance/Turn；state 来源须匹配当前 active 投影。部分纠正只能绑定明确仍活跃的 item，不能复活已纠正假设。
+
+改写保守限定为完整原问加有来源的补全值，分别保留 original/proposed/selected query；scope 完全一致，显式 critical entity/document/version/time/negation/constraint 项保持。任意自由增删、缺源、范围扩大均失败，不静默改用不安全原文。typed result 返回事实来源、绑定、topic、歧义、结构 guard 结果与 delta hash，供后续 Trace 使用；不保存思维链。**结构校验不能证明自然语言语义保真，Memory 不能证明文档事实**。语义 skip、候选完整性、改写质量仍需后续评测/人审。
+
+复用 `ResolvedConversationDelta` 与现有 reducer。shift 停用旧上下文，return 重验旧来源并停用无关活跃条目；v2 delta 的可选 `topic_relation` 标记区分上下文停用与用户纠正，旧记录缺省为 None。混合 correction + shift/return 草稿明确拒绝，避免将纠正标为可恢复停用。未增加迁移/表/依赖或改变 A/B 选择；旧 v1/v2 可读。澄清仅生成 unresolved ambiguity state，丢弃猜测的 resolved mutations；后续结构化回复可清除歧义。
+
+`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；本层不执行 Evidence RAG 或接受 documentary answer。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace、Context Assembler、模型计量与公开 UI/API 未实现，Implementation #4 NOT_STARTED。
 
 ### 现有产品路径
 

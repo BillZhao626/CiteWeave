@@ -5,6 +5,7 @@ the monotonically increasing Conversation fence invalidates old owners. Each pub
 function owns its short transaction and returns detached, validated durable DTOs.
 """
 
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
@@ -50,6 +51,9 @@ from citeweave.conversation_models import (
 )
 from citeweave.db import transaction
 from citeweave.domain import DocumentRow, VersionRow
+
+if TYPE_CHECKING:
+    from citeweave.conversation_interpretation import InterpretationDraft, InterpretationInput
 
 
 def _clock(db):
@@ -234,6 +238,7 @@ def accept(
     state: StateSnapshot,
     *,
     delta: ResolvedConversationDelta | None = None,
+    interpretation: tuple["InterpretationInput", "InterpretationDraft"] | None = None,
 ) -> Acceptance:
     with transaction() as db:
         conversation = _conversation(db, workspace, conversation_id)
@@ -250,6 +255,52 @@ def accept(
             raise CoreConflict("snapshot_identity_conflict")
         acceptance_id = uuid4()
         previous = db.get(Accepted, turn.expected_head) if turn.expected_head else None
+        if interpretation is not None:
+            from citeweave.conversation_interpretation import interpret, selected_sources
+
+            context, draft = interpretation
+            if (
+                context.conversation_id != conversation_id
+                or context.turn_id != turn_id
+                or context.request != Admission.model_validate(turn.request)
+                or context.previous != (Acceptance.model_validate(previous) if previous else None)
+            ):
+                raise CoreConflict("interpretation_input_conflict")
+            # Bounded exact identity reads, NOT a second history search/admission.
+            # Head lock and immutable bundles make the earlier selection stable;
+            # never trust a caller-supplied Acceptance DTO as durable authority.
+            sources = selected_sources(context)
+            rows = (
+                db.execute(
+                    select(Accepted, Turn.request, Run.status)
+                    .join(Turn, Turn.id == Accepted.turn_id)
+                    .join(Run, Run.id == Accepted.run_id)
+                    .where(
+                        Accepted.conversation_id == conversation_id,
+                        Accepted.id.in_([s.acceptance.id for s in sources]),
+                    )
+                ).all()
+                if sources
+                else []
+            )
+            durable = {
+                a.id: (Acceptance.model_validate(a), Admission.model_validate(q), status)
+                for a, q, status in rows
+            }
+            for source in sources:
+                if durable.get(source.acceptance.id) != (
+                    source.acceptance,
+                    source.request,
+                    RunStatus.ACCEPTED,
+                ):
+                    raise CoreConflict("interpretation_durable_provenance_conflict")
+            checked = interpret(context, draft=draft)
+            if (
+                checked.delta != delta
+                or (checked.mode == "CLARIFY" and checked.control_result != result)
+                or (checked.mode != "CLARIFY" and result.kind != "evidence_insufficient")
+            ):
+                raise CoreConflict("interpretation_control_conflict")
         if delta is not None:
             from citeweave.conversation_history import reduce_state, within
 

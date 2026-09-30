@@ -183,6 +183,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "qdrant-client" },
     { name = "sqlalchemy" },
+    { name = "tokenizers" },
     { name = "uvicorn" },
 ]
 
@@ -219,6 +220,7 @@ requires-dist = [
     { name = "qdrant-client", specifier = "==1.16.2" },
     { name = "sentence-transformers", marker = "extra == 'models'", specifier = ">=3,<6" },
     { name = "sqlalchemy", specifier = ">=2.0,<2.1" },
+    { name = "tokenizers", specifier = "==0.23.2" },
     { name = "uvicorn", specifier = ">=0.30,<1" },
 ]
 provides-extras = ["models"]

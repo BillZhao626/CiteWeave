@@ -39,14 +39,47 @@ def test_populated_0009_upgrade_repeat_constraints_and_legacy_readers():
         cfg.set_main_option("script_location", str(ROOT / "migrations"))
         command.upgrade(cfg, "0009")
         workspace, scope = metadata()
-        conv = core.create(workspace, "before-migration")
-        run = core.admit(
-            workspace,
-            conv.id,
-            "before",
-            Admission(question="Original fixture", scope=scope, expected_head=None),
-            execution(),
-        )
+        # Seed the historical shape with reflected tables, never today's ORM.
+        from decimal import Decimal
+
+        from sqlalchemy import MetaData, Table
+
+        from citeweave.catalog import fingerprint
+        from citeweave.conversation_contract import RunView
+        from citeweave.conversation_provider import RunAuthorization, authorize_run
+
+        conv_id, turn_id, run_id = uuid4(), uuid4(), uuid4()
+        request = Admission(question="Original fixture", scope=scope, expected_head=None)
+        owner = execution()
+        with transaction() as db:
+            tables = MetaData()
+            conv_table = Table("cw5_conversations", tables, autoload_with=db.connection())
+            turn_table = Table("cw5_turns", tables, autoload_with=db.connection())
+            run_table = Table("cw5_runs", tables, autoload_with=db.connection())
+            db.execute(
+                conv_table.insert().values(
+                    id=conv_id, workspace_id=workspace, key="before-migration", fence=1
+                )
+            )
+            db.execute(
+                turn_table.insert().values(
+                    id=turn_id, conversation_id=conv_id, request=request.model_dump(mode="json")
+                )
+            )
+            db.execute(
+                run_table.insert().values(
+                    id=run_id,
+                    conversation_id=conv_id,
+                    turn_id=turn_id,
+                    key="before",
+                    fingerprint=fingerprint(request.model_dump(mode="json")),
+                    owner=owner.owner,
+                    fence=1,
+                    deadline=owner.deadline,
+                    status="ADMITTED",
+                )
+            )
+            before_run = db.scalar(text("SELECT to_jsonb(r) FROM cw5_runs r WHERE id=:id"), {"id": run_id})
         query_id, eval_id = uuid4(), uuid4()
         with transaction() as db:
             db.add(
@@ -92,9 +125,33 @@ def test_populated_0009_upgrade_repeat_constraints_and_legacy_readers():
             before = list(
                 db.execute(text("SELECT to_jsonb(p) FROM cw4_provider_phases p ORDER BY id")).scalars()
             )
+        command.upgrade(cfg, "0010")
+        with transaction() as db:
+            assert (
+                db.scalar(text("SELECT to_jsonb(r) FROM cw5_runs r WHERE id=:id"), {"id": run_id})
+                == before_run
+            )
         migrate()
         migrate()
-        assert core.read_run_id(workspace, conv.id, run.id).run == run
+        run = core.read_run_id(workspace, conv_id, run_id).run
+        assert isinstance(run, RunView) and run.owner == owner.owner
+        with transaction() as db:
+            after_run = db.scalar(text("SELECT to_jsonb(r) FROM cw5_runs r WHERE id=:id"), {"id": run_id})
+            assert all(after_run[k] == v for k, v in before_run.items())
+            assert all(after_run[k] is None for k in after_run.keys() - before_run.keys())
+        authorize_run(
+            workspace,
+            run,
+            RunAuthorization(
+                id=uuid4(),
+                run_id=run.id,
+                expires_at=run.deadline,
+                max_calls=3,
+                max_input_tokens=300,
+                max_output_tokens=300,
+                max_yuan=Decimal("0.003"),
+            ),
+        )
         with transaction() as db:
             after = list(db.scalars(select(ProviderPhaseRow).order_by(ProviderPhaseRow.id)))
             assert len(after) == len(before) == 3
@@ -104,7 +161,7 @@ def test_populated_0009_upgrade_repeat_constraints_and_legacy_readers():
                 )
                 assert all(current[key] == value for key, value in old.items())
                 assert row.conversation_run_id is None and row.authorization_id is None
-            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0010"
+            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0011"
         # Audit DB constraint itself, rather than only the service's input checks.
         from test_conversation_provider_postgres import authorization
 

@@ -48,7 +48,10 @@ class UnavailableRuntime:
 
 
 def mount(app, principal, runtime: ConversationalRuntime | None = None):
-    runtime = runtime if runtime is not None else UnavailableRuntime()
+    if runtime is None:
+        from citeweave.conversation_runtime import build_runtime
+
+        runtime = build_runtime()
 
     @app.post("/v1/conversations", response_model=PublicConversation)
     def create(idempotency_key: str = Header(min_length=1, max_length=128), workspace=Depends(principal)):

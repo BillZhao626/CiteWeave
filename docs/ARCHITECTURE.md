@@ -42,6 +42,18 @@ flowchart LR
 
 ## 实现入口
 
+### 当前增量：#5c-1 Durable Provider Ledger / Recovery
+
+在 accepted main `3502981`（#5b）上，Product Owner 单独批准的 #5c-1 只实现 provider 账本与恢复基础设施；Human Implementation Review pending。此前各节描述对应增量当时的边界，本节为当前计量/恢复状态。**#5c-2 runtime 接线与 #5d 均 NOT_STARTED；默认生产 runtime 不可用，production history 仍 fail-closed。**
+
+Alembic `0010` 为既有 `cw4_provider_phases` 增加 nullable Conversation Run 外键、provider/model/price revision、单次调用授权 ID/期限/input-output caps、prompt revision 和 request hash。复用原 phase/attempt、owner/fence、reservation、usage/cost/result identity；不新增账本、不伪造 QueryRun，也不在 `cw5_runs` 重复存调用计量。条件约束禁止 Conversation 与 QueryRun/Eval 混合归属，保留旧 Eval+Query 合法组合；每 Run/purpose 一个 phase，授权 ID 唯一，数据库 trigger 阻止身份/价格/授权追溯修改。
+
+`conversation_provider.py` 在短事务中先锁 Conversation，校验 workspace/scope/head/owner/fence/PG deadline，再写 phase；flush 后再验期限。PREPARED 与 DISPATCHED 分开，后者必须先 commit 才可能由未来 runtime 发出外部请求；重复 dispatch 明确失败。当前模块没有 transport/runtime 调用。成功/不确定观察保留 provider usage、request ID、result hash；缺值不补造。费用复用 `costs.py` 的固定 revision 和 dispatch 时间，只是估计，非实扣账单；单次显式授权不替代后续累计预算策略。
+
+过期 ADMITTED 无可能执行的 provider 派发时进入 INTERRUPTED；直接观测到的确定未执行拒绝同样可安全恢复。DISPATCHED/UNKNOWN 或已有 provider 响应但尚无 Acceptance 时保守进入 UNKNOWN，禁止普通 retry；已 ACCEPTED 不被 reconciliation 改写。未决 phase 不能被接受或隐藏成可重试失败，同 Run 后续 phase 也不能继续派发。既有来源/Citation/head/fence 原子接受不弱化，无自动重发、后台恢复或 provider-specific reconciliation。详见 [ADR 0011](adr/0011-conversation-provider-ledger.md)。
+
+验证使用 UUID 隔离 PG、原创 synthetic receipts 和 mocked transport，旧 Query/Eval 回归保持有效；实际计数见 [HANDOFF](../HANDOFF.md)。没有迁移配置中的应用 DB，没有启动服务/修改 Qdrant 或 RAGFlow。**provider/model/Judge calls = 0；monetary exposure = 0 CNY；REAL_QDRANT NOT_VERIFIED；DEV/HARD/REG NOT_RUN；public API/React、retrieval/ranking/EvidencePack 语义不变；v0.2a NOT_COMPLETE。**
+
 ### v0.2a 内部 Conversation Core（Implementation #1）
 
 独立授权的持久核心已实现；公开 API 接线见 Implementation #5a，React 会话 UI 见 #5b，真实模型会话执行未开放。PostgreSQL `cw5_conversations / cw5_turns / cw5_runs / cw5_acceptances` 保存会话、不可变原始请求、相关执行尝试和不可变接受记录；v0.1 QueryRun、单轮问答、摄取和证据 reader 不改变。

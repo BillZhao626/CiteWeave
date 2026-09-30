@@ -4,7 +4,20 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Index,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -296,11 +309,55 @@ class EvalOutboxRow(Stamp, Base):
 
 class ProviderPhaseRow(Stamp, Base):
     __tablename__ = "cw4_provider_phases"
-    __table_args__ = (UniqueConstraint("logical_key", "phase_attempt"),)
+    __table_args__ = (
+        UniqueConstraint("logical_key", "phase_attempt"),
+        # Existing 0008 constraints, now also represented in ORM metadata.
+        ForeignKeyConstraint(
+            ["eval_run_id", "case_id"], ["cw2_eval_cases.eval_run_id", "cw2_eval_cases.case_id"]
+        ),
+        CheckConstraint("phase_attempt BETWEEN 1 AND 2"),
+        CheckConstraint(
+            "conversation_run_id IS NULL OR (query_run_id IS NULL AND eval_run_id IS NULL AND case_id IS NULL)",
+            name="ck_provider_conversation_owner",
+        ),
+        CheckConstraint(
+            "conversation_run_id IS NULL OR ("
+            "provider IS NOT NULL AND model IS NOT NULL AND price_revision IS NOT NULL AND "
+            "authorization_id IS NOT NULL AND authorization_deadline IS NOT NULL AND "
+            "input_tokens IS NOT NULL AND input_tokens > 0 AND "
+            "output_tokens IS NOT NULL AND output_tokens > 0 AND reserved_yuan > 0 AND "
+            "prompt_revision IS NOT NULL AND request_hash IS NOT NULL AND "
+            "phase IN ('interpretation','generation') AND phase_attempt = 1)",
+            name="ck_provider_conversation_authorization",
+        ),
+        Index(
+            "uq_provider_conversation_purpose",
+            "conversation_run_id",
+            "phase",
+            unique=True,
+            postgresql_where=text("conversation_run_id IS NOT NULL"),
+        ),
+        Index(
+            "uq_provider_conversation_authorization",
+            "authorization_id",
+            unique=True,
+            postgresql_where=text("conversation_run_id IS NOT NULL"),
+        ),
+    )
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     eval_run_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw2_eval_runs.id"))
     case_id: Mapped[str | None] = mapped_column(String(80))
     query_run_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw1_query_runs.id"))
+    conversation_run_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw5_runs.id"))
+    provider: Mapped[str | None] = mapped_column(String(80))
+    model: Mapped[str | None] = mapped_column(String(160))
+    price_revision: Mapped[str | None] = mapped_column(String(100))
+    authorization_id: Mapped[UUID | None] = mapped_column()
+    authorization_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    input_tokens: Mapped[int | None] = mapped_column(Integer)
+    output_tokens: Mapped[int | None] = mapped_column(Integer)
+    prompt_revision: Mapped[str | None] = mapped_column(String(160))
+    request_hash: Mapped[str | None] = mapped_column(String(64))
     logical_key: Mapped[str] = mapped_column(String(200))
     phase: Mapped[str] = mapped_column(String(24))
     phase_attempt: Mapped[int] = mapped_column(Integer)

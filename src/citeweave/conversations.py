@@ -241,6 +241,10 @@ def retry(workspace, conversation_id, turn_id, prior_run_id, key, execution: Exe
             raise CoreConflict("retry_superseded")
         if prior.status not in {"FAILED", "CANCELLED", "INTERRUPTED", "STALE"}:
             raise CoreConflict("retry_not_allowed")
+        from citeweave.conversation_provider import blocks_retry
+
+        if blocks_retry(db, prior.id):
+            raise CoreConflict("retry_not_allowed")
         _scope(db, workspace, body.scope, current=True)
         return _new_run(db, conversation, turn, key, digest, execution, prior.id)
 
@@ -273,6 +277,10 @@ def accept(
         require_owner(
             run.status, run.owner, run.fence, owner, fence, conversation.fence, run.deadline, _clock(db)
         )
+        from citeweave.conversation_provider import unresolved
+
+        if unresolved(db, run.id):
+            raise CoreConflict("provider_outcome_unknown")
         if state.source_turn_id != turn.id or state.previous_snapshot_id != turn.expected_head:
             raise CoreConflict("snapshot_identity_conflict")
         acceptance_id = uuid4()
@@ -423,6 +431,10 @@ def finish(workspace, conversation_id, turn_id, run_id, owner, fence, target: Ru
         # A still-current owner may record UNKNOWN after its deadline. This is
         # terminal bookkeeping, never permission to accept a late result.
         require_fence(run.status, run.owner, run.fence, owner, fence, conversation.fence)
+        from citeweave.conversation_provider import blocks_retry
+
+        if target != RunStatus.UNKNOWN and blocks_retry(db, run.id):
+            raise CoreConflict("provider_outcome_requires_unknown")
         run.status = transition(run.status, target)
         run.completed_at = _clock(db)
         conversation.fence += 1
@@ -434,13 +446,16 @@ def reconcile_expired(workspace, conversation_id) -> ConversationView:
     """One bounded durable check. Expiry fences work; never infer death from a socket.
 
     INTERRUPTED says local ownership ended, not that a provider request failed.
-    No dispatch exists in this core; known UNKNOWN outcomes remain terminal.
+    Durable provider dispatch can require UNKNOWN; accepted results stay authoritative.
     """
     with transaction() as db:
         conversation = _conversation(db, workspace, conversation_id)
         active = _active(db, conversation_id)
         if active and active.deadline <= _clock(db):
-            active.status = transition(active.status, RunStatus.INTERRUPTED)
+            from citeweave.conversation_provider import reconcile
+
+            target = RunStatus.UNKNOWN if reconcile(db, active.id) else RunStatus.INTERRUPTED
+            active.status = transition(active.status, target)
             active.completed_at = _clock(db)
             conversation.fence += 1
             db.flush()

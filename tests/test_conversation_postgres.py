@@ -194,7 +194,7 @@ def test_upgrade_preserves_legacy_reader_and_schema(isolated_pg):
 
     legacy, before = isolated_pg
     with transaction() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0009"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0010"
         after = schemas.Run.model_validate(read_query(db.get(QueryRunRow, legacy))).model_dump(mode="json")
         assert after == before
         assert db.scalar(select(func.count()).select_from(Conversation)) == 0

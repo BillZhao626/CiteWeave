@@ -20,6 +20,19 @@ from citeweave.evaluation.lifecycle import lock, owned
 
 evaluation_owner = ContextVar("evaluation_owner", default=None)
 
+# Direct transport observations already treated as non-execution by this gateway.
+KNOWN_NOT_EXECUTED = frozenset(
+    {
+        "llm_connection_failed",
+        "llm_key_missing",
+        "circuit_open",
+        "llm_http_429",
+        "llm_http_400",
+        "llm_http_401",
+        "llm_http_403",
+    }
+)
+
 
 def guard(db, query_id, query_owner, query_fence, token, phase):
     now = lock(db)
@@ -75,6 +88,8 @@ def dispatch(identity, query_owner, query_fence, token=None):
     with transaction() as db:
         lock(db)
         row = db.get(ProviderPhaseRow, identity)
+        if row.conversation_run_id is not None:
+            raise ValueError("conversation_provider_requires_conversation_guard")
         now = guard(db, row.query_run_id, query_owner, query_fence, token, row.phase)
         owner, fence = (token.owner, token.fence) if token else (query_owner, query_fence)
         if row.state != "PREPARED" or row.owner != owner or row.fence != fence:
@@ -86,6 +101,8 @@ def complete(identity, query_owner, query_fence, token, parts=None, code=None, o
     with transaction() as db:
         lock(db)
         row = db.get(ProviderPhaseRow, identity)
+        if row.conversation_run_id is not None:
+            raise ValueError("conversation_provider_requires_conversation_guard")
         try:
             guard(db, row.query_run_id, query_owner, query_fence, token, row.phase)
             expected = (token.owner, token.fence) if token else (query_owner, query_fence)
@@ -119,15 +136,7 @@ def complete(identity, query_owner, query_fence, token, parts=None, code=None, o
                 row.estimated_yuan = estimated_cost(
                     row.usage
                 )  # visible lower-bound estimate, reservation retained
-            safe = code in {
-                "llm_connection_failed",
-                "llm_key_missing",
-                "circuit_open",
-                "llm_http_429",
-                "llm_http_400",
-                "llm_http_401",
-                "llm_http_403",
-            }
+            safe = code in KNOWN_NOT_EXECUTED
             row.state, row.outcome, row.error_code = (
                 ("REJECTED", "known_not_executed", code) if safe else ("UNKNOWN", "unknown", code)
             )

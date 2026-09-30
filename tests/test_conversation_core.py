@@ -133,6 +133,7 @@ def accept_service(monkeypatch):
     )
     conversation = SimpleNamespace(id=uuid4(), head_id=None, fence=1)
     db = Mock()
+    db.scalar.return_value = None  # No provider phase exists in this local control fixture.
     writes = []
     db.add.side_effect = writes.append
     db.flush.side_effect = lambda: [setattr(row, "created_at", now) for row in writes]

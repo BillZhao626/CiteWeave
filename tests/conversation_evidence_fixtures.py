@@ -81,7 +81,7 @@ class FakeGenerator:
 
 
 class Fixture:
-    def __init__(self, workspace, scope, document=None):
+    def __init__(self, workspace, scope, document=None, *, source_sha256="0" * 64):
         self.workspace, self.scope = workspace, scope
         self.document = document or uuid4()
         self.artifact, self.parent_id, self.child_id = uuid4(), uuid4(), uuid4()
@@ -89,7 +89,7 @@ class Fixture:
         self.profile = document_profile("telecom-protocol-pdf-v1")
         block = Block(
             scope=Scope(workspace_id=workspace, kb_id=scope.kb_id, revision_id=self.version),
-            source_sha256="0" * 64,
+            source_sha256=source_sha256,
             block_id="original-synthetic",
             text="The receiver discards the damaged message.",
             locator_kind="pdf_bbox",
@@ -109,7 +109,7 @@ class Fixture:
             document_id=str(self.document),
             version_id=str(self.version),
             filename="synthetic.pdf",
-            source_sha256="0" * 64,
+            source_sha256=source_sha256,
             artifact_id=str(self.artifact),
             canonical_sha="1" * 64,
             tree_hash="2" * 64,

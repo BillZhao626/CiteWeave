@@ -48,7 +48,7 @@ flowchart LR
 
 `conversations.py` 在短事务中锁定 Conversation，检查 workspace/显式 KB 与版本范围、幂等 fingerprint、expected head 和单活动执行。部分唯一索引限制活动 Run；单调 fence、owner 和显式 deadline 阻止迟到接受。同 key 同请求读回原身份，异内容冲突；独立请求 busy/head conflict，不排队或 rebase。显式 retry 保留原 Turn、产生新 Run；UNKNOWN 不重发。
 
-接受记录将已产出的控制结果与仅含来源 Turn/前驱的最小状态快照存为一个 bundle；其 ID 同时是 result/state/head 身份。插入 bundle、推进 head、关闭 Run、释放活动槽在一个事务内完成。当前只接受预先校验的 clarification/evidence-insufficient 文本，拒绝 documentary answer；Working State 扩展见 Implementation #2，内部澄清策略见 Implementation #3，仍无 Citation 接入。读回只判断 PG 真相，显式过期 reconciliation 最多处理一个活动 Run，没有自动续算。
+接受记录将已产出的控制结果与仅含来源 Turn/前驱的最小状态快照存为一个 bundle；其 ID 同时是 result/state/head 身份。插入 bundle、推进 head、关闭 Run、释放活动槽在一个事务内完成。最初仅接受 clarification/evidence-insufficient 控制结果；Working State 扩展见 Implementation #2，内部澄清策略见 Implementation #3，documentary answer/Citation 接入见 Implementation #4。读回只判断 PG 真相，显式过期 reconciliation 最多处理一个活动 Run，没有自动续算。
 
 Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不提供破坏性 downgrade。理由、替代方案和恢复边界见 [ADR 0010 implementation record](adr/0010-conversation-core-storage.md)。离线验证已通过；既有 PostgreSQL 18.1 的独立 UUID 测试库完成 12 项真实 PG 测试，覆盖迁移/旧 reader、并发/幂等/fencing、原子可见性、回滚和回执丢失读回。应用数据库未迁移，实际应用数据兼容性和 backup restore **未验证**，当前计数见 [HANDOFF](../HANDOFF.md)。这不代表 v0.2a 完成或可启动 provider。
 
@@ -74,7 +74,19 @@ Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不�
 
 复用 `ResolvedConversationDelta` 与现有 reducer。shift 停用旧上下文，return 重验旧来源并停用无关活跃条目；v2 delta 的可选 `topic_relation` 标记区分上下文停用与用户纠正，旧记录缺省为 None。混合 correction + shift/return 草稿明确拒绝，避免将纠正标为可恢复停用。未增加迁移/表/依赖或改变 A/B 选择；旧 v1/v2 可读。澄清仅生成 unresolved ambiguity state，丢弃猜测的 resolved mutations；后续结构化回复可清除歧义。
 
-`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；本层不执行 Evidence RAG 或接受 documentary answer。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace、Context Assembler、模型计量与公开 UI/API 未实现，Implementation #4 NOT_STARTED。
+`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；解释层自身不执行 Evidence RAG；其后接线及 documentary answer 接受见 Implementation #4。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace、模型计量与公开 UI/API 未实现；Context Assembler 见 Implementation #4。
+
+### v0.2a Context Assembler / Evidence RAG（Implementation #4）
+
+`conversation_evidence.py` 提供内部 `GenerationContext` 和 `execute`：admitted Run preflight → 既有 HistorySelection/Working State → Implementation #3 interpretation → 原文/已验证 rewrite → 当前范围的 Evidence RAG → typed assembly → Answer/Citation validation → atomic acceptance。CLARIFY 不检索、不生成文档答案。生产 history read 继续 fail-closed；隔离 L1 显式 permit 是唯一已验证的执行入口。
+
+原问、检索 query、解释元数据、必要完整历史组、活跃且相关的 state 投影、documentary pack 分类型保存。历史只携带原始用户文本和 correction/dependency 来源；不携带历史 assistant answer 或旧 Citation。USE_ORIGINAL 不注入无关历史，已纠正条目不进入活跃投影；Memory 始终只解释意图。完整 pack 不因历史占用而裁剪。显式本地 UTF-8 字节门禁只限制 synthetic 工作量，不替代真实 provider tokenizer/framing/output reserve；超限失败而非伪装证据不足。
+
+`conversation_evidence_pg.py` 复用现有 `capture`、`StructuralRetriever`、Dense/BM25/RRF/BGE、EvidencePack selection 和 `citation_for`，使用当前授权 KB/不可变版本，未改排名、索引、prompt 或选择语义。生成只有显式注入的 provider-neutral seam，测试使用 deterministic fake；空 pack 沿用现有 REFUSAL，不调用生成。原始 v0.1 Ask 和 QueryRun 不变，不为会话伪造提前完成的单轮结果。
+
+`DocumentaryResult` 在现有 acceptance JSON 内保留 Answer/Citation、结构 snapshot、完整 pack 和最小 Trace 身份；无迁移、新表或旧记录改写。提交事务重验来源内容/ACCEPTED Run、scope/版本/document、不可变 build/atom/lineage、pack 文本/标签、当前 Run 和引用身份，再用既有 reducer、head/owner/fence/deadline 检查原子发布 result/state/head/终态 Run/slot。返回 receipt 丢失通过既有 readback 恢复，不自动执行或重试。失败不发布，显式 finish/reconciliation 负责终态处理。
+
+验证标签 `CURRENT_PACK_PHYSICAL_ONLY` 明确只证明引用身份和物理解析，不证明自然语言语义支持。离线、真实隔离 PG + fake retrieval adapters 的实际结果见 HANDOFF；真实 Qdrant、模型答案质量和生产会话能力未验证。完整 Trace/public API/UI、provider accounting/admission 属于后续另行授权；Implementation #5 NOT_STARTED，v0.2a NOT_COMPLETE。
 
 ### 现有产品路径
 

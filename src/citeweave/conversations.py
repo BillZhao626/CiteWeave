@@ -19,6 +19,7 @@ from citeweave.conversation_contract import (
     Admission,
     ConversationView,
     CoreConflict,
+    DocumentaryResult,
     Execution,
     Operation,
     ProducedResult,
@@ -234,12 +235,16 @@ def accept(
     run_id,
     owner,
     fence,
-    result: ProducedResult,
+    result: ProducedResult | DocumentaryResult,
     state: StateSnapshot,
     *,
     delta: ResolvedConversationDelta | None = None,
     interpretation: tuple["InterpretationInput", "InterpretationDraft"] | None = None,
 ) -> Acceptance:
+    # Revalidate nested JSON even when a caller used unchecked model_copy.
+    result = type(result).model_validate(result.model_dump(mode="json"))
+    if isinstance(result, DocumentaryResult) and interpretation is None:
+        raise CoreConflict("documentary_interpretation_required")
     with transaction() as db:
         conversation = _conversation(db, workspace, conversation_id)
         turn = _turn(db, conversation_id, turn_id)
@@ -298,9 +303,17 @@ def accept(
             if (
                 checked.delta != delta
                 or (checked.mode == "CLARIFY" and checked.control_result != result)
-                or (checked.mode != "CLARIFY" and result.kind != "evidence_insufficient")
+                or (
+                    checked.mode != "CLARIFY"
+                    and result.kind != "evidence_insufficient"
+                    and not isinstance(result, DocumentaryResult)
+                )
             ):
                 raise CoreConflict("interpretation_control_conflict")
+            if isinstance(result, DocumentaryResult):
+                from citeweave.conversation_evidence_pg import validate_durable_result
+
+                validate_durable_result(db, workspace, run_id, context, checked, result)
         if delta is not None:
             from citeweave.conversation_history import reduce_state, within
 
@@ -353,6 +366,31 @@ def accept(
         conversation.fence += 1
         db.flush()
         return Acceptance.model_validate(accepted)
+
+
+def execution_input(workspace, supplied: RunView):
+    """Short preflight; commit repeats all guards after external work."""
+    with transaction() as db:
+        conversation = _conversation(db, workspace, supplied.conversation_id)
+        turn = _turn(db, conversation.id, supplied.turn_id)
+        run = _run(db, conversation.id, turn.id, supplied.id)
+        request = Admission.model_validate(turn.request)
+        _scope(db, workspace, request.scope, current=True)
+        require_head(conversation.head_id, turn.expected_head)
+        require_owner(
+            run.status,
+            run.owner,
+            run.fence,
+            supplied.owner,
+            supplied.fence,
+            conversation.fence,
+            run.deadline,
+            _clock(db),
+        )
+        if supplied != _run_view(run, turn):
+            raise CoreConflict("documentary_run_identity_conflict")
+        previous = db.get(Accepted, turn.expected_head) if turn.expected_head else None
+        return request, Acceptance.model_validate(previous) if previous else None
 
 
 def finish(workspace, conversation_id, turn_id, run_id, owner, fence, target: RunStatus) -> RunView:

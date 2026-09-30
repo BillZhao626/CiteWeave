@@ -1,6 +1,6 @@
 # 架构与职责
 
-CiteWeave 使用 React + TypeScript 工作台和 FastAPI API。同步查询通过 SSE 返回草稿及最终结果；文档摄取交给异步 worker。前端类型由 Pydantic / OpenAPI 生成。
+CiteWeave 使用 React + TypeScript 工作台和 FastAPI API。v0.1 单轮查询通过 SSE 返回草稿及最终结果，v0.2a 会话 UI 读取持久 Run/result（其 SSE endpoint 仅为有限快照）；文档摄取交给异步 worker。前端类型由 Pydantic / OpenAPI 生成。
 
 ```mermaid
 flowchart LR
@@ -44,7 +44,7 @@ flowchart LR
 
 ### v0.2a 内部 Conversation Core（Implementation #1）
 
-独立授权的持久核心已实现；公开 API 接线见 Implementation #5a，React 会话 UI 与真实模型执行未实现。PostgreSQL `cw5_conversations / cw5_turns / cw5_runs / cw5_acceptances` 保存会话、不可变原始请求、相关执行尝试和不可变接受记录；v0.1 QueryRun、单轮问答、摄取和证据 reader 不改变。
+独立授权的持久核心已实现；公开 API 接线见 Implementation #5a，React 会话 UI 见 #5b，真实模型会话执行未开放。PostgreSQL `cw5_conversations / cw5_turns / cw5_runs / cw5_acceptances` 保存会话、不可变原始请求、相关执行尝试和不可变接受记录；v0.1 QueryRun、单轮问答、摄取和证据 reader 不改变。
 
 `conversations.py` 在短事务中锁定 Conversation，检查 workspace/显式 KB 与版本范围、幂等 fingerprint、expected head 和单活动执行。部分唯一索引限制活动 Run；单调 fence、owner 和显式 deadline 阻止迟到接受。同 key 同请求读回原身份，异内容冲突；独立请求 busy/head conflict，不排队或 rebase。显式 retry 保留原 Turn、产生新 Run；UNKNOWN 不重发。
 
@@ -74,7 +74,7 @@ Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不�
 
 复用 `ResolvedConversationDelta` 与现有 reducer。shift 停用旧上下文，return 重验旧来源并停用无关活跃条目；v2 delta 的可选 `topic_relation` 标记区分上下文停用与用户纠正，旧记录缺省为 None。混合 correction + shift/return 草稿明确拒绝，避免将纠正标为可恢复停用。未增加迁移/表/依赖或改变 A/B 选择；旧 v1/v2 可读。澄清仅生成 unresolved ambiguity state，丢弃猜测的 resolved mutations；后续结构化回复可清除歧义。
 
-`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；解释层自身不执行 Evidence RAG；其后接线及 documentary answer 接受见 Implementation #4。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace 与模型计量未实现；Context Assembler 见 Implementation #4，公开 API 的有限持久字段投影见 #5a，React 会话 UI 未实现。
+`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；解释层自身不执行 Evidence RAG；其后接线及 documentary answer 接受见 Implementation #4。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace 与模型计量未实现；Context Assembler 见 Implementation #4，公开 API 的有限持久字段投影见 #5a，React 会话 UI 见 #5b。
 
 ### v0.2a Context Assembler / Evidence RAG（Implementation #4）
 
@@ -86,11 +86,11 @@ Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不�
 
 `DocumentaryResult` 在现有 acceptance JSON 内保留 Answer/Citation、结构 snapshot、完整 pack 和最小 Trace 身份；无迁移、新表或旧记录改写。提交事务重验来源内容/ACCEPTED Run、scope/版本/document、不可变 build/atom/lineage、pack 文本/标签、当前 Run 和引用身份，再用既有 reducer、head/owner/fence/deadline 检查原子发布 result/state/head/终态 Run/slot。返回 receipt 丢失通过既有 readback 恢复，不自动执行或重试。失败不发布，显式 finish/reconciliation 负责终态处理。
 
-验证标签 `CURRENT_PACK_PHYSICAL_ONLY` 明确只证明引用身份和物理解析，不证明自然语言语义支持。离线、真实隔离 PG + fake retrieval adapters 的实际结果见 HANDOFF；真实 Qdrant、模型答案质量和生产会话能力未验证。另行授权的公开 API 与持久 Trace 投影见 #5a；完整 Trace 重建、UI、provider accounting/admission 仍待后续授权，v0.2a NOT_COMPLETE。
+验证标签 `CURRENT_PACK_PHYSICAL_ONLY` 明确只证明引用身份和物理解析，不证明自然语言语义支持。离线、真实隔离 PG + fake retrieval adapters 的实际结果见 HANDOFF；真实 Qdrant、模型答案质量和生产会话能力未验证。另行授权的公开 API 与持久 Trace 投影见 #5a；UI 见另行授权的 #5b；完整 Trace 重建、provider accounting/admission 仍待后续授权，v0.2a NOT_COMPLETE。
 
 ### v0.2a Public Conversational API / Durable Trace（Implementation #5a）
 
-`conversation_api.py` 复用现有 `/v1`、Bearer/session workspace 授权、错误 envelope 和 no-store 响应；`conversation_public.py` 只定义版本化 allowlist 投影，不另建会话真相。Pydantic/OpenAPI 是类型来源，`contracts/openapi.json`、`apps/web/openapi.json` 和生成的 TypeScript 同步更新。旧路径与 schema 保持不变。无新表/迁移、React 会话组件或测试专用 HTTP endpoint。
+`conversation_api.py` 复用现有 `/v1`、Bearer/session workspace 授权、错误 envelope 和 no-store 响应；`conversation_public.py` 只定义版本化 allowlist 投影，不另建会话真相。Pydantic/OpenAPI 是类型来源，`contracts/openapi.json`、`apps/web/openapi.json` 和生成的 TypeScript 同步更新。旧路径与 schema 保持不变。#5a 无新表/迁移或测试专用 HTTP endpoint，React 会话组件见 #5b。
 
 | 方法 / 路径 | 契约 |
 | --- | --- |
@@ -112,7 +112,21 @@ Trace 公开原问、scope、Conversation/Turn/Run/retry、输入 head、accepte
 
 SSE 复用 `data: <JSON>\n\n`，`conversation-event-v1` 封装 lifecycle（Run snapshot）和存在时的 result（accepted bundle）。一次 GET 读取同一授权快照，发出一或两条事件后关闭；无 provisional draft、订阅/重放日志或 Last-Event-ID 保证。断线不取消执行；用 Run/result 或再次 GET events 重连读回。PG commit 前没有 final/partial documentary Trace 可见，HTTP reader 沿用 Core 锁得到一致结果。
 
-实际隔离 PG、API、v0.1/#1–#4 回归与生成类型检查见 [HANDOFF](../HANDOFF.md)。**provider/model/Judge calls = 0；DEV/HARD/REG NOT_RUN；REAL_QDRANT NOT_VERIFIED；React conversational UI、real provider/accounting、#5b/#5c NOT_STARTED；v0.2a NOT_COMPLETE。** 本增量不改变检索/ranking/prompt/EvidencePack/offsets，也不声称真实会话 runtime 已可用。
+实际隔离 PG、API、v0.1/#1–#4 回归与生成类型检查见 [HANDOFF](../HANDOFF.md)。**provider/model/Judge calls = 0；DEV/HARD/REG NOT_RUN；REAL_QDRANT NOT_VERIFIED；real provider/accounting、#5c NOT_STARTED；v0.2a NOT_COMPLETE。** 本增量不改变检索/ranking/prompt/EvidencePack/offsets，也不声称真实会话 runtime 已可用。另行授权的 React 会话 UI 见下节。
+
+### v0.2a React Conversational Product Surface（Implementation #5b）
+
+`workspace.tsx` 在现有知识库 Ask 工作台中提供会话/单轮选择；旧 `?run=` reader 继续走单轮路径。复用文档上传/选择、生成 API 类型、现有 Button、Citation token 解析和 `PdfEvidence`。`conversation-panel.tsx` 显式显示下一 Turn 的文档版本范围、原始问题、持久 Run 状态和三种已接受结果。clarification 可在下一 Turn 自然回复，evidence_insufficient 不显示文档引用；documentary_answer 的 Citation 绑定其自身不可变版本、exact span 和 content URL。切换范围/追问不会把旧引用重定向到新文档；物理定位语义不变。
+
+`conversation-session.ts` 管理请求与读回，不成为第二套会话真相。每个有意 create/submit 先保存稳定 key，再发送；sessionStorage 仅保存本标签页当前 Conversation/已知 Run 身份、明确选择的版本和未确认请求（原问题/scope/expected_head/key）。结果和当前 head 每次由公开 Conversation/Run/Trace GET 获取；提交成功后也重新读取 head。无 mount/effect 自动提交；同步操作锁避免双击/StrictMode 重复发送。网络丢失/503 保留同 key 同 body，先读回，再由用户显式恢复；已有 Run 只读回，不重 dispatch。409 刷新状态，下一次提交须新的有意操作，不自动 rebase。存储写失败阻止发送；授权读回失败时移除可使用的缓存结果/head。
+
+ADMITTED 只表示后端已准入，UI 不猜测检索/生成阶段，也不把 HTTP 503 当作 FAILED。每次进入 pending 观察期最多三次自动 GET（空闲时相隔三秒），之后手动刷新；终态按后端 ACCEPTED/FAILED/CANCELLED/INTERRUPTED/UNKNOWN/STALE 展示。`/events` 仍是有限持久快照，本 UI 使用 GET 读回，不引入 token streaming、Last-Event-ID、订阅、事件日志或断线取消。当前 API 没有历史枚举；刷新只恢复本标签页已知 Run，不能恢复其他浏览器的完整历史。新会话不删除原有服务端记录。
+
+Trace Inspector 是答案后的次级 disclosure，只显示 conversation-trace-v1 已公开的身份、原问/scope、状态/时间、解释模式、选定 query、文档/版本及 Evidence/Citation/validation 等字段。null 显示“未记录 / 不可用”，不推导 CLARIFY、阶段耗时、失败原因或费用。`CURRENT_PACK_PHYSICAL_ONLY ≠ semantic support`，语义评估保持 `NOT_ASSESSED`。
+
+浏览器验收由 opt-in `tests/test_conversation_browser.py` 启动，Playwright 配置只接受该 harness 的本地 URL。它在现有 PostgreSQL 上创建/迁移/删除自己的 UUID 隔离库，生成原创单页 PDF 和对应 source hash，使用生产 web build、原有鉴权/公开 endpoint 和服务端 `ConversationalRuntime` seam。fake model/retrieval/generator 调用 #4 编排，LocalHistoryRead permit 仅存在于隔离测试中；Python 外发 HTTP adapter 被测试拦截。另起一个未注入 runtime 的应用验证默认 503/no-admission。没有新增测试 HTTP endpoint、生产配置开关或 React canned results。Chromium 覆盖三类结果、引用/PDF 高亮、accepted head、Trace、刷新、回执丢失同键恢复、键盘操作与小窗；PG 额外检查 Turn/Run/Acceptance 基数。命令、实际计数及 synthetic 限制见 [HANDOFF](../HANDOFF.md)。现有双平台离线 CI 不替代这次本地真实 PG/browser 证据。
+
+**生产会话 runtime 仍不可用，production history query 仍 DEFERRED/fail-closed；provider/model/Judge calls = 0。#5c 仍需另行授权，尚未开始；完整 Trace 重建/计量、真实语义质量与生产执行准入未完成，v0.2a NOT_COMPLETE。** #5b 不改变任何后端生产源码、durable schema、检索/Evidence/offset 契约。
 
 ### 现有产品路径
 

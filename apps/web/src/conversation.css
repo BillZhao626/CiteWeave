@@ -1,0 +1,82 @@
+.conversation-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.conversation-controls {
+  padding: 16px 22px;
+  border-bottom: 1px solid #dce5df;
+}
+.conversation-controls p {
+  margin: 8px 0;
+}
+.conversation-scope {
+  margin: 12px 0 0;
+  min-width: 0;
+}
+.conversation-scope legend {
+  font-size: 13px;
+  font-weight: 600;
+}
+.conversation-scope .scope-option {
+  align-items: start;
+}
+.conversation-scope .block-id {
+  overflow-wrap: anywhere;
+}
+.conversational-panel {
+  min-width: 0;
+}
+.conversational-panel .conversation {
+  min-height: 200px;
+}
+.conversation-turn + .conversation-turn {
+  border-top: 1px solid #dce5df;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+.conversation-trace dl {
+  display: grid;
+  gap: 8px;
+}
+.conversation-trace dt {
+  font-weight: 600;
+}
+.conversation-trace dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.conversation-trace pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.conversational-panel .answer-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.conversational-panel .citation-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.conversational-panel .answer-author {
+  flex-wrap: wrap;
+}
+.workspace-mode {
+  margin-bottom: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.workspace-mode select {
+  padding: 6px;
+}
+@media (max-width: 760px) {
+  .conversation-controls {
+    padding: 14px;
+  }
+  .conversational-panel .composer-foot {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

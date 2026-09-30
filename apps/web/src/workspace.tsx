@@ -24,7 +24,8 @@ import {
 import { readAnswer } from "./stream";
 import { generationLabel, sectionPath } from "./product-facts";
 import { PdfEvidence } from "./pdf-evidence";
-import { citationForPart, citationParts } from "./citation-tokens";
+import { CitationText } from "./citation-text";
+import { ConversationPanel } from "./conversation-panel";
 
 const statuses: Record<string, string> = {
   PENDING: "已排队",
@@ -43,7 +44,11 @@ export function KnowledgeWorkspace() {
 }
 
 function Workspace({ id }: { id: string }) {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
+  const surface =
+    params.get("ask") === "single" || params.has("run")
+      ? "single"
+      : "conversation";
   const replayId = params.get("run") ?? "";
   const replay = useQuery({
     queryKey: ["run", replayId],
@@ -101,7 +106,7 @@ function Workspace({ id }: { id: string }) {
   useEffect(() => () => controller.current?.abort(), []);
   const evidence = useQuery({
     queryKey: ["evidence", runId, selected?.evidence_id],
-    enabled: !!selected,
+    enabled: !!selected && surface === "single",
     queryFn: async () =>
       unwrap(
         await api.GET("/v1/evidence/{evidence_id}", {
@@ -234,23 +239,14 @@ function Workspace({ id }: { id: string }) {
     }
   };
   function answerContent(value: Answer) {
-    return citationParts(value.text).map((part, i) => {
-      const citation = citationForPart(part, value.citations);
-      return citation ? (
-        <button
-          key={i}
-          className="inline-citation"
-          aria-pressed={selected?.evidence_id === citation.evidence_id}
-          title={`打开 ${citation.label} · ${citation.filename} 原文证据`}
-          onClick={() => setSelected(citation)}
-          aria-label={`查看引用 ${citation.label}`}
-        >
-          [{citation.label}]
-        </button>
-      ) : (
-        part
-      );
-    });
+    return (
+      <CitationText
+        text={value.text}
+        citations={value.citations}
+        selected={selected}
+        onSelect={setSelected}
+      />
+    );
   }
   return (
     <section className="workspace">
@@ -272,8 +268,25 @@ function Workspace({ id }: { id: string }) {
         <span>02 引用 / Evidence</span>
         <span>→</span>
         <span>03 PDF 原文</span>
-        {runId && <Link to={`/runs/${runId}`}>运行记录 / Trace ↗</Link>}
+        {surface === "single" && runId && (
+          <Link to={`/runs/${runId}`}>运行记录 / Trace ↗</Link>
+        )}
       </div>
+      <label className="workspace-mode">
+        问答方式
+        <select
+          aria-label="问答方式"
+          value={surface}
+          disabled={busy}
+          onChange={(event) => {
+            setSelected(null);
+            setParams({ ask: event.target.value });
+          }}
+        >
+          <option value="conversation">会话 · 多轮证据问答</option>
+          <option value="single">单轮 · 现有 Ask</option>
+        </select>
+      </label>
       {(kb.error || docs.error) && (
         <p className="error" role="alert">
           {message(kb.error || docs.error)}
@@ -359,279 +372,288 @@ function Workspace({ id }: { id: string }) {
             </p>
           )}
         </aside>
-        <div className="chat-panel">
-          <div className="section-heading">
-            <h3>
-              <Search size={15} /> 证据问答
-            </h3>
-            <span>{asked ? "固定来源版本" : "就绪 / idle"}</span>
-          </div>
-          <details className="query-settings">
-            <summary>
-              下一次提问设置 ·{" "}
-              {profile === "telecom-structural-v1" ? "结构感知" : "兼容路径"}
-            </summary>
-            <div className="query-options">
-              <label>
-                下一次提问 · 检索路径
-                <select
-                  aria-label="检索路径"
-                  disabled={busy}
-                  value={profile}
-                  onChange={(e) => {
-                    setProfile(e.target.value as typeof profile);
-                    setScope([]);
-                  }}
-                >
-                  <option value="m3-context">兼容路径 · Legacy</option>
-                  <option value="telecom-structural-v1">
-                    结构感知 · Telecom
-                  </option>
-                </select>
-              </label>
-              {profile === "telecom-structural-v1" && (
+        {surface === "conversation" ? (
+          <ConversationPanel
+            kbId={id}
+            docs={docs.data ?? []}
+            selected={selected}
+            onSelect={setSelected}
+          />
+        ) : (
+          <div className="chat-panel">
+            <div className="section-heading">
+              <h3>
+                <Search size={15} /> 证据问答
+              </h3>
+              <span>{asked ? "固定来源版本" : "就绪 / idle"}</span>
+            </div>
+            <details className="query-settings">
+              <summary>
+                下一次提问设置 ·{" "}
+                {profile === "telecom-structural-v1" ? "结构感知" : "兼容路径"}
+              </summary>
+              <div className="query-options">
+                <label>
+                  下一次提问 · 检索路径
+                  <select
+                    aria-label="检索路径"
+                    disabled={busy}
+                    value={profile}
+                    onChange={(e) => {
+                      setProfile(e.target.value as typeof profile);
+                      setScope([]);
+                    }}
+                  >
+                    <option value="m3-context">兼容路径 · Legacy</option>
+                    <option value="telecom-structural-v1">
+                      结构感知 · Telecom
+                    </option>
+                  </select>
+                </label>
+                {profile === "telecom-structural-v1" && (
+                  <>
+                    <label>
+                      来源模式
+                      <select
+                        aria-label="来源模式"
+                        disabled={busy}
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value as typeof mode)}
+                      >
+                        <option value="auto">自动</option>
+                        <option value="single">单来源</option>
+                        <option value="compare">跨来源比较</option>
+                      </select>
+                    </label>
+                    <details>
+                      <summary>
+                        文档范围 ·{" "}
+                        {scope.length ? `${scope.length} 份` : "全部可用文档"}
+                      </summary>
+                      {docs.data
+                        ?.filter((d) => d.active_version_id)
+                        .map((d) => (
+                          <label className="scope-option" key={d.id}>
+                            <input
+                              type="checkbox"
+                              disabled={busy}
+                              checked={scope.includes(d.id)}
+                              onChange={(e) =>
+                                setScope(
+                                  e.target.checked
+                                    ? [...scope, d.id]
+                                    : scope.filter((x) => x !== d.id),
+                                )
+                              }
+                            />
+                            {d.title}
+                          </label>
+                        ))}
+                    </details>
+                  </>
+                )}
+              </div>
+            </details>
+            <div className="conversation">
+              {!asked && (
+                <div className="chat-empty">
+                  <span className="quote-emblem">
+                    <Quote size={30} />
+                  </span>
+                  <p className="eyebrow">ASK. TRACE. VERIFY.</p>
+                  <h2>你想从文档中找到什么？</h2>
+                  <p>提出一个具体问题。回答生成后，点击引用即可回到原 PDF。</p>
+                  <button
+                    className="suggestion"
+                    onClick={() =>
+                      setQuestion(
+                        "湖畔观测站的温度传感器多久采样一次，原始数据保留多久？",
+                      )
+                    }
+                  >
+                    示例：采样频率和数据保留时间是什么？ <ArrowUp size={15} />
+                  </button>
+                </div>
+              )}
+              {asked && (
                 <>
-                  <label>
-                    来源模式
-                    <select
-                      aria-label="来源模式"
-                      disabled={busy}
-                      value={mode}
-                      onChange={(e) => setMode(e.target.value as typeof mode)}
-                    >
-                      <option value="auto">自动</option>
-                      <option value="single">单来源</option>
-                      <option value="compare">跨来源比较</option>
-                    </select>
-                  </label>
-                  <details>
-                    <summary>
-                      文档范围 ·{" "}
-                      {scope.length ? `${scope.length} 份` : "全部可用文档"}
-                    </summary>
-                    {docs.data
-                      ?.filter((d) => d.active_version_id)
-                      .map((d) => (
-                        <label className="scope-option" key={d.id}>
-                          <input
-                            type="checkbox"
-                            disabled={busy}
-                            checked={scope.includes(d.id)}
-                            onChange={(e) =>
-                              setScope(
-                                e.target.checked
-                                  ? [...scope, d.id]
-                                  : scope.filter((x) => x !== d.id),
-                              )
-                            }
-                          />
-                          {d.title}
-                        </label>
-                      ))}
-                  </details>
+                  <div className="question-bubble">{asked}</div>
+                  <div className="answer-block">
+                    <div className="answer-author">
+                      <span className="mini-logo">C</span>
+                      <strong>CiteWeave</strong>
+                      <span>
+                        {busy
+                          ? stage
+                          : answer
+                            ? answer.citations.length
+                              ? "最终答案 / final"
+                              : "证据不足 / insufficient evidence"
+                            : error?.includes("停止")
+                              ? "已取消 / cancelled"
+                              : "失败 / failed"}
+                      </span>
+                    </div>
+                    {replay.data && !liveAsked && (
+                      <p className="replay-notice">历史回答 · 原始运行记录</p>
+                    )}
+                    {trace.data?.evidence_pack?.degraded && (
+                      <p className="warning-banner">
+                        降级检索 · BGE 不可用，使用 RRF 种子。
+                      </p>
+                    )}
+                    {trace.data?.evidence_pack?.source_coverage
+                      .coverage_unmet && (
+                      <p className="warning-banner">
+                        来源缺口 · 部分请求来源未进入答案上下文。
+                      </p>
+                    )}
+                    {busy && (
+                      <p className="draft-label">
+                        <LoaderCircle size={13} className="spin" />
+                        临时草稿 · provisional · 引用将在完成时校验
+                      </p>
+                    )}
+                    <div className="answer-text">
+                      {answer
+                        ? answerContent(answer)
+                        : draft || (busy ? "正在查找可用证据…" : "")}
+                    </div>
+                    {error && (
+                      <p className="error" role="alert">
+                        {error}
+                      </p>
+                    )}
+                    {answer && (
+                      <>
+                        <div className="verified-label">
+                          <Check size={13} />{" "}
+                          {answer.citations.length
+                            ? "引用与原文片段一致"
+                            : "未提供可引用答案"}{" "}
+                          <span>· 不代表语义支持已自动验证</span>
+                        </div>
+                        <div className="citation-cards">
+                          {answer.citations.map((c) => (
+                            <button
+                              key={c.evidence_id}
+                              className={
+                                selected?.evidence_id === c.evidence_id
+                                  ? "citation-card selected"
+                                  : "citation-card"
+                              }
+                              onClick={() => setSelected(c)}
+                            >
+                              <span className="citation-index">{c.label}</span>
+                              <div>
+                                <strong>{c.filename}</strong>
+                                <p>{c.span.quote}</p>
+                                <small>
+                                  第 {c.span.boxes[0].page_index + 1} 页 ·
+                                  查看原文 ↗
+                                </small>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    {trace.data && (
+                      <details className="trace">
+                        <summary>开发者记录 · {trace.data.status}</summary>
+                        <p>{generationLabel(trace.data)}</p>
+                        <p>
+                          估算 ¥{answer?.estimated_yuan?.toFixed(6) ?? "不可用"}{" "}
+                          · 实际扣费不可用
+                        </p>
+                        <Link className="ops-link" to={`/runs/${runId}`}>
+                          打开完整 Run Inspector →
+                        </Link>
+                        <p>Run {runId}</p>
+                        <p>
+                          固定 {trace.data.versions.length} 个文档版本；
+                          {trace.data.candidates.length} 个检索候选。
+                        </p>
+                        <pre>
+                          {JSON.stringify(
+                            trace.data.candidates.map((c) => ({
+                              id: c.candidate_id,
+                              retrieval: c.retrieval,
+                              rrf: c.rrf_score,
+                              reranker: c.reranker_score,
+                              evidence_rank: c.final_evidence_rank,
+                            })),
+                            null,
+                            2,
+                          )}
+                        </pre>
+                      </details>
+                    )}
+                  </div>
                 </>
               )}
             </div>
-          </details>
-          <div className="conversation">
-            {!asked && (
-              <div className="chat-empty">
-                <span className="quote-emblem">
-                  <Quote size={30} />
-                </span>
-                <p className="eyebrow">ASK. TRACE. VERIFY.</p>
-                <h2>你想从文档中找到什么？</h2>
-                <p>提出一个具体问题。回答生成后，点击引用即可回到原 PDF。</p>
-                <button
-                  className="suggestion"
-                  onClick={() =>
-                    setQuestion(
-                      "湖畔观测站的温度传感器多久采样一次，原始数据保留多久？",
-                    )
-                  }
-                >
-                  示例：采样频率和数据保留时间是什么？ <ArrowUp size={15} />
-                </button>
-              </div>
-            )}
-            {asked && (
-              <>
-                <div className="question-bubble">{asked}</div>
-                <div className="answer-block">
-                  <div className="answer-author">
-                    <span className="mini-logo">C</span>
-                    <strong>CiteWeave</strong>
-                    <span>
-                      {busy
-                        ? stage
-                        : answer
-                          ? answer.citations.length
-                            ? "最终答案 / final"
-                            : "证据不足 / insufficient evidence"
-                          : error?.includes("停止")
-                            ? "已取消 / cancelled"
-                            : "失败 / failed"}
-                    </span>
-                  </div>
-                  {replay.data && !liveAsked && (
-                    <p className="replay-notice">历史回答 · 原始运行记录</p>
-                  )}
-                  {trace.data?.evidence_pack?.degraded && (
-                    <p className="warning-banner">
-                      降级检索 · BGE 不可用，使用 RRF 种子。
-                    </p>
-                  )}
-                  {trace.data?.evidence_pack?.source_coverage
-                    .coverage_unmet && (
-                    <p className="warning-banner">
-                      来源缺口 · 部分请求来源未进入答案上下文。
-                    </p>
-                  )}
-                  {busy && (
-                    <p className="draft-label">
-                      <LoaderCircle size={13} className="spin" />
-                      临时草稿 · provisional · 引用将在完成时校验
-                    </p>
-                  )}
-                  <div className="answer-text">
-                    {answer
-                      ? answerContent(answer)
-                      : draft || (busy ? "正在查找可用证据…" : "")}
-                  </div>
-                  {error && (
-                    <p className="error" role="alert">
-                      {error}
-                    </p>
-                  )}
-                  {answer && (
-                    <>
-                      <div className="verified-label">
-                        <Check size={13} />{" "}
-                        {answer.citations.length
-                          ? "引用与原文片段一致"
-                          : "未提供可引用答案"}{" "}
-                        <span>· 不代表语义支持已自动验证</span>
-                      </div>
-                      <div className="citation-cards">
-                        {answer.citations.map((c) => (
-                          <button
-                            key={c.evidence_id}
-                            className={
-                              selected?.evidence_id === c.evidence_id
-                                ? "citation-card selected"
-                                : "citation-card"
-                            }
-                            onClick={() => setSelected(c)}
-                          >
-                            <span className="citation-index">{c.label}</span>
-                            <div>
-                              <strong>{c.filename}</strong>
-                              <p>{c.span.quote}</p>
-                              <small>
-                                第 {c.span.boxes[0].page_index + 1} 页 ·
-                                查看原文 ↗
-                              </small>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                  {trace.data && (
-                    <details className="trace">
-                      <summary>开发者记录 · {trace.data.status}</summary>
-                      <p>{generationLabel(trace.data)}</p>
-                      <p>
-                        估算 ¥{answer?.estimated_yuan?.toFixed(6) ?? "不可用"} ·
-                        实际扣费不可用
-                      </p>
-                      <Link className="ops-link" to={`/runs/${runId}`}>
-                        打开完整 Run Inspector →
-                      </Link>
-                      <p>Run {runId}</p>
-                      <p>
-                        固定 {trace.data.versions.length} 个文档版本；
-                        {trace.data.candidates.length} 个检索候选。
-                      </p>
-                      <pre>
-                        {JSON.stringify(
-                          trace.data.candidates.map((c) => ({
-                            id: c.candidate_id,
-                            retrieval: c.retrieval,
-                            rrf: c.rrf_score,
-                            reranker: c.reranker_score,
-                            evidence_rank: c.final_evidence_rank,
-                          })),
-                          null,
-                          2,
-                        )}
-                      </pre>
-                    </details>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-          <form
-            className="composer"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void ask();
-            }}
-          >
-            <label className="sr-only" htmlFor="question">
-              输入问题
-            </label>
-            <textarea
-              id="question"
-              placeholder={
-                ready
-                  ? "输入一个关于文档的问题…"
-                  : "上传并等待文档处理完成后，即可提问…"
-              }
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              maxLength={profile === "telecom-structural-v1" ? 512 : 160}
-              rows={2}
-              disabled={!ready || busy}
-              onKeyDown={(e) => {
-                if (
-                  e.key === "Enter" &&
-                  !e.shiftKey &&
-                  !e.nativeEvent.isComposing
-                ) {
-                  e.preventDefault();
-                  void ask();
-                }
+            <form
+              className="composer"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void ask();
               }}
-            />
-            <div className="composer-foot">
-              <span>
-                {question.length} /{" "}
-                {profile === "telecom-structural-v1" ? 512 : 160} · Enter 发送
-              </span>
-              {busy ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => controller.current?.abort()}
-                >
-                  停止
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  aria-label="发送问题"
-                  disabled={!ready || !question.trim()}
-                  size="icon"
-                >
-                  <ArrowUp />
-                </Button>
-              )}
-            </div>
-          </form>
-        </div>
-        {selected && (
+            >
+              <label className="sr-only" htmlFor="question">
+                输入问题
+              </label>
+              <textarea
+                id="question"
+                placeholder={
+                  ready
+                    ? "输入一个关于文档的问题…"
+                    : "上传并等待文档处理完成后，即可提问…"
+                }
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                maxLength={profile === "telecom-structural-v1" ? 512 : 160}
+                rows={2}
+                disabled={!ready || busy}
+                onKeyDown={(e) => {
+                  if (
+                    e.key === "Enter" &&
+                    !e.shiftKey &&
+                    !e.nativeEvent.isComposing
+                  ) {
+                    e.preventDefault();
+                    void ask();
+                  }
+                }}
+              />
+              <div className="composer-foot">
+                <span>
+                  {question.length} /{" "}
+                  {profile === "telecom-structural-v1" ? 512 : 160} · Enter 发送
+                </span>
+                {busy ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => controller.current?.abort()}
+                  >
+                    停止
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    aria-label="发送问题"
+                    disabled={!ready || !question.trim()}
+                    size="icon"
+                  >
+                    <ArrowUp />
+                  </Button>
+                )}
+              </div>
+            </form>
+          </div>
+        )}
+        {surface === "single" && selected && (
           <aside className="evidence-panel">
             <div className="section-heading">
               <h3>

@@ -51,7 +51,21 @@ def authorization(run, purpose="generation"):
 
 
 def admit(sample):
-    return core.admit(*sample[:2], "run", sample[2], execution())
+    run = core.admit(*sample[:2], "run", sample[2], execution())
+    ledger.authorize_run(
+        sample[0],
+        run,
+        ledger.RunAuthorization(
+            id=uuid4(),
+            run_id=run.id,
+            expires_at=run.deadline,
+            max_calls=3,
+            max_input_tokens=300,
+            max_output_tokens=300,
+            max_yuan=Decimal("0.003"),
+        ),
+    )
+    return run
 
 
 def expire(run):

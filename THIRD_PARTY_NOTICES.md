@@ -29,6 +29,7 @@ MQTT 来源：**MQTT Version 5.0**, edited by Andrew Banks, Ed Briggs, Ken Borge
 | psycopg / psycopg-binary | [LGPL 条款](https://github.com/psycopg/psycopg/blob/master/LICENSE.txt)；未修改、独立安装的库，不移除替换与再链接权利 |
 | E5-small | [固定模型版本](https://huggingface.co/intfloat/multilingual-e5-small/tree/614241f622f53c4eeff9890bdc4f31cfecc418b3) 的 MIT 元数据；只下载到本地缓存 |
 | BGE reranker v2 m3 | [固定模型版本](https://huggingface.co/BAAI/bge-reranker-v2-m3/tree/953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e) 的 Apache-2.0 元数据；不分发权重 |
+| DeepSeek V4.1 offline tokenizer / text framing | [官方 recipe 固定 revision](https://github.com/deepseek-ai/deepseek-recipe/tree/8cadfede7063c896b944e7bae05daa3549ae97ea)，MIT；tokenizer notice 为 Copyright (c) 2023 DeepSeek。`fetch_provider_tokenizer.py` 校验 SHA256 并把 tokenizer 和完整 LICENSE 保存到忽略的本地缓存，不分发权重或 tokenizer。纯文本计量按官方 V4.1 protocol 实现；不声称等同实际账单 |
 | PyTorch / CUDA | PyTorch 与 NVIDIA 各自条款；锁定 wheel 不等于将全部组件授权为 MIT |
 | PDF.js | [Apache-2.0](https://github.com/mozilla/pdf.js/blob/master/LICENSE) 及字体 / wasm 附带声明；`prepare_web.py` 复制时保留 LICENSE 与资产目录 |
 | shadcn/ui | 保留 [SHADCN-LICENSE.md](apps/web/SHADCN-LICENSE.md) |

@@ -1,14 +1,18 @@
 """Additive core tables; legacy QueryRun readers and tables stay unchanged."""
 
 from datetime import datetime
+from decimal import Decimal
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    BigInteger,
     CheckConstraint,
     DateTime,
     ForeignKey,
     ForeignKeyConstraint,
     Index,
+    Integer,
+    Numeric,
     String,
     UniqueConstraint,
     func,
@@ -61,6 +65,18 @@ class ConversationTurnRow(Base):
 class ConversationRunRow(Base):
     __tablename__ = "cw5_runs"
     __table_args__ = (
+        UniqueConstraint("authorization_id", name="uq_conversation_run_authorization"),
+        CheckConstraint(
+            "(authorization_id IS NULL AND authorization_deadline IS NULL AND "
+            "authorization_max_calls IS NULL AND authorization_input_tokens IS NULL AND "
+            "authorization_output_tokens IS NULL AND authorization_yuan IS NULL) OR "
+            "(authorization_id IS NOT NULL AND authorization_deadline IS NOT NULL AND "
+            "authorization_max_calls IS NOT NULL AND authorization_max_calls >= 0 AND "
+            "authorization_input_tokens IS NOT NULL AND authorization_input_tokens >= 0 AND "
+            "authorization_output_tokens IS NOT NULL AND authorization_output_tokens >= 0 AND "
+            "authorization_yuan IS NOT NULL AND authorization_yuan >= 0)",
+            name="ck_conversation_run_authorization",
+        ),
         UniqueConstraint("conversation_id", "key"),
         UniqueConstraint("conversation_id", "turn_id", "id"),
         UniqueConstraint("retry_of"),
@@ -94,6 +110,12 @@ class ConversationRunRow(Base):
     owner: Mapped[UUID] = mapped_column()
     fence: Mapped[int] = mapped_column()
     deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    authorization_id: Mapped[UUID | None] = mapped_column()
+    authorization_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    authorization_max_calls: Mapped[int | None] = mapped_column(Integer)
+    authorization_input_tokens: Mapped[int | None] = mapped_column(BigInteger)
+    authorization_output_tokens: Mapped[int | None] = mapped_column(BigInteger)
+    authorization_yuan: Mapped[Decimal | None] = mapped_column(Numeric(12, 8))
     status: Mapped[str] = mapped_column(String(24))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

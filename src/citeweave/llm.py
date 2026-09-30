@@ -4,6 +4,7 @@ import asyncio
 import json
 import time
 from collections.abc import AsyncIterator
+from contextlib import aclosing
 from datetime import datetime, timezone
 from typing import Protocol
 
@@ -26,6 +27,17 @@ class LLMProvider(Protocol):
     def stream(self, messages: list[dict]) -> AsyncIterator[dict]: ...
 
 
+def completion_payload(messages, model, max_tokens=1024):
+    return dict(
+        model=model,
+        messages=messages,
+        thinking={"type": "disabled"},
+        max_tokens=max_tokens,
+        stream=True,
+        stream_options={"include_usage": True},
+    )
+
+
 class DeepSeekProvider:
     def __init__(self, transport=None, circuit=None):
         self.transport = transport
@@ -34,23 +46,31 @@ class DeepSeekProvider:
         self.max_attempts = None  # DurableProvider sets one actual send per ledger attempt.
 
     async def stream(self, messages):
+        async with aclosing(
+            self.stream_request(completion_payload(messages, settings().deepseek_model))
+        ) as stream:
+            async for part in stream:
+                yield part
+
+    async def stream_request(self, body, *, before_send=None):
         config = settings()
         attempts = self.max_attempts or config.provider_attempts
         key = config.deepseek_api_key.get_secret_value()
         if not key:
             raise ProviderError("llm_key_missing")
+        if before_send is not None:
+            from citeweave.provider_accounting import serialize_request, validate_request
+
+            validate_request(body)
+            if attempts != 1 or body["model"] != config.deepseek_model:
+                raise ProviderError("provider_request_identity_conflict")
+            transport_body = {"content": serialize_request(body)}
+        else:
+            transport_body = {"json": body}
         try:
             permit = await asyncio.to_thread(self.circuit.change, "acquire")
         except CircuitOpen:
             raise ProviderError("circuit_open") from None
-        body = dict(
-            model=config.deepseek_model,
-            messages=messages,
-            thinking={"type": "disabled"},
-            max_tokens=1024,
-            stream=True,
-            stream_options={"include_usage": True},
-        )
         succeeded = False
         try:
             async with httpx.AsyncClient(
@@ -72,15 +92,17 @@ class DeepSeekProvider:
                     )
                     started = False
                     try:
+                        if before_send is not None:
+                            await asyncio.to_thread(before_send)
                         async with client.stream(
                             "POST",
                             "https://api.deepseek.com/chat/completions",
-                            json=body,
+                            **transport_body,
                             timeout=httpx.Timeout(
                                 await asyncio.to_thread(network_timeout, 25),
                                 connect=min(5, await asyncio.to_thread(network_timeout, 25)),
                             ),
-                            headers={"Authorization": "Bearer " + key},
+                            headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"},
                         ) as response:
                             item["http_status"] = response.status_code
                             if response.status_code != 200:
@@ -114,6 +136,8 @@ class DeepSeekProvider:
                                 if len(raw) > 65536:
                                     raise ProviderError("llm_event_limit")
                                 value = json.loads(raw)
+                                if value.get("id") and not value.get("usage"):
+                                    yield dict(provider_id=value["id"])
                                 if value.get("usage"):
                                     usage = {
                                         k: v

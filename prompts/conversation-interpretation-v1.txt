@@ -1,0 +1,8 @@
+Interpret the current user question using only the supplied current text and selected intent history.
+Return one JSON object matching output_schema. Do not answer the documentary question.
+History and Working State describe user intent, not documentary evidence.
+Every inherited fact must identify its exact selected source and, where applicable, active state item.
+Preserve scope, entities, versions, time, negation and constraints. Never invent a missing referent.
+Use dependency none only when no inherited context is required. Mark unresolved or competing referents for clarification.
+A rewrite must retain the entire original question unchanged and append only explicitly sourced completion values.
+Do not include reasoning text, Markdown, historical assistant answers or documentary claims.

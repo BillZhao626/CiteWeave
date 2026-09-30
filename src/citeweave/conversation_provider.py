@@ -1,8 +1,8 @@
-"""Conversation adapter for the existing provider ledger. No transport/runtime wiring.
+"""Conversation provider ledger and immutable aggregate Run authorization.
 
-Each explicit authorization reserves ONE call for ONE Run/purpose. Positive
-synthetic authorizations in tests are not production spending grants. Admission
-policy, aggregate budgets and external execution remain #5c-2 responsibilities.
+No transport here. Explicit phase grants consume the Run envelope permanently;
+an absent grant authorizes zero calls/spending. Synthetic test grants are not
+production spending grants.
 """
 
 from decimal import Decimal
@@ -21,6 +21,82 @@ from citeweave.provider_phases import KNOWN_NOT_EXECUTED
 
 Hash = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 TokenCount = Annotated[StrictInt, Field(ge=0)]
+
+
+class RunAuthorization(DurableDTO):
+    id: UUID
+    run_id: UUID
+    expires_at: AwareDatetime
+    max_calls: int = Field(ge=0, le=2147483647, strict=True)
+    max_input_tokens: int = Field(ge=0, le=9223372036854775807, strict=True)
+    max_output_tokens: int = Field(ge=0, le=9223372036854775807, strict=True)
+    max_yuan: Decimal = Field(ge=0, max_digits=12, decimal_places=8, allow_inf_nan=False)
+
+
+def authorize_run(workspace, supplied, authorization: RunAuthorization):
+    grant = RunAuthorization.model_validate(authorization.model_dump())
+    if grant.run_id != supplied.id:
+        raise CoreConflict("run_authorization_identity_conflict")
+    with transaction() as db:
+        run, now = _owned(db, workspace, supplied)
+        if not now < grant.expires_at <= run.deadline:
+            raise CoreConflict("run_authorization_deadline_conflict")
+        values = dict(
+            authorization_id=grant.id,
+            authorization_deadline=grant.expires_at,
+            authorization_max_calls=grant.max_calls,
+            authorization_input_tokens=grant.max_input_tokens,
+            authorization_output_tokens=grant.max_output_tokens,
+            authorization_yuan=grant.max_yuan,
+        )
+        if run.authorization_id is not None:
+            if any(getattr(run, key) != value for key, value in values.items()):
+                raise CoreConflict("run_authorization_conflict")
+            return
+        if db.scalar(
+            select(ProviderPhaseRow.id).where(ProviderPhaseRow.conversation_run_id == run.id).limit(1)
+        ):
+            raise CoreConflict("run_authorization_after_reservation")
+        for key, value in values.items():
+            setattr(run, key, value)
+        db.flush()
+        _, now = _owned(db, workspace, supplied)
+        if grant.expires_at <= now:
+            raise CoreConflict("run_authorization_expired")
+
+
+def _aggregate(db, run, now, candidate=None):
+    if run.authorization_id is None:
+        raise CoreConflict("run_authorization_required")
+    if run.authorization_deadline <= now:
+        raise CoreConflict("run_authorization_expired")
+    rows = list(db.scalars(select(ProviderPhaseRow).where(ProviderPhaseRow.conversation_run_id == run.id)))
+    calls = len(rows) + (candidate is not None)
+    inputs = sum(p.input_tokens for p in rows) + (candidate.input_tokens if candidate else 0)
+    outputs = sum(p.output_tokens for p in rows) + (candidate.output_tokens if candidate else 0)
+    amount = sum((p.reserved_yuan for p in rows), Decimal(0)) + (
+        candidate.max_yuan if candidate else Decimal(0)
+    )
+    if (
+        calls > run.authorization_max_calls
+        or inputs > run.authorization_input_tokens
+        or outputs > run.authorization_output_tokens
+        or amount > run.authorization_yuan
+    ):
+        raise CoreConflict("run_authorization_exceeded")
+    if candidate and candidate.expires_at > run.authorization_deadline:
+        raise CoreConflict("run_authorization_deadline_conflict")
+    if any(p.authorization_deadline > run.authorization_deadline for p in rows):
+        raise CoreConflict("run_authorization_deadline_conflict")
+    if any(
+        p.usage
+        and (
+            p.usage.get("prompt_tokens", 0) > p.input_tokens
+            or p.usage.get("completion_tokens", 0) > p.output_tokens
+        )
+        for p in rows
+    ):
+        raise CoreConflict("provider_usage_exceeded_authorization")
 
 
 class CallAuthorization(DurableDTO):
@@ -125,7 +201,9 @@ def prepare(workspace, supplied, authorization: CallAuthorization):
         if row:
             if any(getattr(row, k) != v for k, v in values.items()):
                 raise CoreConflict("provider_authorization_conflict")
+            _aggregate(db, run, now)
             return row  # Read receipt only; dispatch separately rejects every non-PREPARED state.
+        _aggregate(db, run, now, grant)
         if unresolved(db, run.id):
             raise CoreConflict("provider_outcome_unknown")
         row = ProviderPhaseRow(**values, reserved_at=now)
@@ -144,7 +222,9 @@ def dispatch(workspace, supplied, identity):
         if unresolved(db, run.id):
             raise CoreConflict("provider_outcome_unknown")
         row.state, row.outcome, row.dispatched_at = "DISPATCHED", "unknown", now
+        _aggregate(db, run, now)
         _flush_owned(db, workspace, supplied, row)
+        _aggregate(db, run, core._clock(db))
 
 
 def complete(workspace, supplied, identity, observation: Observation):

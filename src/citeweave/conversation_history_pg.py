@@ -1,19 +1,28 @@
-"""PostgreSQL accepted-history adapter; production scan/time admission is deferred.
+"""Accepted selector with explicit local-test or admitted-runtime authority.
 
-The explicit local L1 permit only works in UUID-named isolated test databases.
-Its finite table ceilings and 1000ms statement deadline are test resources, never
-product parameters. No provider configuration or external index is involved.
+Runtime reads bind owner/fence/head/scope/deadline, an explicit per-Conversation
+corpus ceiling and a bounded PG statement timeout. No default production limits.
+The existing isolated L1 permit and its test-only envelope remain unchanged.
 """
 
 import json
 from contextlib import contextmanager
 from typing import Literal
 
+from pydantic import Field
 from sqlalchemy import event, text
 from sqlalchemy.exc import DBAPIError
 
 from citeweave import conversations as core
-from citeweave.conversation_contract import CoreConflict, DurableDTO, WorkingState, require_head
+from citeweave.conversation_contract import (
+    Admission,
+    CoreConflict,
+    DurableDTO,
+    RunView,
+    WorkingState,
+    require_head,
+    require_owner,
+)
 from citeweave.conversation_history import (
     MAX_BYTES,
     MAX_ROWS,
@@ -31,6 +40,15 @@ class LocalHistoryRead(DurableDTO):
     """Explicit opt-in to the separately authorized synthetic L1 test envelope."""
 
     purpose: Literal["isolated_l1"] = "isolated_l1"
+
+
+class RuntimeHistoryRead(DurableDTO):
+    """Internal runtime authority; no public input or default production capacity."""
+
+    purpose: Literal["runtime"] = "runtime"
+    run: RunView
+    scan_limit: int = Field(gt=0, le=2147483646)
+    statement_ms: int = Field(gt=0, le=2147483647)
 
 
 # Metadata filtering examines the bounded test corpus in PG, not a recent Python
@@ -118,12 +136,18 @@ FROM payload
 """
 
 
-def read_history(workspace, conversation_id, query: HistoryQuery, *, permit: LocalHistoryRead | None = None):
-    if permit is None or permit.purpose != "isolated_l1":
+def read_history(
+    workspace,
+    conversation_id,
+    query: HistoryQuery,
+    *,
+    permit: LocalHistoryRead | RuntimeHistoryRead | None = None,
+):
+    if not isinstance(permit, (LocalHistoryRead, RuntimeHistoryRead)):
         return HistorySelection(head=query.expected_head, failure="history_query_disabled")
     counter = [0]
     try:
-        return _read_local_history(workspace, conversation_id, query, counter)
+        return _read_local_history(workspace, conversation_id, query, counter, permit)
     except CoreConflict as exc:
         if str(exc) != "round_trip_cap":
             raise
@@ -163,23 +187,68 @@ def _bounded_transaction(counter):
             event.remove(connection, "before_cursor_execute", count)
 
 
-def _read_local_history(workspace, conversation_id, query, counter):
+def _read_local_history(workspace, conversation_id, query, counter, permit):
     with _bounded_transaction(counter) as db:
         # Timeout applies to locks as well as subsequent reads, and resets at commit.
-        db.execute(text("SELECT set_config('statement_timeout', '1000', true)"))
-        guard = db.execute(
-            text("""
+        production = isinstance(permit, RuntimeHistoryRead)
+        if production:
+            run = permit.run
+            if run.conversation_id != conversation_id or run.expected_head != query.expected_head:
+                raise CoreConflict("history_run_identity_conflict")
+            db.execute(
+                text("""SELECT set_config('statement_timeout',
+                greatest(1, least(:ms, floor(extract(epoch FROM (:deadline - clock_timestamp()))*1000)::bigint))::text, true),
+                set_config('enable_seqscan','off',true)"""),
+                {"ms": permit.statement_ms, "deadline": run.deadline},
+            )
+        else:
+            db.execute(text("SELECT set_config('statement_timeout', '1000', true)"))
+        if not production:
+            guard = db.execute(
+                text("""
             SELECT current_database() ~ '^cw_conversation_test_[0-9a-f]{32}$',
               (SELECT count(*) FROM (SELECT 1 FROM cw5_acceptances LIMIT 513) a),
               (SELECT count(*) FROM (SELECT 1 FROM cw5_turns LIMIT 513) t),
               (SELECT count(*) FROM (SELECT 1 FROM cw5_runs LIMIT 1025) r)
         """)
-        ).one()
-        if not guard[0] or guard[1] > 512 or guard[2] > 512 or guard[3] > 1024:
-            return HistorySelection(head=query.expected_head, failure="local_scan_envelope_exceeded")
+            ).one()
+            if not guard[0] or guard[1] > 512 or guard[2] > 512 or guard[3] > 1024:
+                return HistorySelection(head=query.expected_head, failure="local_scan_envelope_exceeded")
         conversation = core._conversation(db, workspace, conversation_id)
         require_head(conversation.head_id, query.expected_head)
         core._scope(db, workspace, query.scope, current=True)
+        if production:
+            row = (
+                db.execute(
+                    text("""SELECT r.*, t.request, t.expected_head, clock_timestamp() AS now,
+                (SELECT count(*) FROM (SELECT 1 FROM cw5_acceptances
+                  WHERE conversation_id=:conversation LIMIT :sentinel) c) AS corpus_count
+                FROM cw5_runs r JOIN cw5_turns t ON t.id=r.turn_id
+                WHERE r.id=:run AND r.conversation_id=:conversation"""),
+                    {"conversation": conversation_id, "run": run.id, "sentinel": permit.scan_limit + 1},
+                )
+                .mappings()
+                .one()
+            )
+            require_owner(
+                row["status"],
+                row["owner"],
+                row["fence"],
+                run.owner,
+                run.fence,
+                conversation.fence,
+                row["deadline"],
+                row["now"],
+            )
+            if (
+                row["turn_id"] != run.turn_id
+                or row["deadline"] != run.deadline
+                or row["expected_head"] != query.expected_head
+                or Admission.model_validate(row["request"]).scope != query.scope
+            ):
+                raise CoreConflict("history_run_identity_conflict")
+            if row["corpus_count"] > permit.scan_limit:
+                return HistorySelection(head=query.expected_head, failure="history_scan_envelope_exceeded")
         # 1 deadline + 1 finite-scan guard + 1 conversation + 2 authorization + 1 history = 6 trips.
         result = db.execute(
             text(HISTORY_SQL),

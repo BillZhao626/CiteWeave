@@ -42,6 +42,24 @@ flowchart LR
 
 ## 实现入口
 
+### 当前任务：#5c-2 单次授权真实 smoke 已通过，待 Human Implementation Review
+
+accepted baseline 为 `01858bf`（PR #14）。此前累计授权存储阻塞已由 Human Review 显式批准的一次 additive `0011` 迁移解决。下方 #1–#5c-1 节是历史增量记录；当前状态以本节和 [HANDOFF](../HANDOFF.md) 为准。
+
+`cw5_runs` 保存不可变的授权身份、到期时间、calls/input/output/CNY 总上限；无授权为零权限，旧数据不回填授权。ProviderPhase 继续作为唯一调用账本，不复制生命周期。prepare 与 dispatch 均在 Conversation 锁内检查累计占用及 owner/fence/head/scope/DB deadline；UNKNOWN 保留占用，usage 超额阻止继续调用。详见 [ADR 0011 扩展](adr/0011-conversation-provider-ledger.md#5c-2-approved-aggregate-authorization-extension)。
+
+默认仍为 unavailable/fail-closed。显式服务器配置 `CW_CONVERSATION_RUNTIME_POLICY` 指向 RuntimePolicy JSON，`CW_CONVERSATION_TOKENIZER` 指向 hash 校验的官方离线 tokenizer。policy 绑定 workspace/Conversation/Admission、绝对 Run/授权期限、总限额、各 phase 限额、history scan/statement 和 context bytes；没有默认正数生产预算，没有 public grant API，也未安装 live policy。需要本地模型授权与已有网关配置。所有配置缺失、身份不符或过期均不得派发。
+
+ProductionRuntime 连接 Public Turn → durable admission → 有界 PG History/State → guarded Interpretation → 原 StructuralEvidenceRetriever → Context/EvidencePack → 原 DeepSeekProvider → citation validation → atomic Acceptance。RuntimeHistoryRead 以显式 scan/statement 上限、PG 时间、scope/head/fence 检查准入，保持既有 Recent A/Relevant B、State 和 correction-chain 选择语义。semantic HistoryQuery 仍是服务器显式输入；没有新增启发式信号抽取。Interpretation 使用模型结构化结果或绑定准确请求的 reviewed draft，再走既有守卫；CLARIFY bypass 不派发生成为答案。首烟测选择 reviewed USE_ORIGINAL，并非自动识别所有自包含问题。
+
+请求只有受支持的 system/user 纯文本形态。`provider_accounting.py` 用固定官方 V4.1 tokenizer/framing 计量完整消息，拒绝特殊 token literal 和未支持 controls；对实际发送的序列化字节求 hash，峰值 cache-miss 成本由 `costs.py` 计算。E5/BGE 数不是计费数，离线计量不是 provider usage。gateway 复用原 transport，在 HTTP 前提交 DISPATCHED；此路径 max_attempts=1。超时/丢失结果保持 UNKNOWN；实际 usage/request ID/result hash 保留，Acceptance 是唯一有效答案，没有新付费自动重试。
+
+最终离线后端 359、前端 41；真实隔离 PostgreSQL/Qdrant 合并 146；Chromium 3 通过，详细命令/重叠计数见 HANDOFF。REAL_QDRANT VERIFIED 仅覆盖原创合成 fixture + 真实本地 E5/BGE，不证明生产数据或语义质量。应用数据库未升级。公开 API 及 retrieval/ranking/EvidencePack 语义不变；仅内部授权 schema/接线扩展。Owner 已确认 CNY 并授权的单次真实 generation 已完成：provider generation = 1，Interpretation/Judge = 0，retry = 0；DEV/HARD/REG NOT_RUN；#5d NOT_STARTED；v0.2a NOT_COMPLETE。该单次授权已消耗，后续调用仍须另行授权。
+
+当前发布状态：**Production Runtime real smoke VERIFIED**；real provider generation: **1 call**；usage: **306 input / 11 output / 317 total**；**finish_reason=stop**；estimated non-peak cost under pinned rate: **0.00035000 CNY**；**actual provider billing amount NOT independently verified**。Citation and atomic Acceptance succeeded；no retry / Interpretation / Judge call；**REAL_QDRANT VERIFIED；semantic quality evaluation still NOT_RUN；DEV/HARD/REG NOT_RUN；#5d NOT_STARTED；v0.2a NOT_COMPLETE**。Human Review 已接受本次接线烟测，当前仅发布一个实现 commit/PR 供代码审阅，不扩大运行授权。
+
+真实 smoke 保持原请求 hash、306-token 离线输入计量、1024 输出硬上限与 0.008804 CNY 最大预留；provider 实报输入 306、输出 11、总计 317、cache hit 0 / miss 306，finish reason stop。按固定 revision 的非高峰价格精确估计 0.00035000 CNY，未声称拿到实际扣款。既有 ProviderPhase 持久化 COMPLETED/known、request ID/usage/cost/result hash/timestamps；既有 ProviderEvent 记录烟测 finish reason。Citation 校验及原子 Acceptance 成功，head 仅前进一次，Acceptance 将 Conversation fence 从 1 增至 2；完成在绝对期限前，无 stale/late writeback。真实隔离 PG 的独立读回已通过。只证明接线，不证明语义质量。持久烟测数据库保留供审阅；请求、账本身份、时刻及局限见 [HANDOFF](../HANDOFF.md)。本次执行无需产品代码修复，也没有重跑无关广泛测试。
+
 ### 当前增量：#5c-1 Durable Provider Ledger / Recovery
 
 在 accepted main `3502981`（#5b）上，Product Owner 单独批准的 #5c-1 只实现 provider 账本与恢复基础设施；Human Implementation Review pending。此前各节描述对应增量当时的边界，本节为当前计量/恢复状态。**#5c-2 runtime 接线与 #5d 均 NOT_STARTED；默认生产 runtime 不可用，production history 仍 fail-closed。**

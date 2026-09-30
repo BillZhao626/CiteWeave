@@ -20,13 +20,19 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from citeweave import catalog, schemas
 from citeweave.blobs import LocalBlobStore
+from citeweave.conversation_api import ConversationalRuntime
+from citeweave.conversation_contract import CoreConflict
 from citeweave.db import migrate, transaction
 from citeweave.domain import DocumentRow, IngestionJobRow, KnowledgeBaseRow, QueryRunRow, VersionRow
 from citeweave.settings import settings
 
 
 def create_app(
-    admin_token: str | None = None, workspace_id: UUID | None = None, lab_root: Path | None = None
+    admin_token: str | None = None,
+    workspace_id: UUID | None = None,
+    lab_root: Path | None = None,
+    *,
+    conversation_runtime: ConversationalRuntime | None = None,
 ):
     admin_token = admin_token or settings().admin_token.get_secret_value()
     workspace_id = workspace_id or settings().workspace_id
@@ -96,6 +102,10 @@ def create_app(
     @app.exception_handler(RequestValidationError)
     async def validation_error(request, exc):
         return error(request, "validation_error", 422)
+
+    @app.exception_handler(CoreConflict)
+    async def conversation_conflict(request, exc):
+        return error(request, str(exc), 409)
 
     @app.exception_handler(SQLAlchemyError)
     async def database_error(request, exc):
@@ -298,6 +308,10 @@ def create_app(
     from citeweave.inspection import mount as mount_inspection
 
     mount_inspection(app, principal)
+
+    from citeweave.conversation_api import mount as mount_conversations
+
+    mount_conversations(app, principal, conversation_runtime)
 
     if lab_root:
         from citeweave.lab import install_lab

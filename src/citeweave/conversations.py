@@ -5,6 +5,7 @@ the monotonically increasing Conversation fence invalidates old owners. Each pub
 function owns its short transaction and returns detached, validated durable DTOs.
 """
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
@@ -180,17 +181,33 @@ def _new_run(db, conversation, turn, key, digest, execution, retry_of=None):
 
 
 def admit(workspace: UUID, conversation_id: UUID, key: str, body: Admission, execution: Execution) -> RunView:
+    return admit_once(workspace, conversation_id, key, body, lambda: execution)[0]
+
+
+def admit_once(
+    workspace: UUID,
+    conversation_id: UUID,
+    key: str,
+    body: Admission,
+    execution_factory: Callable[[], Execution],
+) -> tuple[RunView, bool]:
+    """Core admission receipt: replay never creates or dispatches another attempt.
+
+    The server-only factory supplies ownership/deadline after authorization and
+    conflict checks. It must be local and side-effect free (no external work).
+    """
     key = Operation(key=key).key
     with transaction() as db:
         conversation = _conversation(db, workspace, conversation_id)
         _scope(db, workspace, body.scope)
         existing = _replay(db, conversation_id, key, fingerprint(body))
         if existing:
-            return _run_view(existing, _turn(db, conversation_id, existing.turn_id))
+            return _run_view(existing, _turn(db, conversation_id, existing.turn_id)), False
         require_head(conversation.head_id, body.expected_head)
         if _active(db, conversation_id):
             raise CoreConflict("conversation_busy")
         _scope(db, workspace, body.scope, current=True)
+        execution = execution_factory()
         turn = Turn(
             id=uuid4(),
             conversation_id=conversation_id,
@@ -199,7 +216,7 @@ def admit(workspace: UUID, conversation_id: UUID, key: str, body: Admission, exe
         )
         db.add(turn)
         db.flush()
-        return _new_run(db, conversation, turn, key, fingerprint(body), execution)
+        return _new_run(db, conversation, turn, key, fingerprint(body), execution), True
 
 
 def retry(workspace, conversation_id, turn_id, prior_run_id, key, execution: Execution) -> RunView:
@@ -439,9 +456,17 @@ def read_conversation(workspace, conversation_id) -> ConversationView:
 
 def read_run(workspace, conversation_id, key: str) -> Readback:
     key = Operation(key=key).key
+    return _read_run(workspace, conversation_id, Run.key == key)
+
+
+def read_run_id(workspace: UUID, conversation_id: UUID, run_id: UUID) -> Readback:
+    return _read_run(workspace, conversation_id, Run.id == run_id)
+
+
+def _read_run(workspace, conversation_id, identity) -> Readback:
     with transaction() as db:
         conversation = _conversation(db, workspace, conversation_id)
-        run = db.scalar(select(Run).where(Run.conversation_id == conversation_id, Run.key == key))
+        run = db.scalar(select(Run).where(Run.conversation_id == conversation_id, identity))
         if run is None:
             raise HTTPException(404, "conversation_run_not_found")
         turn = _turn(db, conversation_id, run.turn_id)

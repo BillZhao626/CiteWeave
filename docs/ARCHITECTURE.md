@@ -44,7 +44,7 @@ flowchart LR
 
 ### v0.2a 内部 Conversation Core（Implementation #1）
 
-独立授权的持久核心已实现，尚未接入公开 API/UI 或模型执行。PostgreSQL `cw5_conversations / cw5_turns / cw5_runs / cw5_acceptances` 保存会话、不可变原始请求、相关执行尝试和不可变接受记录；v0.1 QueryRun、单轮问答、摄取和证据 reader 不改变。
+独立授权的持久核心已实现；公开 API 接线见 Implementation #5a，React 会话 UI 与真实模型执行未实现。PostgreSQL `cw5_conversations / cw5_turns / cw5_runs / cw5_acceptances` 保存会话、不可变原始请求、相关执行尝试和不可变接受记录；v0.1 QueryRun、单轮问答、摄取和证据 reader 不改变。
 
 `conversations.py` 在短事务中锁定 Conversation，检查 workspace/显式 KB 与版本范围、幂等 fingerprint、expected head 和单活动执行。部分唯一索引限制活动 Run；单调 fence、owner 和显式 deadline 阻止迟到接受。同 key 同请求读回原身份，异内容冲突；独立请求 busy/head conflict，不排队或 rebase。显式 retry 保留原 Turn、产生新 Run；UNKNOWN 不重发。
 
@@ -74,7 +74,7 @@ Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不�
 
 复用 `ResolvedConversationDelta` 与现有 reducer。shift 停用旧上下文，return 重验旧来源并停用无关活跃条目；v2 delta 的可选 `topic_relation` 标记区分上下文停用与用户纠正，旧记录缺省为 None。混合 correction + shift/return 草稿明确拒绝，避免将纠正标为可恢复停用。未增加迁移/表/依赖或改变 A/B 选择；旧 v1/v2 可读。澄清仅生成 unresolved ambiguity state，丢弃猜测的 resolved mutations；后续结构化回复可清除歧义。
 
-`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；解释层自身不执行 Evidence RAG；其后接线及 documentary answer 接受见 Implementation #4。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace、模型计量与公开 UI/API 未实现；Context Assembler 见 Implementation #4。
+`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；解释层自身不执行 Evidence RAG；其后接线及 documentary answer 接受见 Implementation #4。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace 与模型计量未实现；Context Assembler 见 Implementation #4，公开 API 的有限持久字段投影见 #5a，React 会话 UI 未实现。
 
 ### v0.2a Context Assembler / Evidence RAG（Implementation #4）
 
@@ -86,7 +86,33 @@ Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不�
 
 `DocumentaryResult` 在现有 acceptance JSON 内保留 Answer/Citation、结构 snapshot、完整 pack 和最小 Trace 身份；无迁移、新表或旧记录改写。提交事务重验来源内容/ACCEPTED Run、scope/版本/document、不可变 build/atom/lineage、pack 文本/标签、当前 Run 和引用身份，再用既有 reducer、head/owner/fence/deadline 检查原子发布 result/state/head/终态 Run/slot。返回 receipt 丢失通过既有 readback 恢复，不自动执行或重试。失败不发布，显式 finish/reconciliation 负责终态处理。
 
-验证标签 `CURRENT_PACK_PHYSICAL_ONLY` 明确只证明引用身份和物理解析，不证明自然语言语义支持。离线、真实隔离 PG + fake retrieval adapters 的实际结果见 HANDOFF；真实 Qdrant、模型答案质量和生产会话能力未验证。完整 Trace/public API/UI、provider accounting/admission 属于后续另行授权；Implementation #5 NOT_STARTED，v0.2a NOT_COMPLETE。
+验证标签 `CURRENT_PACK_PHYSICAL_ONLY` 明确只证明引用身份和物理解析，不证明自然语言语义支持。离线、真实隔离 PG + fake retrieval adapters 的实际结果见 HANDOFF；真实 Qdrant、模型答案质量和生产会话能力未验证。另行授权的公开 API 与持久 Trace 投影见 #5a；完整 Trace 重建、UI、provider accounting/admission 仍待后续授权，v0.2a NOT_COMPLETE。
+
+### v0.2a Public Conversational API / Durable Trace（Implementation #5a）
+
+`conversation_api.py` 复用现有 `/v1`、Bearer/session workspace 授权、错误 envelope 和 no-store 响应；`conversation_public.py` 只定义版本化 allowlist 投影，不另建会话真相。Pydantic/OpenAPI 是类型来源，`contracts/openapi.json`、`apps/web/openapi.json` 和生成的 TypeScript 同步更新。旧路径与 schema 保持不变。无新表/迁移、React 会话组件或测试专用 HTTP endpoint。
+
+| 方法 / 路径 | 契约 |
+| --- | --- |
+| POST `/v1/conversations` | `Idempotency-Key` 创建或返回同 workspace 会话，200；无请求体 |
+| GET `/v1/conversations/{conversation_id}` | 当前 head、active Turn/Run 身份；不包含历史内容 |
+| POST `/v1/conversations/{conversation_id}/turns` | `Idempotency-Key` + `{question, scope: {kb_id, version_ids}, expected_head}`；expected_head 必填，初始为 null；返回稳定 Conversation/Turn/Run 身份与状态 |
+| GET `/v1/conversations/{conversation_id}/runs/{run_id}` | 该 Run 的持久状态及其 accepted bundle（如有）；不触发执行 |
+| GET `…/runs/{run_id}/result` | 该 Run 已原子接受的结果；尚无结果返回 409 `conversation_result_unavailable` |
+| GET `…/runs/{run_id}/trace` | `conversation-trace-v1`，已持久化的结构化身份/结果描述 |
+| GET `…/runs/{run_id}/events` | `text/event-stream`，有限 durable snapshot，不订阅未来阶段 |
+
+Turn DTO 直接转换为 Core Admission，复用原 scope 规范化与 fingerprint；不清理/截断原问。Core `admit_once` 在既有事务内区分首次准入/幂等重放，相同 key+请求返回原身份，改变请求、过期 head 或第二活动 Turn 为 409；授权/scope/跨会话访问按既有 404 边界处理。新的 `read_run_id` 复用原授权读回事务；不新增 route 层并发规则。服务器执行 owner/deadline 不接受客户端输入。
+
+默认 `UnavailableRuntime` 对新授权提交返回 503 `conversation_runtime_unavailable`，事务不创建 Turn/Run；生产 history query 仍 DEFERRED/fail-closed。显式注入的 provider-neutral runtime 只有 `prepare`（锁内本地、无副作用的执行身份/期限供应）与 `execute`（准入 commit 后调用现有执行/接受边界），没有默认模型、token/time/cost 假设或后台工作架构。测试使用隔离 L1 的确定性 runtime。运行时只有新准入调用一次；重放即使默认 runtime 不可用也可恢复原身份，不重执行。Pending 为 202，终态读回为 200。执行异常返回去敏 503 `conversation_runtime_outcome_unavailable`，不推断 FAILED/UNKNOWN、不自动重发：重放 key/Run readback 恢复 durable truth；现有显式 finish/reconciliation 负责失联后的 lifecycle。
+
+结果为 `conversation-result-v1` discriminated union：clarification、evidence_insufficient、documentary_answer。文档答案只输出当前 accepted text、已有 Citation（exact span、版本、PDF locator/content URL）与 snapshot 中 document/version 绑定；不输出内部 Answer 的 prompt/usage/provider 信息。failed/old attempt 即使同一 Turn 后续 retry 成功，也不将后者标为前者的结果；head 与 attempt 是不同身份。
+
+Trace 公开原问、scope、Conversation/Turn/Run/retry、输入 head、accepted/output-state bundle ID、状态和已存时间；documentary bundle 额外公开已存解释 mode/hash/selected query、History SourceRef、输入 state item ID、retrieval profile、document/version、pack hash、Evidence/Citation 身份与物理验证结果。无历史原文、state 值、隐藏思维链、私有 prompt、原始 provider payload、凭据或另一个 workspace 的内容。所有字段从已授权 durable readback 投影，不重新解释/检索。控制 bundle 的解释/检索字段为 null（`metadata_availability=control_bundle`）；未接受为 `no_accepted_bundle`。这些缺失并不表示没有尝试过该阶段。失败类别/完整解释输入/阶段计量未持久化则不补造，不为有限 Trace 改 schema。`CURRENT_PACK_PHYSICAL_ONLY` 不证明 semantic entailment，`semantic_support=NOT_ASSESSED`。
+
+SSE 复用 `data: <JSON>\n\n`，`conversation-event-v1` 封装 lifecycle（Run snapshot）和存在时的 result（accepted bundle）。一次 GET 读取同一授权快照，发出一或两条事件后关闭；无 provisional draft、订阅/重放日志或 Last-Event-ID 保证。断线不取消执行；用 Run/result 或再次 GET events 重连读回。PG commit 前没有 final/partial documentary Trace 可见，HTTP reader 沿用 Core 锁得到一致结果。
+
+实际隔离 PG、API、v0.1/#1–#4 回归与生成类型检查见 [HANDOFF](../HANDOFF.md)。**provider/model/Judge calls = 0；DEV/HARD/REG NOT_RUN；REAL_QDRANT NOT_VERIFIED；React conversational UI、real provider/accounting、#5b/#5c NOT_STARTED；v0.2a NOT_COMPLETE。** 本增量不改变检索/ranking/prompt/EvidencePack/offsets，也不声称真实会话 runtime 已可用。
 
 ### 现有产品路径
 

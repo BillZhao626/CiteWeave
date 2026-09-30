@@ -109,6 +109,9 @@ class ResolvedConversationDelta(DurableDTO):
     put: tuple[StateValue, ...] = ()
     deactivate: tuple[UUID, ...] = ()
     relations: tuple[HistoryRelation, ...] = ()
+    # Optional for legacy v2 bundles. Distinguishes retiring context on a shift
+    # from an explicit user correction when an old topic is later revalidated.
+    topic_relation: Literal["continue", "shift", "return"] | None = None
 
 
 class StateEntry(DurableDTO):

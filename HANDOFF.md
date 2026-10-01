@@ -1,3 +1,13 @@
+# Current milestone — DEV campaign identity repair; paid admission rejected
+
+Status: **V02A_DEV_EXECUTION_NOT_STARTED**. [Identity repair and negative admission evidence](docs/V02_DEV_CAMPAIGN_IDENTITY_REVIEW.md), [ADR0013](docs/adr/0013-dev-campaign-execution-namespace.md). Starting accepted Observation repair be12e0797b7908cd42ba03aa53e079593db053f4 / tree3a2ae99a176edcbebe566f2696cc40a51d5562a8; Owner permits autonomous evaluation-only repairs with conditional paid execution.
+
+Optional campaign namespace at PgBackend/RealDevBackend plus launcher wiring isolates all24 cases; same-campaign recovery and FAILED/no-retry retain their guards. Shared core/schema/Gold/prompts/ranking remain unchanged. **Conditional paid eligibility FAIL**: new prefix Turn/Acceptance/State UUIDs enter production request bodies. D1.V1/A frozen1811 input tokens/hash3aa1e273… becomes1815/1824 with different hashes in final isolated counterexamples. No request/hash/reserve was re-frozen. Owner's explicit HUMAN_STOP for request/hash/token changes applies; no new HUMAN campaign, authorization, provider POST or real outputs.
+
+300 focused tests passed, zero failures/skips. Full release and exact new candidate commit/tree are recorded in ignored `.runtime/evaluation/campaign-identity-repair/`. Seven PG/Qdrant/blob/citation bindings, accepted0012 definitions, historical STOPPED/UNKNOWN evidence and application0005/28 versions verified read-only; before/after full DEV product rows preserved. Historical HUMAN campaign count1 / ACTIVE0 / ProviderPhase1. New provider/model/Judge0, usage0/0, spend0; historical unresolved exposure≤0.016110 CNY remains separate and nonzero. No #5d, push/PR/merge/tag/release or winner. A reviewed resolution of frozen wire provenance versus campaign isolation is needed before paid execution.
+
+## Previous milestone — Provider Observation remediation (subsequently accepted)
+
 # Current milestone — Provider Observation remediation (provider-free)
 
 Status: **V02A_PROVIDER_OBSERVATION_REMEDIATION_READY_FOR_HUMAN_REVIEW** · 2026-10-01. [Review packet](docs/V02_PROVIDER_OBSERVATION_REMEDIATION_REVIEW.md) records the bounded response-side repair. Shared Observation/Usage DTO and schema0012 unchanged; no provider/model/Judge/account API or positive grant this task. New candidate still requires Human review and independent paid authorization.

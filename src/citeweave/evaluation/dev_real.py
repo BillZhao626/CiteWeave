@@ -45,9 +45,14 @@ def require_dev_database():
 
 
 class RealDevBackend(PgBackend):
-    def __init__(self, data, view, config):
+    def __init__(self, data, view, config, *, campaign_id=None):
         super().__init__(
-            data, view, config, mode="REAL_DEV_FIXED_PREFIX_V1", isolation_check=require_dev_database
+            data,
+            view,
+            config,
+            mode="REAL_DEV_FIXED_PREFIX_V1",
+            isolation_check=require_dev_database,
+            campaign_id=campaign_id,
         )
 
 

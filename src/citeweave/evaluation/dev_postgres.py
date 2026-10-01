@@ -60,7 +60,16 @@ def require_isolated():
 class PgBackend(DtoBackend):
     authority = "EXISTING_POSTGRES_ADMISSION_ACCEPTANCE"
 
-    def __init__(self, data, view, config, *, mode="FIXED_PREFIX_L1", isolation_check=require_isolated):
+    def __init__(
+        self,
+        data,
+        view,
+        config,
+        *,
+        mode="FIXED_PREFIX_L1",
+        isolation_check=require_isolated,
+        campaign_id=None,
+    ):
         isolation_check()
         self.data, self.view, self.config = data, view, config
         self.mode = mode
@@ -77,6 +86,11 @@ class PgBackend(DtoBackend):
             + ":"
             + mode
         )
+        if campaign_id is not None:
+            # Stable semantic case, separately authorized execution namespace.
+            # Hashing the semantic key keeps the operation within its 128 chars.
+            campaign_id = UUID(str(campaign_id))
+            key = "dev-campaign:" + campaign_id.hex + ":" + digest({"semantic_key": key})
         self.conversation = core.create(self.workspace, key).id
         self.refs, self.raw_fetches = {}, []
         self.prefix_acceptances = {}

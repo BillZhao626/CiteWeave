@@ -250,7 +250,7 @@ def launch(policy):
                 if token["status"] == "OUTCOME_UNKNOWN":
                     raise CoreConflict("dev_campaign_unknown")
                 continue
-            backend = RealDevBackend(data, view, arm(aid))
+            backend = RealDevBackend(data, view, arm(aid), campaign_id=policy.campaign_id)
             run, result = None, None
             state_only = aid == "cp-a-v1" and view.id in {"D1.V2", "D3.V1"}
             try:

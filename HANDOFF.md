@@ -1,4 +1,18 @@
-# Current milestone — frozen DEV v3 Human Gold
+# Current milestone — Paid DEV execution readiness (provider-free)
+
+Status: **V02A_DEV_PAID_READINESS_BLOCKED** · 2026-10-01. [One authorization packet](docs/V02_DEV_PAID_EXECUTION_AUTHORIZATION.md) records frozen Gold/checkpoint, exact A/AB0 population, request specimens, rates, deadlines, real binding blockers and future Human fields. No positive authorization or paid launcher exists.
+
+Start HEAD `c905bb55489108aa118e669d576e037ba5c81ca1` / tree `b6dadc84fd530bdc7fd2a22bb453b4058669d3b3` / clean; v3, approval, all12 view hashes, pinned v1/v2 history and7 original PDF/canonical sources reverified unchanged. Only explicitly authorized readiness code/tests/docs/navigation now differ; no commit/push/PR/merge/tag/release.
+
+Paid proposal: V0/R0; A/AB0 each12 views,24 logical targets; expected36 physical calls, conditional38 under exact skip/guard, protocol48 (24 interpretation +24 generation); Judge/retry/refetch0, saved allowances not reusable. All36 full reference specimens serialized with pinned official tokenizer; input40538 tokens (not live cap), reference output4074 (not reserve). Live dynamic input/output/total-token and expected/protocol CNY ceilings remain UNKNOWN; no arbitrary reserve/margin or1024 reuse. Current authorization0 calls/0 CNY. Public official pricing freshly verified byte-identical2026-10-01; peak cache-miss2/output8 CNY/M; account CNY applicability/alias limitation still Human gate.
+
+Read-only real application PG is migration0005, exact DEV versions0/7; Qdrant HTTP200 has no DEV business bindings; local E5/BGE manifests match expected revisions but model gateway stopped. REAL_DEV_CORPUS_QDRANT NOT_VERIFIED, no fixture substitution. State-only A's existing fake artifact path cannot close a completed paid phase as FAILED (`provider_outcome_requires_unknown`); two real isolated-PG tests prove no target Acceptance. Proper evaluation-only durable settlement/campaign reservations/watchdog/cancellation and review-capacity reconciliation remain blockers. Production API/runtime/prompt/ranking/schema unchanged; #5d NOT_STARTED.
+
+Validation: backend433 passed/209 integration deselected; frontend41/5 files; lint/format220 files, generated contracts/typecheck/build passed; real UUID-isolated DEV/ledger/budget/UNKNOWN/State boundary45 passed,0 failures/skips. New12 proposal tests overlap offline count. Existing Python/Vite warnings retained; initial missing-module TDD collection failure corrected, not counted PASS. Project PG/Qdrant started for read-only metadata and own testDBs, stopped afterward; application data/collections/old stopped RAGFlow resources untouched. No sealed content accessed; DEV/HARD/REG NOT_RUN; external provider/model/Judge0/spend0.
+
+Next: review bounded reserve/dynamic-input derivation, separately prepare exact realDEV bindings and evaluation-only settlement/campaign protections, reconcile cumulative Human review capacity and account applicability; then freeze a candidate and request one explicit finite calls/tokens/CNY/model/campaign/dataset/approval authorization. Money approval alone cannot bypass technical blockers. No further execution is authorized here.
+
+## Previous milestone — frozen DEV v3 Human Gold
 
 Status: **V02A_DEV_HUMAN_GOLD_FROZEN** · 2026-10-01. Human Product Owner APPROVE, 12 LABEL units, duration NOT_MEASURED; no personal name invented.
 

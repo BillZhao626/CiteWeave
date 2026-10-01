@@ -14,6 +14,9 @@
 
 | 当前任务 | 按需阅读 |
 | --- | --- |
+| 当前：DEV v3 Human Gold APPROVED / FROZEN | [冻结记录与12个view哈希](V02_DEV_HUMAN_GOLD_FREEZE.md)、[批准的人审表](V02_DEV_DATA_REVIEW.md)、[readiness](V02_DEV_READINESS.md)：外部不可变 attestation 绑定原 v3 字节；12 LABEL 单位，分钟未测量；DEV/HARD/REG及provider/Judge仍0，付费执行未授权。v1/v2历史保留，真实DEV结果不得修改v3 |
+| 历史：DEV v3；TEST_FIRST_READY_FOR_HUMAN_FREEZE | [完整人审表](V02_DEV_DATA_REVIEW.md)、[针对性重审](V02_DEV_TEST_FIRST_AUDIT_V3.md)、[交付](V02_DEV_READINESS.md)：Owner 明确 D1.V2 return 与 pending/active State 为不同维度；其他11题不变。v2 字节及历史保留；人审未签，DEV/provider/Judge=0，无付费授权工作 |
+| 历史：DEV revision 2；HUMAN_DATA_REVIEW_REQUIRED | [HANDOFF](../HANDOFF.md)、[v2 交付与付费门禁](V02_DEV_READINESS.md)、[完整 12-view 人审表](V02_DEV_DATA_REVIEW.md)、[v1 人审历史](V02_DEV_DATA_REVIEW_V1.md)、[Owner 澄清记录](V02_DEV_READINESS_BLOCKER.md)：首次人审 REVISE；D1.V2/D3.V1 A 可用当前 State 解析意图（评测输出，无旧原文/B 分/生产 Acceptance）；D3.V2 保持完整纠正组，D4.V2 覆盖分母 N/A。付费门禁仍未解决，Provider=0，DEV/HARD/REG NOT_RUN，#5d NOT_STARTED |
 | 当前：Implementation #5b React 会话 / Browser E2E 人审 | [实际 Architecture / UI / API](ARCHITECTURE.md)、[HANDOFF](../HANDOFF.md)：复用 Ask/文档/PDF，显式版本 scope、持久 head/Run/三类结果、同键恢复及安全 Trace；有限 SSE 不作为实时流，使用有界 GET 读回；deterministic 服务端测试 runtime 仅用于隔离 E2E。默认生产 runtime 不可用，history query 仍 fail-closed，无 schema/迁移变化；物理引用验证不证明语义支持 |
 | 产品范围、路线、里程碑与漂移检查 | [v0.2 Blueprint](V02_BLUEPRINT.md) |
 | 技术取舍、责任方向、后续架构问题 | [v0.2 Foundation](V02_FOUNDATION.md)，结合当前 [Architecture](ARCHITECTURE.md) |

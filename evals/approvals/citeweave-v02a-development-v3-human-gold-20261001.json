@@ -1,0 +1,80 @@
+{
+  "accepted_semantics": {
+    "correction": "D3.V2 requires complete T1/T4 atomic correction provenance; State alone cannot substitute.",
+    "d4_v2": "No required raw-history source group; candidate/final history coverage denominator N/A.",
+    "evidence": "History/State is never documentary Evidence; factual answers require current authorized EvidencePack.",
+    "ordinary_state_intent": "D1.V2/D3.V1 A may use accepted active bounded State for intent; no old raw-history materialization/coverage, B credit or Evidence authority.",
+    "state_and_topic": "Pending/active accepted Working State availability and movement relative to current conversational focus are independent dimensions.",
+    "topic_relations": {
+      "D1.V1": "continue",
+      "D1.V2": "return",
+      "D3.V1": "return"
+    }
+  },
+  "actual_review_minutes": null,
+  "approval_id": "citeweave-v02a-development-v3-human-gold-20261001",
+  "approved_views": {
+    "D1.V1": "29e586f7d151f4b64c132de885ee76a8047c13a4997c3e98eda1c0da58207ca0",
+    "D1.V2": "fc69e5c555e50208af48ca441f78ade5c0b9afb0420a1682c9c23b6e683ee48f",
+    "D2.V1": "b68ea9a6bf3e8bfda7194ccda8a168eb85001d96282f89aaabc6c17fcc3dc2c2",
+    "D2.V2": "a9eecff681ed68fe299e83098ace7c837fa7e3fa42dc18a274025783b6c60810",
+    "D3.V1": "a4435cce8a0dd33c7b4ab5e80347fb288b5394c4f5da85891e970edfc177cdc8",
+    "D3.V2": "7cfa37b07e24ab63e686129f515040a0f4403346ba2c3e28a3decac1e29bf415",
+    "D4.V1": "2dc5fb019aa619a00b5230d1f49f889ec8361a5e4144e266ecda379a772b9fab",
+    "D4.V2": "dc59a5f3f0fba8674391250957198526bcc627decad0aa1fdd3e1bee3f741b57",
+    "D5.V1": "512877045386ca55c62a11d771e9fca3186b910973d23c93d936e119b8d60c8d",
+    "D5.V2": "74332f24aab85f87679a03075dc1127a06e4d7e72b0d63f740fea714c432ba79",
+    "D6.V1": "00b192909e42b21c2f56483362cedf5da6178253ab502d38cb6a806f769db862",
+    "D6.V2": "4ded30175f6b605f22d6b02f9d2595fb4769053f2948a5a5ca3bf8ec91a3dba3"
+  },
+  "authority": "Explicit Human Product Owner decision in this task; assistant transcribed the decision, not a personal or cryptographic reviewer signature.",
+  "caveats": [
+    "Twelve-view synthetic Development mechanism/failure-mode set, not population-level conversational quality evidence.",
+    "D6.V1 is not standalone proof of real long-conversation semantic performance; capacity is a separate controlled L1 boundary concern.",
+    "D3.V2 tests correction/provenance integrity in addition to answer correctness; do not collapse it into generic answer accuracy.",
+    "AI-assisted authorship with known arm definitions; Human review and Test-first audit do not establish independently blinded data."
+  ],
+  "completed_label_units": [
+    "LABEL:D1.V1",
+    "LABEL:D1.V2",
+    "LABEL:D2.V1",
+    "LABEL:D2.V2",
+    "LABEL:D3.V1",
+    "LABEL:D3.V2",
+    "LABEL:D4.V1",
+    "LABEL:D4.V2",
+    "LABEL:D5.V1",
+    "LABEL:D5.V2",
+    "LABEL:D6.V1",
+    "LABEL:D6.V2"
+  ],
+  "dataset_id": "citeweave-v02a-development-v3",
+  "dataset_sha256": "a01953930e2893065dc6f724b6ce896015124744d6614ac14a6354f087636023",
+  "dataset_version": 3,
+  "decision": "APPROVE",
+  "execution_at_approval": {
+    "DEV": "NOT_RUN",
+    "HARD": "NOT_RUN",
+    "REG": "NOT_RUN"
+  },
+  "future_defect_policy": "Preserve v3 and all its results; record any defect, create a new dataset version/hash and obtain a new Human review. Real DEV outcomes must never mutate v3.",
+  "paid_execution_authorized": false,
+  "provider_model_judge_outputs_used_to_tune": false,
+  "references": {
+    "docs/V02_DEV_DATA_REVIEW_V1.md": "70f851f10c316426abe9c2970695c4d8770f8e5fca8df70c031afad7d5fdf79b",
+    "docs/V02_DEV_DATA_REVIEW_V2.md": "b73f7221456c8bbeab7577558c979d829bc6fee74002c98e7fe270dca97b738b",
+    "docs/V02_DEV_READINESS_BLOCKER.md": "dd96692a1cba1f2d0a5efcaeeb796b60795729b4a4cf36e4ae31e0af197a5276",
+    "docs/V02_DEV_TEST_FIRST_AUDIT.md": "95a330e97d6f046e2b75ddafd209f08b5b95a6f95fc1a0984134c11905a99218",
+    "docs/V02_DEV_TEST_FIRST_AUDIT_V3.md": "c40cb72b23485eb4731c8b6007e175083c373395d3b7296856283a57d05320af",
+    "evals/citeweave-v02a-development-v1.json": "f33f96f51f1e5bf310bc9034e673c40ffd74f6a1fe91a4a62d2a1af45be0dd44",
+    "evals/citeweave-v02a-development-v2.json": "3b1ef5dc37376cf26b5fb20aa8367d76ed2af5ccf376a312a62fc2d6dbcd20a7"
+  },
+  "review_date": "2026-10-01",
+  "review_duration_status": "NOT_MEASURED",
+  "review_units_completed": 12,
+  "reviewer_personal_name": null,
+  "reviewer_role": "Human Product Owner",
+  "schema_revision": "v02a-human-gold-attestation-v1",
+  "test_first_audit_reference": "docs/V02_DEV_TEST_FIRST_AUDIT_V3.md",
+  "workload_reconciliation": "12 LABEL units completed for this approval; minutes not measured. Earlier revision review actual units/minutes and cumulative campaign workload remain separately unreconciled. No pool reset or extra units inferred."
+}

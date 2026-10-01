@@ -1,0 +1,1591 @@
+{
+  "author": "CiteWeave project original AI-assisted proposals, 2026-10-01; not Human Gold",
+  "category_coverage": {
+    "ambiguous reference": [
+      "D4.V1",
+      "D4.V2"
+    ],
+    "boundary/adversarial supplement": [],
+    "constraint supersession": [
+      "D3.V2"
+    ],
+    "document-scope change": [
+      "D6.V1",
+      "D6.V2"
+    ],
+    "evidence-insufficient": [
+      "D6.V2"
+    ],
+    "long conversation / context pressure": [
+      "D6.V1"
+    ],
+    "new-but-irrelevant noise": [
+      "D1.V2"
+    ],
+    "no-rewrite-needed": [
+      "D2.V1",
+      "D2.V2"
+    ],
+    "old-but-relevant": [
+      "D1.V2",
+      "D3.V1"
+    ],
+    "omitted entity": [
+      "D1.V1"
+    ],
+    "pronoun/coreference": [
+      "D1.V1",
+      "D1.V2"
+    ],
+    "rewrite-danger / negation": [
+      "D5.V1",
+      "D5.V2"
+    ],
+    "rewrite-required": [
+      "D5.V1",
+      "D5.V2"
+    ],
+    "simple follow-up": [
+      "D1.V1",
+      "D4.V2"
+    ],
+    "single-turn regression": [
+      "D2.V1"
+    ],
+    "topic return": [
+      "D3.V1",
+      "D3.V2"
+    ],
+    "topic shift": [
+      "D2.V2"
+    ],
+    "user correction": [
+      "D3.V2"
+    ]
+  },
+  "clarification_revision": "owner-all-members-20261001",
+  "closed_loop_branch": {
+    "first": "D4.V1",
+    "label_review": "PENDING",
+    "mode": "L1_CLOSED_LOOP_SEPARATE_FROM_FIXED_PREFIX",
+    "next": "D4.V2",
+    "reply": "For the D4-task valve test, I mean Beacon-South: which indicator should it show?",
+    "required_kind": "clarification"
+  },
+  "connectivity_review": "OWNER_PENDING_NO_CAL_OR_G_REUSE",
+  "dataset_id": "citeweave-v02a-development-v1",
+  "license": "MIT",
+  "owner_review": "PENDING",
+  "protocol_sha256": "86cea9068f14b4a84c0db6f647b02b68ce1897c8d32222070dd95af8195500be",
+  "repeat": 1,
+  "schema_revision": "v02a-multiturn-dev-v1",
+  "sealed_content": "ABSENT_INACCESSIBLE",
+  "seed": 20260929,
+  "sources": [
+    {
+      "canonical_sha256": "b7c30e42b6a5ec222b6a872b98b7832012d216a8bdd5711b672875c3e80e4b6a",
+      "document_id": "8a550b02-93f4-57ee-88d5-265e3e21ab96",
+      "family": "D1",
+      "id": "D1.manual",
+      "pdf_box": [
+        0.0784313725490196,
+        0.07575757575757576,
+        0.9281045751633987,
+        0.11868686868686869
+      ],
+      "pdf_sha256": "887494ebc37ace42ce3b7512ded394dee5bf82c16512900630d6e8a8ed0b2867",
+      "provenance": "original_AI_assisted_MIT_review_pending",
+      "text": "Ferrule-Q requires a nine-minute cooldown before optical inspection. Thermal\nTray-R uses a separate four-minute standby cycle.",
+      "version_id": "8077f914-b388-5a27-afdb-699735635d6b"
+    },
+    {
+      "canonical_sha256": "afe250226584df0dc74da30bfcd73d16736dab901e7017a1e41a46bfe71d4d01",
+      "document_id": "6118a01a-7b69-55da-b98c-e2a35e2d1cb5",
+      "family": "D2",
+      "id": "D2.manual",
+      "pdf_box": [
+        0.0784313725490196,
+        0.07575757575757576,
+        0.9281045751633987,
+        0.11868686868686869
+      ],
+      "pdf_sha256": "e88c3735cfc7e4db1eeea837adf7779c209ca0b7cbb517156a2fc24d20eed9d2",
+      "provenance": "original_AI_assisted_MIT_review_pending",
+      "text": "Grove-Panel records an alarm by illuminating its amber indicator. Orchard-Clock\ncalibration uses a violet status marker and does not govern Grove-Panel alarms.",
+      "version_id": "96589c61-798e-574c-9fba-c04d17bdfc8a"
+    },
+    {
+      "canonical_sha256": "70ab8e4c5db954e10cabb759999f8a1bafc2fb7cbab5fed82413aaa97d898ea6",
+      "document_id": "a1ff4504-79bc-511c-8089-a03088b54370",
+      "family": "D3",
+      "id": "D3.manual",
+      "pdf_box": [
+        0.0784313725490196,
+        0.07575757575757576,
+        0.9281045751633987,
+        0.1414141414141414
+      ],
+      "pdf_sha256": "921f0de2fb8c5c7a48e30e6821728fe4f88ee398ae3bc1a75e10a6faa22f56ab",
+      "provenance": "original_AI_assisted_MIT_review_pending",
+      "text": "Cobalt-Latch release amber uses a three-notch alignment. Cobalt-Latch release\nviolet uses a five-notch alignment. Display framing does not change latch\nalignment.",
+      "version_id": "39c513f3-4a62-5236-8efd-d15dab4e1787"
+    },
+    {
+      "canonical_sha256": "6ef961e63c75ddfd6ae61ca2abd0ce20d30c588fece1f383113d42827740628c",
+      "document_id": "197979b8-5674-5e05-9304-87176861f18d",
+      "family": "D4",
+      "id": "D4.manual",
+      "pdf_box": [
+        0.0784313725490196,
+        0.07575757575757576,
+        0.9281045751633987,
+        0.11868686868686869
+      ],
+      "pdf_sha256": "fcd81e986c6deab76772abf7f066d3ef25432a3eb59551cd5fbf228d432b091c",
+      "provenance": "original_AI_assisted_MIT_review_pending",
+      "text": "Beacon-North displays a blue indicator after a valve test. Beacon-South displays\na green indicator after a valve test. Neither unit is a default selection.",
+      "version_id": "1506a478-7da5-51d3-8e26-f71599e4550f"
+    },
+    {
+      "canonical_sha256": "43f7bdae874f08f0223aea8c7807d55b447c790d096dee9652ef484f12e1cfcb",
+      "document_id": "65650e4d-fcaa-5640-94ea-28ae818e6e42",
+      "family": "D5",
+      "id": "D5.manual",
+      "pdf_box": [
+        0.0784313725490196,
+        0.07575757575757576,
+        0.9281045751633987,
+        0.11868686868686869
+      ],
+      "pdf_sha256": "e38d9026e7065e3b17d7494ad63eb3ddd6240770264bbbf835255c25ec87e492",
+      "provenance": "original_AI_assisted_MIT_review_pending",
+      "text": "Quill m4 must not relay before 24 hours have elapsed after initialization. At or\nafter 24 hours, Quill m4 may relay if its isolation check passes.",
+      "version_id": "1cf8706f-2078-579a-907c-84e6e6b5fc6d"
+    },
+    {
+      "canonical_sha256": "7e5323652f6d426b3f762ef2d02fe5f9633f3b807fbe3bfd93056999eb9bb5fc",
+      "document_id": "1b4d4e77-f64b-5b75-ae74-66ded16a5c6d",
+      "family": "D6",
+      "id": "D6.ledger",
+      "pdf_box": [
+        0.0784313725490196,
+        0.07575757575757576,
+        0.9281045751633987,
+        0.11868686868686869
+      ],
+      "pdf_sha256": "55160ef8d32f9d4643c50a2a451c4682d73027de8f9645947e75ee51b172ba0c",
+      "provenance": "original_AI_assisted_MIT_review_pending",
+      "text": "Sable-Pump maintenance ledgers record scheduled service dates and cycle counts.\nThis ledger defines no brownout contingency.",
+      "version_id": "f1d40561-6c03-5d72-80f3-05413942d7d0"
+    },
+    {
+      "canonical_sha256": "1627a0ff2d4c9db5ea0c628c3fc2b1ad125c43d9a90c252709b4997d502c2663",
+      "document_id": "7af30a2c-7d79-5e21-aa9b-017f21350fc6",
+      "family": "D6",
+      "id": "D6.contingency",
+      "pdf_box": [
+        0.0784313725490196,
+        0.07575757575757576,
+        0.9281045751633987,
+        0.11868686868686869
+      ],
+      "pdf_sha256": "a31c86c83f2284653180dd09101ad56c9a298dbe98e72b6c00ca1393fa8c890b",
+      "provenance": "original_AI_assisted_MIT_review_pending",
+      "text": "During a brownout, Sable-Pump must switch to the gravity bypass. Scheduled\nservice records do not define or replace this contingency.",
+      "version_id": "84f2de55-f6f4-5ddf-9e4c-658752ef3091"
+    }
+  ],
+  "split": "Development",
+  "version": 1,
+  "views": [
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D1.V1:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D1.V1:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D1.V1:behavior",
+          "severity": "critical",
+          "statement": "Resolve it to Ferrule-Q; answer nine-minute cooldown; do not inherit Tray-R's four-minute standby."
+        }
+      ],
+      "categories": [
+        "pronoun/coreference",
+        "simple follow-up",
+        "omitted entity"
+      ],
+      "dependency": "required",
+      "diagnostic_limits": {},
+      "evidence_support": [
+        [
+          "D1.manual",
+          0,
+          68
+        ]
+      ],
+      "facts": [
+        [
+          "entity",
+          "Ferrule-Q",
+          "T1"
+        ]
+      ],
+      "family": "D1",
+      "hard": false,
+      "id": "D1.V1",
+      "irrelevant_history": [
+        "T2"
+      ],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D1-task inspection, use Ferrule-Q.",
+          "scope": [
+            "D1.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Ferrule-Q"
+            ],
+            "task": "D1-task",
+            "topic": "D1-task"
+          },
+          "state": [
+            {
+              "key": "unit",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Ferrule-Q"
+            }
+          ]
+        },
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T2",
+          "question": "Keep the D1-task inspection request pending.",
+          "scope": [
+            "D1.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": null,
+            "topic": null
+          },
+          "state": []
+        }
+      ],
+      "primary_category": "pronoun/coreference",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D1-task",
+        "topic": "D1-task"
+      },
+      "question": "For the D1-task inspection, how long must it cool?",
+      "reference": "Resolve it to Ferrule-Q; answer nine-minute cooldown; do not inherit Tray-R's four-minute standby.",
+      "reference_answer": "Ferrule-Q requires a nine-minute cooldown before optical inspection. [E1]",
+      "required_aspects": [
+        "Ferrule-Q",
+        "nine-minute cooldown before optical inspection"
+      ],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T1"
+            ]
+          ],
+          "id": "D1.V1:G1",
+          "old": false
+        }
+      ],
+      "scope": [
+        "D1.manual"
+      ],
+      "sha256": "f499850aeafa4448466900c4c6782df15488ddfd64ad314239242f8002f002b9",
+      "topic_relation": "continue"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D1.V2:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D1.V2:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D1.V2:behavior",
+          "severity": "critical",
+          "statement": "Resolve it to Ferrule-Q; answer nine-minute cooldown; do not inherit Tray-R's four-minute standby."
+        }
+      ],
+      "categories": [
+        "old-but-relevant",
+        "new-but-irrelevant noise",
+        "pronoun/coreference"
+      ],
+      "dependency": "required",
+      "diagnostic_limits": {
+        "cp-a-v1": "outside-window state provenance unavailable; no raw rematerialization",
+        "cp-r-v1": "source unavailable; no guessed binding"
+      },
+      "evidence_support": [
+        [
+          "D1.manual",
+          0,
+          68
+        ]
+      ],
+      "facts": [
+        [
+          "entity",
+          "Ferrule-Q",
+          "T1"
+        ]
+      ],
+      "family": "D1",
+      "hard": true,
+      "id": "D1.V2",
+      "irrelevant_history": [
+        "T2",
+        "T3"
+      ],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D1-task inspection, use Ferrule-Q.",
+          "scope": [
+            "D1.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Ferrule-Q"
+            ],
+            "task": "D1-task",
+            "topic": "D1-task"
+          },
+          "state": [
+            {
+              "key": "unit",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Ferrule-Q"
+            }
+          ]
+        },
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T2",
+          "question": "Keep the D1-task inspection request pending.",
+          "scope": [
+            "D1.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": null,
+            "topic": null
+          },
+          "state": []
+        },
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T3",
+          "question": "Now check Thermal Tray-R's standby display.",
+          "scope": [
+            "D1.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Thermal Tray-R"
+            ],
+            "task": "tray-display",
+            "topic": "tray-display"
+          },
+          "state": []
+        }
+      ],
+      "primary_category": "old-but-relevant",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D1-task",
+        "topic": "D1-task"
+      },
+      "question": "For the D1-task inspection, how long must it cool?",
+      "reference": "Resolve it to Ferrule-Q; answer nine-minute cooldown; do not inherit Tray-R's four-minute standby.",
+      "reference_answer": "Ferrule-Q requires a nine-minute cooldown before optical inspection. [E1]",
+      "required_aspects": [
+        "Ferrule-Q",
+        "nine-minute cooldown before optical inspection"
+      ],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T1"
+            ]
+          ],
+          "id": "D1.V2:G1",
+          "old": true
+        }
+      ],
+      "scope": [
+        "D1.manual"
+      ],
+      "sha256": "e5e2aeb5467531b76309037bd320e6724b5f4e9105c4a3e8657200fa40d57353",
+      "topic_relation": "continue"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D2.V1:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D2.V1:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D2.V1:behavior",
+          "severity": "critical",
+          "statement": "Use original self-contained query, skip interpretation dispatch, answer amber indicator, exclude Orchard calibration."
+        }
+      ],
+      "categories": [
+        "no-rewrite-needed",
+        "single-turn regression"
+      ],
+      "dependency": "none",
+      "diagnostic_limits": {},
+      "evidence_support": [
+        [
+          "D2.manual",
+          0,
+          65
+        ]
+      ],
+      "facts": [],
+      "family": "D2",
+      "hard": false,
+      "id": "D2.V1",
+      "irrelevant_history": [],
+      "outcome": "documentary_answer",
+      "prefix": [],
+      "primary_category": "no-rewrite-needed",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D2-task",
+        "topic": "D2-task"
+      },
+      "question": "How does Grove-Panel record an alarm?",
+      "reference": "Use original self-contained query, skip interpretation dispatch, answer amber indicator, exclude Orchard calibration.",
+      "reference_answer": "Grove-Panel records an alarm by illuminating its amber indicator. [E1]",
+      "required_aspects": [
+        "Grove-Panel",
+        "amber indicator"
+      ],
+      "required_history": [],
+      "scope": [
+        "D2.manual"
+      ],
+      "sha256": "04a27ed07e86d2dbc0b265c3be31d317f9bb529577ff0f121791d04dd7d41459",
+      "topic_relation": "continue"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D2.V2:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D2.V2:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D2.V2:behavior",
+          "severity": "critical",
+          "statement": "Use original self-contained query, skip interpretation dispatch, answer amber indicator, exclude Orchard calibration."
+        }
+      ],
+      "categories": [
+        "topic shift",
+        "no-rewrite-needed"
+      ],
+      "dependency": "none",
+      "diagnostic_limits": {},
+      "evidence_support": [
+        [
+          "D2.manual",
+          0,
+          65
+        ]
+      ],
+      "facts": [],
+      "family": "D2",
+      "hard": false,
+      "id": "D2.V2",
+      "irrelevant_history": [
+        "T1"
+      ],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "Discuss Orchard-Clock calibration first.",
+          "scope": [
+            "D2.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Orchard-Clock"
+            ],
+            "task": "orchard-calibration",
+            "topic": "orchard-calibration"
+          },
+          "state": []
+        }
+      ],
+      "primary_category": "topic shift",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D2-task",
+        "topic": "D2-task"
+      },
+      "question": "How does Grove-Panel record an alarm?",
+      "reference": "Use original self-contained query, skip interpretation dispatch, answer amber indicator, exclude Orchard calibration.",
+      "reference_answer": "Grove-Panel records an alarm by illuminating its amber indicator. [E1]",
+      "required_aspects": [
+        "Grove-Panel",
+        "amber indicator"
+      ],
+      "required_history": [],
+      "scope": [
+        "D2.manual"
+      ],
+      "sha256": "98454738f595325440d3015f5bce31ab1c80725894b1152191497bdba5daeebf",
+      "topic_relation": "shift"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D3.V1:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D3.V1:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D3.V1:behavior",
+          "severity": "critical",
+          "statement": "Return to amber intent using T1, answer three-notch alignment, do not inherit display topic."
+        }
+      ],
+      "categories": [
+        "topic return",
+        "old-but-relevant"
+      ],
+      "dependency": "required",
+      "diagnostic_limits": {
+        "cp-a-v1": "outside-window raw provenance unavailable",
+        "cp-r-v1": "old raw source unavailable"
+      },
+      "evidence_support": [
+        [
+          "D3.manual",
+          0,
+          56
+        ]
+      ],
+      "facts": [
+        [
+          "entity",
+          "Cobalt-Latch release amber",
+          "T1"
+        ]
+      ],
+      "family": "D3",
+      "hard": true,
+      "id": "D3.V1",
+      "irrelevant_history": [
+        "T2",
+        "T3"
+      ],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D3-task latch testing, use Cobalt-Latch release amber.",
+          "scope": [
+            "D3.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Cobalt-Latch release amber"
+            ],
+            "task": "D3-task",
+            "topic": "D3-task"
+          },
+          "state": [
+            {
+              "key": "release",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Cobalt-Latch release amber"
+            }
+          ]
+        },
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T2",
+          "question": "Discuss unrelated display framing.",
+          "scope": [
+            "D3.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": "display-framing",
+            "topic": "display-framing"
+          },
+          "state": []
+        },
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T3",
+          "question": "Continue the display discussion.",
+          "scope": [
+            "D3.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": "display-framing",
+            "topic": "display-framing"
+          },
+          "state": []
+        }
+      ],
+      "primary_category": "topic return",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D3-task",
+        "topic": "D3-task"
+      },
+      "question": "Return to the D3-task latch test: which alignment applies?",
+      "reference": "Return to amber intent using T1, answer three-notch alignment, do not inherit display topic.",
+      "reference_answer": "Cobalt-Latch release amber uses a three-notch alignment. [E1]",
+      "required_aspects": [
+        "release amber",
+        "three-notch alignment"
+      ],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T1"
+            ]
+          ],
+          "id": "D3.V1:G1",
+          "old": true
+        }
+      ],
+      "scope": [
+        "D3.manual"
+      ],
+      "sha256": "0b11b065efa7e66520bef65209466ce840e7e5a63d81a8d324939d3956ba5394",
+      "topic_relation": "return"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D3.V2:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D3.V2:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D3.V2:behavior",
+          "severity": "critical",
+          "statement": "Recover complete T1/T4 correction group; retain amber record as superseded, use violet and five-notch alignment."
+        }
+      ],
+      "categories": [
+        "user correction",
+        "constraint supersession",
+        "topic return"
+      ],
+      "dependency": "required",
+      "diagnostic_limits": {
+        "cp-a-v1": "incomplete_group/search_incomplete despite current violet state",
+        "cp-r-v1": "incomplete_group/search_incomplete; never consume T4 partially"
+      },
+      "evidence_support": [
+        [
+          "D3.manual",
+          57,
+          113
+        ]
+      ],
+      "facts": [
+        [
+          "entity",
+          "Cobalt-Latch release violet",
+          "T4"
+        ]
+      ],
+      "family": "D3",
+      "hard": true,
+      "id": "D3.V2",
+      "irrelevant_history": [
+        "T2",
+        "T3"
+      ],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D3-task latch testing, use Cobalt-Latch release amber.",
+          "scope": [
+            "D3.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Cobalt-Latch release amber"
+            ],
+            "task": "D3-task",
+            "topic": "D3-task"
+          },
+          "state": [
+            {
+              "key": "release",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Cobalt-Latch release amber"
+            }
+          ]
+        },
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T2",
+          "question": "Discuss unrelated display framing.",
+          "scope": [
+            "D3.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": "display-framing",
+            "topic": "display-framing"
+          },
+          "state": []
+        },
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T3",
+          "question": "Continue the display discussion.",
+          "scope": [
+            "D3.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": "display-framing",
+            "topic": "display-framing"
+          },
+          "state": []
+        },
+        {
+          "control": "intent_seed",
+          "correction": "T1",
+          "id": "T4",
+          "question": "Correction for D3-task: use Cobalt-Latch release violet, replacing amber.",
+          "scope": [
+            "D3.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Cobalt-Latch release violet"
+            ],
+            "task": "D3-task",
+            "topic": "D3-task"
+          },
+          "state": [
+            {
+              "key": "release",
+              "kind": "entity",
+              "replaces": "T1:release",
+              "value": "Cobalt-Latch release violet"
+            }
+          ]
+        }
+      ],
+      "primary_category": "user correction",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D3-task",
+        "topic": "D3-task"
+      },
+      "question": "Return to the D3-task latch test: which alignment applies?",
+      "reference": "Recover complete T1/T4 correction group; retain amber record as superseded, use violet and five-notch alignment.",
+      "reference_answer": "Cobalt-Latch release violet uses a five-notch alignment. [E1]",
+      "required_aspects": [
+        "release violet",
+        "five-notch alignment"
+      ],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T1",
+              "T4"
+            ]
+          ],
+          "id": "D3.V2:G1",
+          "old": true
+        }
+      ],
+      "scope": [
+        "D3.manual"
+      ],
+      "sha256": "e866cc50ce3b5ee1a8a1a484cedb3a0c4ed72d9da27b91ba914c407420bac291",
+      "topic_relation": "return"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D4.V1:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D4.V1:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D4.V1:behavior",
+          "severity": "critical",
+          "statement": "Ask which of North/South; choose neither; keep unresolved state; no documentary generation."
+        }
+      ],
+      "categories": [
+        "ambiguous reference"
+      ],
+      "dependency": "unresolved",
+      "diagnostic_limits": {},
+      "evidence_support": [],
+      "facts": [
+        [
+          "entity",
+          "Beacon-North",
+          "T1"
+        ],
+        [
+          "entity",
+          "Beacon-South",
+          "T1"
+        ]
+      ],
+      "family": "D4",
+      "hard": true,
+      "id": "D4.V1",
+      "irrelevant_history": [],
+      "outcome": "clarification",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D4-task valve comparison, consider Beacon-North and Beacon-South equally.",
+          "scope": [
+            "D4.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Beacon-North",
+              "Beacon-South"
+            ],
+            "task": "D4-task",
+            "topic": "D4-task"
+          },
+          "state": [
+            {
+              "key": "north",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Beacon-North"
+            },
+            {
+              "key": "south",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Beacon-South"
+            }
+          ]
+        }
+      ],
+      "primary_category": "ambiguous reference",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D4-task",
+        "topic": "D4-task"
+      },
+      "question": "For the D4-task valve test, which indicator should it show?",
+      "reference": "Ask which of North/South; choose neither; keep unresolved state; no documentary generation.",
+      "reference_answer": "Which unit do you mean: Beacon-North or Beacon-South?",
+      "required_aspects": [],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T1"
+            ]
+          ],
+          "id": "D4.V1:G1",
+          "old": false
+        }
+      ],
+      "scope": [
+        "D4.manual"
+      ],
+      "sha256": "73dbbd88c3b8fd21c14d6757d244b14f2bb13663bebd15bbfc26c32b67419c6a",
+      "topic_relation": "continue"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D4.V2:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D4.V2:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D4.V2:behavior",
+          "severity": "critical",
+          "statement": "Clear prior unresolved state for the explicit South choice; answer green indicator; do not use North's blue indicator."
+        }
+      ],
+      "categories": [
+        "ambiguous reference",
+        "simple follow-up"
+      ],
+      "dependency": "none",
+      "diagnostic_limits": {},
+      "evidence_support": [
+        [
+          "D4.manual",
+          59,
+          118
+        ]
+      ],
+      "facts": [
+        [
+          "entity",
+          "Beacon-South",
+          "CURRENT"
+        ]
+      ],
+      "family": "D4",
+      "hard": false,
+      "id": "D4.V2",
+      "irrelevant_history": [],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D4-task valve comparison, consider Beacon-North and Beacon-South equally.",
+          "scope": [
+            "D4.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Beacon-North",
+              "Beacon-South"
+            ],
+            "task": "D4-task",
+            "topic": "D4-task"
+          },
+          "state": [
+            {
+              "key": "north",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Beacon-North"
+            },
+            {
+              "key": "south",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Beacon-South"
+            }
+          ]
+        },
+        {
+          "control": "clarification",
+          "correction": null,
+          "id": "T2",
+          "question": "For the D4-task valve test, which indicator should it show?",
+          "scope": [
+            "D4.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": "D4-task",
+            "topic": "D4-task"
+          },
+          "state": [
+            {
+              "key": "pending",
+              "kind": "ambiguity",
+              "replaces": null,
+              "value": "unresolved unit"
+            }
+          ]
+        }
+      ],
+      "primary_category": "ambiguous reference",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D4-task",
+        "topic": "D4-task"
+      },
+      "question": "For the D4-task valve test, I mean Beacon-South: which indicator should it show?",
+      "reference": "Clear prior unresolved state for the explicit South choice; answer green indicator; do not use North's blue indicator.",
+      "reference_answer": "Beacon-South displays a green indicator after a valve test. [E1]",
+      "required_aspects": [
+        "Beacon-South",
+        "green indicator"
+      ],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T2"
+            ]
+          ],
+          "id": "D4.V2:G1",
+          "old": false
+        }
+      ],
+      "scope": [
+        "D4.manual"
+      ],
+      "sha256": "127b47a0a67cb382bfadbcd31ea715d47c51828e229e4e2f4a1d36f4436331c5",
+      "topic_relation": "continue"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D5.V1:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D5.V1:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D5.V1:behavior",
+          "severity": "critical",
+          "statement": "Preserve time/negation and Quill m4 identity; relay before 24 hours is prohibited. V1 answer no; V2 answer yes to NOT relaying."
+        }
+      ],
+      "categories": [
+        "rewrite-required",
+        "rewrite-danger / negation"
+      ],
+      "dependency": "required",
+      "diagnostic_limits": {},
+      "evidence_support": [
+        [
+          "D5.manual",
+          0,
+          74
+        ]
+      ],
+      "facts": [
+        [
+          "entity",
+          "Quill m4",
+          "T1"
+        ]
+      ],
+      "family": "D5",
+      "hard": false,
+      "id": "D5.V1",
+      "irrelevant_history": [],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D5-task relay checks, assess Quill m4.",
+          "scope": [
+            "D5.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Quill m4"
+            ],
+            "task": "D5-task",
+            "topic": "D5-task"
+          },
+          "state": [
+            {
+              "key": "unit",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Quill m4"
+            }
+          ]
+        }
+      ],
+      "primary_category": "rewrite-required",
+      "protected": [
+        [
+          "time",
+          "24 hours"
+        ]
+      ],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D5-task",
+        "topic": "D5-task"
+      },
+      "question": "For the D5-task relay check, before 24 hours must it relay?",
+      "reference": "Preserve time/negation and Quill m4 identity; relay before 24 hours is prohibited. V1 answer no; V2 answer yes to NOT relaying.",
+      "reference_answer": "No. Quill m4 must not relay before 24 hours have elapsed after initialization. [E1]",
+      "required_aspects": [
+        "Quill m4",
+        "relay before 24 hours prohibited"
+      ],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T1"
+            ]
+          ],
+          "id": "D5.V1:G1",
+          "old": false
+        }
+      ],
+      "scope": [
+        "D5.manual"
+      ],
+      "sha256": "b342d99f4d8c276e4d544ca7d68f65a720338d8feda16fc670cf9793165cac0f",
+      "topic_relation": "continue"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D5.V2:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D5.V2:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D5.V2:behavior",
+          "severity": "critical",
+          "statement": "Preserve time/negation and Quill m4 identity; relay before 24 hours is prohibited. V1 answer no; V2 answer yes to NOT relaying."
+        }
+      ],
+      "categories": [
+        "rewrite-required",
+        "rewrite-danger / negation"
+      ],
+      "dependency": "required",
+      "diagnostic_limits": {},
+      "evidence_support": [
+        [
+          "D5.manual",
+          0,
+          74
+        ]
+      ],
+      "facts": [
+        [
+          "entity",
+          "Quill m4",
+          "T1"
+        ]
+      ],
+      "family": "D5",
+      "hard": true,
+      "id": "D5.V2",
+      "irrelevant_history": [],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "For D5-task relay checks, assess Quill m4.",
+          "scope": [
+            "D5.manual"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [
+              "Quill m4"
+            ],
+            "task": "D5-task",
+            "topic": "D5-task"
+          },
+          "state": [
+            {
+              "key": "unit",
+              "kind": "entity",
+              "replaces": null,
+              "value": "Quill m4"
+            }
+          ]
+        }
+      ],
+      "primary_category": "rewrite-required",
+      "protected": [
+        [
+          "time",
+          "24 hours"
+        ],
+        [
+          "negation",
+          "NOT"
+        ]
+      ],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D5-task",
+        "topic": "D5-task"
+      },
+      "question": "For the D5-task relay check, before 24 hours must it NOT relay?",
+      "reference": "Preserve time/negation and Quill m4 identity; relay before 24 hours is prohibited. V1 answer no; V2 answer yes to NOT relaying.",
+      "reference_answer": "Yes: it must NOT relay before 24 hours have elapsed after initialization. [E1]",
+      "required_aspects": [
+        "Quill m4",
+        "relay before 24 hours prohibited"
+      ],
+      "required_history": [
+        {
+          "alternatives": [
+            [
+              "T1"
+            ]
+          ],
+          "id": "D5.V2:G1",
+          "old": false
+        }
+      ],
+      "scope": [
+        "D5.manual"
+      ],
+      "sha256": "2fcf8d4aeb0a8919ba7a6ce65c98b7844f3171baf404a5dd8250cdafc352a2f7",
+      "topic_relation": "continue"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D6.V1:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D6.V1:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D6.V1:behavior",
+          "severity": "critical",
+          "statement": "Use gravity bypass from current contingency source; full-pack L−1/L/L+1 capacity tests are separate L1 fixtures."
+        }
+      ],
+      "categories": [
+        "long conversation / context pressure",
+        "document-scope change"
+      ],
+      "dependency": "none",
+      "diagnostic_limits": {},
+      "evidence_support": [
+        [
+          "D6.contingency",
+          0,
+          64
+        ]
+      ],
+      "facts": [],
+      "family": "D6",
+      "hard": true,
+      "id": "D6.V1",
+      "irrelevant_history": [
+        "T1"
+      ],
+      "outcome": "documentary_answer",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "Keep Sable-Pump maintenance discussion separate from contingency questions.",
+          "scope": [
+            "D6.ledger",
+            "D6.contingency"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": "maintenance",
+            "topic": "maintenance"
+          },
+          "state": []
+        }
+      ],
+      "primary_category": "long conversation / context pressure",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D6-task",
+        "topic": "D6-task"
+      },
+      "question": "During a brownout, what contingency must Sable-Pump apply?",
+      "reference": "Use gravity bypass from current contingency source; full-pack L−1/L/L+1 capacity tests are separate L1 fixtures.",
+      "reference_answer": "During a brownout, Sable-Pump must switch to the gravity bypass. [CURRENT_SOURCE_LABEL]",
+      "required_aspects": [
+        "gravity bypass"
+      ],
+      "required_history": [],
+      "scope": [
+        "D6.ledger",
+        "D6.contingency"
+      ],
+      "sha256": "63dc16b6614cdd72289a8f80d7d7cf0fe625484e864e0398af69a6dd3276567f",
+      "topic_relation": "shift"
+    },
+    {
+      "allowed_equivalence": [
+        "Equivalent wording preserving every critical/material assertion; alternate documentary support requires blinded owner adjudication."
+      ],
+      "assertions": [
+        {
+          "dimension": "interpretation",
+          "id": "D6.V2:intent",
+          "severity": "critical",
+          "statement": "Bind only the intended current entity/constraint; preserve scope and explicit terms."
+        },
+        {
+          "dimension": "Memory/Evidence",
+          "id": "D6.V2:memory",
+          "severity": "critical",
+          "statement": "History/state is non-Evidence; use only current authorized immutable source support."
+        },
+        {
+          "dimension": "outcome",
+          "id": "D6.V2:behavior",
+          "severity": "critical",
+          "statement": "Report evidence insufficient in ledger-only scope; never reuse excluded contingency or historical answers; capacity refusal is distinct."
+        }
+      ],
+      "categories": [
+        "document-scope change",
+        "evidence-insufficient"
+      ],
+      "dependency": "none",
+      "diagnostic_limits": {},
+      "evidence_support": [],
+      "facts": [],
+      "family": "D6",
+      "hard": true,
+      "id": "D6.V2",
+      "irrelevant_history": [
+        "T1"
+      ],
+      "outcome": "evidence_insufficient",
+      "prefix": [
+        {
+          "control": "intent_seed",
+          "correction": null,
+          "id": "T1",
+          "question": "Keep Sable-Pump maintenance discussion separate from contingency questions.",
+          "scope": [
+            "D6.ledger",
+            "D6.contingency"
+          ],
+          "signals": {
+            "constraints": [],
+            "entities": [],
+            "task": "maintenance",
+            "topic": "maintenance"
+          },
+          "state": []
+        }
+      ],
+      "primary_category": "document-scope change",
+      "protected": [],
+      "query_signals": {
+        "constraints": [],
+        "entities": [],
+        "task": "D6-task",
+        "topic": "D6-task"
+      },
+      "question": "During a brownout, what contingency must Sable-Pump apply?",
+      "reference": "Report evidence insufficient in ledger-only scope; never reuse excluded contingency or historical answers; capacity refusal is distinct.",
+      "reference_answer": "证据不足，无法回答。",
+      "required_aspects": [],
+      "required_history": [],
+      "scope": [
+        "D6.ledger"
+      ],
+      "sha256": "2863c7b0252c16978df3e0818acb35143dd9e6a1403c900c77d150f831a3179c",
+      "topic_relation": "shift"
+    }
+  ]
+}

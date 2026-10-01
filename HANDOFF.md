@@ -1,4 +1,72 @@
+# Current milestone — frozen DEV v3 Human Gold
+
+Status: **V02A_DEV_HUMAN_GOLD_FROZEN** · 2026-10-01. Human Product Owner APPROVE, 12 LABEL units, duration NOT_MEASURED; no personal name invented.
+
+Exact dataset `citeweave-v02a-development-v3` / version3 / SHA256 `a01953930e2893065dc6f724b6ce896015124744d6614ac14a6354f087636023` unchanged. External approval `citeweave-v02a-development-v3-human-gold-20261001` / SHA256 `df55c120f92ee4998083872cb6bea421101fc1c9eb89c3dd730242b064debd66`; [freeze/12 exact view hashes/blockers](docs/V02_DEV_HUMAN_GOLD_FREEZE.md), [approved review](docs/V02_DEV_DATA_REVIEW.md), [readiness](docs/V02_DEV_READINESS.md). Small pinned `dev_approval.load_human_gold` verifies dataset/view/approval/reference identities and rejects drift/REG/Holdout before any forbidden reads. No manifest approval rewrite or v4.
+
+Full provider-free release: backend421 passed/207 integration deselected; frontend41 passed/5 files; lint/format216 files/typecheck/build/OpenAPI types passed. Isolated DEV PG9 passed; final focused readiness **62 passed** (overlapping counts). Existing Python/Vite warnings retained. One initial PG path error ran no tests; corrected suite passed. Project PG stopped; application DB/old RAGFlow untouched.
+
+V1/v2 and their histories/audits plus v3 pre-freeze surface preserved. Real DEV results must never mutate v3: retain data/results, record defect, create new version/hash and obtain review. Data minutes are unmeasured; earlier cumulative review workload remains unreconciled. Outputs NOT_RUN. Remaining paid gates: live reserves/input/deadlines/cumulative finite tokens/CNY/authorization/balance/model/rate/new-corpus real bindings/paid policy/State-only A publication integration. Gold is not execution authority. DEV/HARD/REG NOT_RUN; provider/model/Judge=0; spend0; #5d NOT_STARTED; production behavior unchanged.
+
+Create exactly one local Gold/readiness checkpoint after checks; exact commit/tree reported by final Git readback and local receipt. No push/PR/merge/tag/release authorized.
+
+## Previous v3 Test-first milestone (preserved)
+
+# Current milestone — v3 targeted Test-first re-audit
+
+Status: **V02A_DEV_TEST_FIRST_READY_FOR_HUMAN_FREEZE** · 2026-10-01. Human Gold PENDING; no DEV/provider/model/Judge or paid-authorization work.
+
+Owner resolves D1.V2 topic_relation=return relative to current focus, independently of still-valid pending State. New proposal `citeweave-v02a-development-v3` / version 3 / SHA256 `a01953930e2893065dc6f724b6ce896015124744d6614ac14a6354f087636023`. [Complete unsigned 12-view review](docs/V02_DEV_DATA_REVIEW.md), [targeted re-audit](docs/V02_DEV_TEST_FIRST_AUDIT_V3.md), [v3 delivery](docs/V02_DEV_READINESS.md).
+
+Other eleven views/source bytes and all R/A/AB0 structural results remain unchanged. A active Ferrule-Q State is independent of return, with zero old-raw/B credit and no product Acceptance. AB0 durable return/B recovery preserves valid Ferrule-Q State. Provider-free readiness 48 passed; isolated PG 9 passed; no production/API/prompt/schema/frontend behavior change. V2 exact manifest/review/readiness/report and v1 history preserved. Stop for Owner full data/hash/reference review; do not sign Gold or run DEV.
+
+## Previous v2 Test-first audit (preserved)
+
+# Current milestone — Test-first / bias audit
+
+Status: **V02A_DEV_TEST_FIRST_REVISE_REQUIRED** · 2026-10-01.
+
+[Full 12-view arm-independent audit, capability mapping, leakage/coverage/reference review](docs/V02_DEV_TEST_FIRST_AUDIT.md). Exact affected view: **D1.V2** — its `continue` label lacks a fixed criterion after T3 moves to tray-display and the target names D1-task again. Core Ferrule-Q/nine-minute answer remains supported; active State availability does not settle topic classification. Owner must clarify the relation and corresponding interpretation/scoring independently of arm performance before freezing labels. Other 11 views KEEP under the stated limited premises; this is an AI audit, not Human Gold or independent blind review.
+
+V2 ID/version/hash and v1/REVISE history preserved unchanged. No dataset/code/reference file regenerated or edited; only this navigation and the audit record added. Read-only manifest/source/span/fake-receipt checks passed; no DEV/model/provider/Judge, sealed access, services, tests rerun or spending. Stop here; no paid-gate work included.
+
+## Previous revised provider-free readiness record (preserved)
+
+# Current milestone — DEV proposal revision 2
+
+Status: **V02A_DEV_HUMAN_DATA_REVIEW_REQUIRED** · 2026-10-01. Owner first data review returned REVISE; paid execution is still blocked separately.
+
+Current manifest `citeweave-v02a-development-v2` / version 2 / SHA256 `3b1ef5dc37376cf26b5fb20aa8367d76ed2af5ccf376a312a62fc2d6dbcd20a7`. [Complete revised 12-view review](docs/V02_DEV_DATA_REVIEW.md), [revision implementation/accounting/gates](docs/V02_DEV_READINESS.md), [preserved v1 review](docs/V02_DEV_DATA_REVIEW_V1.md) and [v1 readiness](docs/V02_DEV_READINESS_V1.md).
+
+D1.V2/D3.V1: R cannot resolve old intent; A uses active bounded State without reading old T1 or raw/B coverage; AB0 recovers raw T1 through B. A State answers are explicit evaluation artifacts, never product Acceptance. D3.V2 R/A still fail incomplete_group before model seams; AB0 recovers the complete group. D4.V2 removes artificial T2 required-history coverage (N/A), keeping branch provenance and South evidence.
+
+Full offline backend 405 passed/206 integration deselected (two existing deprecations); isolated PG 8 passed; affected execution/accounting after common evaluation message clarification 18 passed; final focused readiness 46 passed and final PG repeat 8 passed (overlapping counts). Required Ruff lint/format 214 files and 30-file publication audit passed. Extra root format check exposed an unchanged older documentation code block; recorded, not altered. Original dataset/source hashes and production/protocol bytes preserved. Final audit results are in current readiness delivery. PG started only for own UUID test databases and stopped afterward; application DB and old stopped RAGFlow volumes untouched.
+
+Owner fields remain PENDING: full labels/references/source semantic support/branch/connectivity, exact reviewed hashes/reviewer/date/reasons/minutes; prior REVISE cumulative actual workload must be reconciled (48 units/384 minutes unchanged). Paid gates remain unresolved: live reserves/input caps/deadlines/cumulative finite tokens/CNY/balance/model/rates/new-corpus real bindings/paid policy and State-only publication integration. Fake accounting is not authority: conditional 38 calls; accepted ceiling 48; actual calls/spend 0. DEV/HARD/REG NOT_RUN; #5d NOT_STARTED; production behavior unchanged; no commit/push/PR/merge/tag/release. Stop at revised Human Data Review; preserve this branch.
+
+## Historical v1 readiness delivery (superseded for data review by revision 2)
+
 # Current milestone
+
+Status: **V02A_DEV_READINESS_BLOCKED — provider-free implementation delivered; data and execution-envelope gates remain** · 2026-10-01
+
+The separately authorized provider-free readiness task started from clean HEAD/main/origin-main `0bfca12302067b9883644def6d313fefdbd78a7e` (tree `78f44cd46114e1c6d3688612045e09ceb7d1987f`), independently matched remote main, verified single Alembic head `0011`, and created `eval/v0.2a-dev-readiness`.
+
+Human Owner resolved the R window/provenance ambiguity on 2026-10-01 and resumed this same task: R/A recent-2 limits ALL materialized raw members; no outside provenance expansion/partial correction groups; fail incomplete/search-incomplete. A may carry bounded current state but cannot rematerialize old text; state is non-Evidence. AB0 recovers relevant old sources/groups through B. Production AB0 is unchanged. The [historical stop and exact Owner clarification](docs/V02_DEV_READINESS_BLOCKER.md) are preserved; accepted protocol text was not rewritten.
+
+The [complete provider-free delivery](docs/V02_DEV_READINESS.md) and [12-view Owner review surface](docs/V02_DEV_DATA_REVIEW.md) are ready to inspect. DEV manifest `citeweave-v02a-development-v1` / complete SHA256 `f33f96f51f1e5bf310bc9034e673c40ffd74f6a1fe91a4a62d2a1af45be0dd44`; D1–D6/12 views, original seven PDF/canonical source proposals, accepted seven HARD identities, exact scope/source/group/support/view hashes. Owner labels/references/branch/connectivity approval **PENDING**. REG/Holdout absent/inaccessible. Manifest is a byte-locked proposal, not accepted Human Gold.
+
+Executable evaluation identities V0/R/A/AB0; shared provider-neutral target and deterministic fake L1 seams; V0 delegates existing single-turn execution, AB0 PG delegates existing production History. Real isolated PG proves admission/atomic acceptance/same-key no-regeneration recovery, strict R/A raw-read boundaries, B complete-group recovery, V0 durable result and D4 clarification closed-loop head clearing. Fixed-prefix and closed-loop have separate mode/Conversation identities. Metrics retain complete-group A/B/union/old/raw/state attribution, semantic Human inputs, physical citation/critical gates, planned denominators, descriptive strata/resources/comparison/futility/INCONCLUSIVE; fakes cannot become semantic candidates. No paid DEV entrypoint or positive server policy installed.
+
+Provider-free accounting uses pinned official offline tokenizer/framing (`tokenizers 0.23.2`) and exact full-message/reference request bytes. Fixed A/AB0 input specimens: interpretation1735–2241 / generation335–925 tokens; proposed output maxima471 /22, still unreviewed references, not reserves. Future protocol max48 calls; conditional fixed-manifest max34=13 interpretation+21 generation, expected fake path32=13+19. Official model/CNY pricing HTML fetched read-only/hash-saved; rates match existing identity. Published provider maxima yield a conditional technical ceiling243.456 CNY/48calls (172.448/34), not an affordable/authorized DEV envelope. **Live input/reserves/combined deadlines/finite agreed CNY/balance/alias/new-corpus real bindings remain DEFERRED/NOT_VERIFIED.** Worst-case agreed DEV exposure UNKNOWN. Thus Human Data Review is not the only gate, and READY/HUMAN_DATA_REVIEW_REQUIRED would be inaccurate. Review pool max48units/384minutes; no owner decisions/minutes signed.
+
+Final focused DEV tests: **38 passed, 0 failed, 0 skipped**. Final full backend `pytest -q -m "not integration"`: **397 passed, 0 failed, 0 skipped; 204 integration deselected** (25.89s). Final isolated DEV PG: **6 passed, 0 failed, 0 skipped** (4.56s); earlier related Core/Evidence/API/Runtime/Budget PG regressions: **112 passed** (43.09s), overlaps focused runs and is not additive. `scripts/check_release.py` passed before the final backend-only extensions: backend391 passed/203 deselected; frontend41 passed (5 files), lint/typecheck/build/OpenAPI/generated TypeScript all passed. After extensions, affected/full backend rerun as above; frontend unchanged and not rerun gratuitously. Final Ruff lint/format **213 files** passed. Existing two Python deprecations and Vite >500kB warning remain. Intermediate PG connection/setup and TDD/format failures were fixed and are not passing counts; details in readiness delivery. New-corpus REAL_QDRANT/E5/BGE/model/semantic output verification not run or claimed.
+
+Runtime receipts/review-plan/official snapshots/source PDFs remain under ignored `.runtime/evaluation/`; publication payload is an explicit allowlist of new eval code/scripts/tests/original manifest/current docs. Credential/private-artifact, source/manifest/hash, local-link and whitespace audits passed. PostgreSQL was stopped initially; Docker Desktop and only this project's PostgreSQL were started to run isolated UUID databases. All test databases cleaned by fixtures; configured application DB was not migrated/seeded. The project PostgreSQL was stopped afterward, preserving its volume; old RAGFlow containers/volumes stayed stopped/preserved. No prune/reset.
+
+**Provider/model/Judge calls=0; provider cost=0 CNY; DEV/HARD/REG NOT_RUN; #5d NOT_STARTED; no production/API/prompt/ranking/offset/schema/frontend change; no commit/push/PR/merge/tag/release.** Preserve this uncommitted branch. Next: Owner reviews the complete 12-view labels/reference/branch/connectivity surface, then separately resolves accepted execution-envelope/real-binding gates and authorizes any actual DEV. No additional preimplementation Calibration, provider pilot or tuning is authorized.
+
+## Accepted #5c-2 baseline record
 
 Status: **v0.2a Implementation #5c-2 — one authorized real smoke PASSED; ready for Human Implementation Review** · 2026-09-30
 

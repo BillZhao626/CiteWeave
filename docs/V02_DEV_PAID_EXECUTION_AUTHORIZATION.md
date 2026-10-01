@@ -1,5 +1,138 @@
 # v0.2a DEV v3 — Paid execution authorization packet
 
+状态：**V02A_DEV_PAID_REMEDIATION_BLOCKED** · 2026-10-01。仅 provider-free implementation/verification；当前真实授权 **0 calls / 0 tokens / 0 CNY**。DEV/HARD/REG NOT_RUN；external LLM/Judge/account API=0，支出0。技术实装/本地验证完成，但用户指定的accepted head0011不能默认为接受新head0012。评测专用持久policy需要的additive migration0012尚待Human接受；本候选可供实现审阅，当前不具备付费执行资格。金额/账户确认不能越过该额外门禁。
+
+## 保留 BLOCKED 证据与冻结身份
+
+先核验原readiness diff与Gold，完成原检查，再创建本地 BLOCKED checkpoint：commit 5c80f0f74a3f2c96aced57700cdab93123d586a6 / tree 9ae13d6801cd958d35fa62aadc78c3b00f719ec4。原授权文档SHA256 1e796521f524e24b7d0382dc7610b99b0796f5d4f28eeb90e0ebdf8678e23503；原 measurements/报告/原文件字节封存忽略目录 blocked-5c80f0f/，原文内容还保留在本文末尾。无 push/PR/merge/tag。
+
+Gold checkpoint c905bb55489108aa118e669d576e037ba5c81ca1 / tree b6dadc84fd530bdc7fd2a22bb453b4058669d3b3。dataset citeweave-v02a-development-v3 SHA256 a01953930e2893065dc6f724b6ce896015124744d6614ac14a6354f087636023；approval citeweave-v02a-development-v3-human-gold-20261001 SHA256 df55c120f92ee4998083872cb6bea421101fc1c9eb89c3dd730242b064debd66。12 views、pinned v1/v2 history、7 PDF/text hashes重验；原字节不改，未读审计私有/或sealed。
+
+完整本地包：本文与 .runtime/evaluation/v02-dev-paid-remediation/{environment.json,contracts-head0012.json,candidate.json}。提交后 scripts/freeze_v02_dev_candidate.py 对最终干净HEAD/tree、真实环境和所有identities再核验，写入不可变candidate.json并在隔离PG创建DISABLED/零grant。完整候选commit/tree在该收据和最终交付中明确列出，避免在提交自身写循环自哈希。未来Human policy必须逐项绑定这些身份；任何tracked diff/新HEAD/环境漂移均拒绝执行。历史prepare_v02_dev_paid_readiness.py仍绑定旧checkpoint，不能用于当前候选。
+
+## A：有限请求与费用
+
+O_I=1561 tokens：冻结参考解释完整JSON包含全部defaults，indent=2后最大UTF8字节1561；按singleton byte最差分词构造明确有限安全余量，原参考最大459 tokens。财务reserve不承诺任意合法模型输出都能完成；生产DTO不加max_length、解释语义不变。
+
+O_G=32768 tokens：覆盖现有完整答案8192 Unicode codepoints guard，含引用label，每字符至多4 UTF8 bytes，普通ByteLevel tokens≤bytes。参考最大22 tokens仅作观察，不当预算；不复用旧1024，不缩短产品语义。
+
+每次请求显式max_tokens。截断/非stop/不完整DONE/invalid JSON/schema/特殊token字面量/超reserve或既有答案guard均fail closed，无retry/repair。完整已知但结构无效的输出保留COMPLETED计量并关闭FAILED目标；不完整传输/网络不确定性保持UNKNOWN并停止campaign。
+
+动态输入采用保守**符号上界**，不是40538 specimen总量、不是分段token计数相加。对完整generation serializer：固定PG history/state全部可注入项按UTF8 bytes计，最长mode/topic；I输出每普通token最多128 decoded UTF8 bytes；合法fact补默认字段/UUID规范化至多2倍原JSON字节（最短current fact51 bytes，nullable defaults最多35 bytes，UUID规范化增量仍在2倍内）；query既有512 codepoints guard×6 JSON escaping bytes；7份固定ASCII corpus当前pack≤6400 chars/bytes；完整message字节上界+5官方framing tokens。固定ByteLevel/BPE无normalizer/额外prefix，merge只合并初始bytes，因此完整序列token数不超过该整数界。它不声称紧致最优或穷举所有输出；每个实际body在PREPARED及before_send再完整serialize、用官方tokenizer精确recount，超槽cap在DISPATCHED前拒绝。
+
+Tokenizer SHA256 81f64d1248a68ce3663e07ab3ee48b851e5df0e32d27cb98e4c9a268151e8d99；recipe 8cadfede7063c896b944e7bae05daa3549ae97ea；tokenizers0.23.2；text-pair/non-thinking/无工具。HTTP JSON转义不作为模型content额外token重复计费。以下是该固定协议的保守财务上界，不是实账保证或质量结论。
+
+| 项目 | 条件最大值 |
+| --- | ---: |
+| I stage input | 2328 |
+| G stage input | 411919 |
+| Campaign input | 6196897 |
+| Campaign output | 777079 |
+| Campaign total | 6973976 |
+| Campaign CNY | 18.610426 |
+
+每槽cap（I output1561 / G output32768；缺席/未用槽不可转让）：
+
+| View / arm | I input | G input | Calls max | CNY max |
+| --- | ---: | ---: | ---: | ---: |
+| D1.V1:cp-a-v1 | 1811 | 410775 | 2 | 1.099804 |
+| D1.V1:cp-ab0-v1 | 1825 | 410775 | 2 | 1.099832 |
+| D1.V2:cp-a-v1 | 1712 | 410538 | 2 | 1.099132 |
+| D1.V2:cp-ab0-v1 | 1834 | 410775 | 2 | 1.099850 |
+| D2.V1:cp-a-v1 | 0 | 348 | 1 | 0.26284 |
+| D2.V1:cp-ab0-v1 | 0 | 348 | 1 | 0.26284 |
+| D2.V2:cp-a-v1 | 0 | 348 | 1 | 0.26284 |
+| D2.V2:cp-ab0-v1 | 0 | 348 | 1 | 0.26284 |
+| D3.V1:cp-a-v1 | 1727 | 410566 | 2 | 1.099218 |
+| D3.V1:cp-ab0-v1 | 1837 | 410823 | 2 | 1.099952 |
+| D3.V2:cp-a-v1 | 0 | 0 | 0 | 0 |
+| D3.V2:cp-ab0-v1 | 2055 | 411291 | 2 | 1.101324 |
+| D4.V1:cp-a-v1 | 2042 | 411229 | 2 | 1.101174 |
+| D4.V1:cp-ab0-v1 | 2021 | 411229 | 2 | 1.101132 |
+| D4.V2:cp-a-v1 | 2328 | 411919 | 2 | 1.103126 |
+| D4.V2:cp-ab0-v1 | 2326 | 411919 | 2 | 1.103122 |
+| D5.V1:cp-a-v1 | 1846 | 410787 | 2 | 1.099898 |
+| D5.V1:cp-ab0-v1 | 1836 | 410787 | 2 | 1.099878 |
+| D5.V2:cp-a-v1 | 1858 | 410791 | 2 | 1.099930 |
+| D5.V2:cp-ab0-v1 | 1860 | 410791 | 2 | 1.099934 |
+| D6.V1:cp-a-v1 | 0 | 446 | 1 | 0.263036 |
+| D6.V1:cp-ab0-v1 | 0 | 446 | 1 | 0.263036 |
+| D6.V2:cp-a-v1 | 0 | 350 | 1 | 0.262844 |
+| D6.V2:cp-ab0-v1 | 0 | 350 | 1 | 0.262844 |
+
+| Arm | Calls max | Input | Output | Total | CNY max |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| cp-a-v1 | 18 | 2891421 | 371375 | 3262796 | 8.753842 |
+| cp-ab0-v1 | 20 | 3305476 | 405704 | 3711180 | 9.856584 |
+
+最坏cache-miss input2/output8 CNY/M；RATE_CARD=deepseek-flash-CNY-2026-09-13。Decimal (input×2+output×8)/1e6，不依赖cache hit/夜间折扣。既有2026-10-01T04:22:53Z官方公开价格快照SHA256 5a7b1832592387340f2fc456399b34b89b05f3fa167c2e35909e2fa4afe021e3 保留，Human在授权时须确认快照仍适用于私人CNY账户；无account API或余额读取。36预期路径财务上界 16.441222 CNY，仅作说明，不是实际消费预测。
+
+## B：真实隔离 corpus/runtime
+
+专用PG DB cw_dev_v3_a01953930e289306：在accepted0011完成真实摄取，仅为本evaluation seam加0012。原配置应用DB仍0005、未升级/seed；只有7个固定Document/Version、专用LocalBlobStore。真实production ingestion、source/text/canonical_block hashes、READY durable commit/PUBLISHED index、local E5/BGE、production retrieval及物理引用7/7核验。没有broker worker、新基础设施或RAGFlow改动。
+
+E5 intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3，384维、dense_only、normalize、原query/passage prefixes；BGE BAAI/bge-reranker-v2-m3@953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e。完整environment的规范SHA256 77a696e9cd7a29c169a4e0ea13fc3dfe60a8ee1881fee2c01f10bc2df6052749，包括7 bindings/7 retrieval packs/citations。首轮Qdrant UnexpectedResponse导致7个本地ingestion失败，保留FAILED_FINAL receipts/BUILDING索引；一次明确local recovery-01使用新生产namespace，成功READY/PUBLISHED。没有provider重试、无删除历史证据。
+
+| Source | Version | Artifact | Qdrant collection | Profile SHA256 |
+| --- | --- | --- | --- | --- |
+| D1.manual | 8077f914-b388-5a27-afdb-699735635d6b | e5056658-7bb5-5045-9736-5fbf2d8704e8 | cw3_v8077f914b3885a27afdb699735635d6b_jfb25ab0d08c850538a6af3fc7801e01c_f1 | f160a4839133f5726e9eba1f96f7bf35ae31cb99ef98dee89bcdd22ddb38f4df |
+| D2.manual | 96589c61-798e-574c-9fba-c04d17bdfc8a | 2a158931-9523-5aa5-a60b-1f619f7ffadf | cw3_v96589c61798e574c9fbac04d17bdfc8a_jf62ed1e7d641557ba39521a4d1425373_f1 | f160a4839133f5726e9eba1f96f7bf35ae31cb99ef98dee89bcdd22ddb38f4df |
+| D3.manual | 39c513f3-4a62-5236-8efd-d15dab4e1787 | bd6d66d0-4eeb-5f5e-a457-94620fbbbab3 | cw3_v39c513f34a6252368efdd15dab4e1787_jbfbeda5b55b25379a5f2a60227654949_f1 | f160a4839133f5726e9eba1f96f7bf35ae31cb99ef98dee89bcdd22ddb38f4df |
+| D4.manual | 1506a478-7da5-51d3-8e26-f71599e4550f | a7e87cda-ed0f-5e9f-9edc-3c5cab83debf | cw3_v1506a4787da551d38e26f71599e4550f_jc962ebe264505280b7e78a5da0f2cf56_f1 | f160a4839133f5726e9eba1f96f7bf35ae31cb99ef98dee89bcdd22ddb38f4df |
+| D5.manual | 1cf8706f-2078-579a-907c-84e6e6b5fc6d | aa560ae0-5877-515f-b9a5-02705fa606c0 | cw3_v1cf8706f2078579a907c84e6e6b5fc6d_j1e26ab39a4ca59938d4b73d4270a02cf_f1 | f160a4839133f5726e9eba1f96f7bf35ae31cb99ef98dee89bcdd22ddb38f4df |
+| D6.ledger | f1d40561-6c03-5d72-80f3-05413942d7d0 | 94ed8728-af80-5c7f-bd82-a171ffe1d108 | cw3_vf1d405616c035d7280f305413942d7d0_je916ec2d9ae151628cc28ebbf54ef0a3_f1 | f160a4839133f5726e9eba1f96f7bf35ae31cb99ef98dee89bcdd22ddb38f4df |
+| D6.contingency | 84f2de55-f6f4-5ddf-9e4c-658752ef3091 | c72a7552-9f8e-5891-8fdd-98cdc9164db1 | cw3_v84f2de55f6f45ddf9e4c658752ef3091_j26f0f9942ee45fe797218ab2d6953d91_f1 | f160a4839133f5726e9eba1f96f7bf35ae31cb99ef98dee89bcdd22ddb38f4df |
+
+全部PDF/text/canonical_block/tree/membership/BM25 hashes在本地不可变contracts。dev_launcher只构造RealDevBackend、StructuralEvidenceRetriever(ModelGateway())，没有FixtureRepository/provider_factory参数；完整预检real PG/Qdrant/citations，每次before_send重验Git/Gold/PDF/config/prompts/protocol/tokenizer/rate/models/PG bindings，production retriever自身验证当前index。物理引用正确不等于语义支持，无真实DEV答案/质量赢家。
+
+## C/D：收尾、硬slot和campaign guard
+
+[ADR0012](adr/0012-dev-campaign-settlement.md)记录责任与迁移。State-only A D1.V2/D3.V1无target产品Run/Acceptance/head/state写入；既有cw2_eval_cases关账，明确EVALUATION_ONLY_NOT_PRODUCT_ACCEPTED。cw4_provider_phases仍唯一call ledger，PREPARED→DISPATCHED→COMPLETED/UNKNOWN，复用原Decimal accounting。完整已知output/hash/usage同事务记录，已知目标在取消/过期后仍能关账，保持STOPPED、不把COMPLETED改UNKNOWN；同键只读durable receipt。UNKNOWN持久OUTCOME_UNKNOWN+STOPPED/INCONCLUSIVE，保留reservation/部分usage；普通目标仍用原product Acceptance guard。
+
+cw6_dev_campaigns绑定campaign UUID、Gold/approval、code/tree/config/prompts/provider/tokenizer/rate/index/protocol、24固定case/repeat1、固定38 phase slots、calls/input/output/total/CNY、授权到期/绝对deadline。PG row lock单active target，prepare/dispatch合计全部永久reservation；1s lock/statement timeout、flush后重验PG clock。real transport必须durable HUMAN/ACTIVE/positive finite grant，调用者对象/SYNTHETIC零授权marker不能给HTTP授权。DISABLED不可升ACTIVE；不自动扩大预算。
+
+执行absolute deadline≤153 minutes，创建真实grant时必须填明确UTC；授权到期≤此deadline。每target45s，每call≤min(35s,target remaining)，原HTTP25s/connect5s。取消由dev_campaign.cancel持久化，禁止新dispatch，保留已DISPATCHED费用/观测。进程丢失无自动resume；受守卫入口将expired DISPATCHED保守UNKNOWN并停止。24结果完成关闭spending，再进行独立Human review；不存在后台自动付费执行。
+
+**38 executable max**：15 I+23 G。D2.V1/V2、D6.V1/V2两arm固定无I；D3.V2 A固定零slots且real PG证明incomplete_group；D4.V1两arm条件G仍保留。DevPolicy拒绝新增缺席槽；每(case,purpose)只能一次，attempt1，取消/skip不能转让。expected36（15I+21G）仅Gold路径说明；protocol48为历史外层上限，本次不能消费额外10槽。V0/R/retry/refetch/repair/Judge=0；每paid目标仅一次history读取，不新跑HARD闭环。
+
+## 尚未关闭的 accepted-head 门禁
+
+用户Blocker B要求accepted Alembic head0011。真实七源摄取/检索已在0011完成；为数据库强制不可变campaign policy及其账本防护，本次在专用环境进一步添加0012，未改应用库。已有0011→0012与legacy reader/生产guard兼容验证，但兼容测试不等于0012接受。所需明确决定：接受这个评测专用additive schema/ADR，或要求另行调整为严格0011。当前schema_acceptance_id/schema_accepted_at均null；HUMAN policy验证也必须具有单独schema acceptance identity/timestamp，否则real dispatch仍拒绝。未自行作Accepted决定。
+
+因此不能宣称仅剩paid/account确认，也不能将本候选标READY_FOR_PAID_AUTHORIZATION。其余A输出储备/保守动态token界、真实7源、State-only关账、38槽及五维campaign guard已实现并provider-free验证；head接受门禁是明确剩余项。
+
+## 后续 Human fields
+
+未来仅此campaign **24 mandatory OUTPUT+up to12 DISPUTE=36 units /288 minutes**，单独finite future-work pool。人工开始前核对剩余units/minutes，使用剩余分钟停止计时，不在耗尽后开启新review；receipt记prospective actual minutes、reviewer、decision、hash和PG timestamp；超额/重复unit拒绝，24 OUTPUT齐备才标reviewed，不自动promotion/winner。Gold历史12 LABEL分钟仍NOT_MEASURED，不推定历史累计分钟满足旧上限，也不重写Gold accounting。
+
+当前下列checks全PENDING/false，confirmation timestamp=null，authorization_id=null：
+
+- intended DeepSeek account/endpoint https://api.deepseek.com/chat/completions；
+- billing currency CNY与当前rate快照适用；
+- 接受public deepseek-flash / DeepSeek-V4.1-Flash alias无法固定immutable weights的复现限制；
+- 当前worst-case input2/output8 CNY/M快照仍有效；
+- private balance和remaining monthly budget足够有限grant，只记录bool/status+timestamp，不保存余额/credentials，不调用账户API；
+- 单独Human有限calls/input/output/total/CNY授权、新campaign UUID、exact候选commit/tree/all identities、24case/38slots、明确UTC expiry/153min deadline和288min未来review工作池；
+- accepted0012 schema/本implementation/ADR的人审结论与schema_acceptance_id/schema_accepted_at。数据、代码、环境、价格、账户漂移均不能重用授权。
+
+candidate.json仅DISABLED/零grant提案，不可变。未来必须另给明确Human positive policy；READY标签、mode编辑、env key、测试marker、时间经过均不构成批准。
+
+## 验证与实际限制
+
+最终provider-free release：backend443 passed /228 integration deselected，frontend41 passed/5 files，232 Python files lint/format、生成OpenAPI/TS、typecheck、frontend lint/build通过。重点PG+DEV/migration/provider suite64 passed，最新Core/campaign suite62 passed（与64/443有重叠，不合计），均0 failures/skips。原checkpoint检查backend433/frontend41及历史BLOCKED证据保留。
+
+失败历史如实保留：Docker daemon最初未运行，启动Desktop的自动审批拒绝后由Owner手动启动；首次real ingestion失败后一次显式local recovery成功；一个测试SQL绑定写法和fake Accounting缺属性修正；首次全release有18个PG setup errors，因为新文件未标integration，修正后443/228完整通过。上述失败不记PASS。保留2个Python deprecation和Vite chunk>500kB/plugin timing warnings，不改无关代码。
+
+Gold admission/12-view hashes/7 source与canonical hashes、专用数据库head0012/真实7 READY-PUBLISHED bindings、7次local E5/BGE/Qdrant检索与物理引用通过。离线完整body/escaping/最大pack计数、truncation/schema fail-closed、五维预算/Decimal、State-only两题零Acceptance/head、同键恢复、UNKNOWN/no-redispatch、取消保留计费、deadline、并发fence、immutable policy及零授权provider-construction/real-dispatch sentinel通过。call bridge采用零real grant的SYNTHETIC marker和fake transport，仅在测试中显式绕开入口并关闭real_transport标志；真实入口和PG real_transport gate分别证明拒绝这些模式，不创建正值Human授权。
+
+不调用外部LLM、不读取账户、无付费输出。Synthetic marker/transport tests均real grant=0，仅机制证据；real local E5/BGE/PG/Qdrant并不证明答案语义质量或实际provider bill。production默认runtime/history admission不开放，#5d NOT_STARTED。独立DB/blob/index保留供未来同一候选复核；仅停止本次使用的项目服务/自建gateway，旧停止RAGFlow容器/卷不动。
+
+---
+
+# Preserved BLOCKED readiness at 5c80f0f (historical; conclusions above supersede only with new evidence)
+
+# v0.2a DEV v3 — Paid execution authorization packet
+
 状态：**V02A_DEV_PAID_READINESS_BLOCKED** · 2026-10-01。本次仅 provider-free 准备与测试；DEV/HARD/REG 均 NOT_RUN，外部 provider/model/Judge 调用 0，支出 0 CNY。没有正值授权、付费入口或部署策略。以下已测样本不能成为真实执行预算。
 
 ## 冻结身份与核验

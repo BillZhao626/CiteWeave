@@ -3,6 +3,7 @@ from alembic import context
 from citeweave import conversation_models  # noqa: F401 -- register additive metadata
 from citeweave.db import engine
 from citeweave.domain import Base
+from citeweave.evaluation import dev_campaign_models  # noqa: F401 -- evaluation-only metadata
 
 with engine().connect() as connection:
     context.configure(

@@ -14,7 +14,7 @@
 
 | 当前任务 | 按需阅读 |
 | --- | --- |
-| 当前：Paid DEV readiness BLOCKED；provider-free only | [单一授权包](V02_DEV_PAID_EXECUTION_AUTHORIZATION.md)：Gold/checkpoint不变；A/AB0各12目标，预期36/条件38/协议48 calls；live tokens/CNY仍UNKNOWN。应用PG0005、DEV versions0/7、真实index未绑定；State-only A付费收尾/campaign保护/人审累计容量未闭合。provider/Judge/spend0、DEV/HARD/REG NOT_RUN，无付费授权 |
+| 当前：Minimal paid DEV remediation；REMEDIATION_BLOCKED / provider-free | [单一授权包](V02_DEV_PAID_EXECUTION_AUTHORIZATION.md)、[ADR0012](adr/0012-dev-campaign-settlement.md)：BLOCKED checkpoint封存；固定38 slots/expected36，O_I1561/O_G32768，总6973976 tokens/18.610426 CNY保守上界；专用PG0012、7/7真实生产index/E5/BGE/Qdrant/物理引用；State-only独立账本收尾、零Acceptance/head；candidate零grant。后端443/前端41、重点PG64及Core62通过（重叠），accepted0011之外的additive0012尚待Human接受；当前不能仅凭金额授权；LLM/Judge/spend0、DEV/HARD/REG NOT_RUN |
 | 冻结数据：DEV v3 Human Gold APPROVED / FROZEN | [冻结记录与12个view哈希](V02_DEV_HUMAN_GOLD_FREEZE.md)、[批准的人审表](V02_DEV_DATA_REVIEW.md)、[readiness](V02_DEV_READINESS.md)：外部不可变 attestation 绑定原 v3 字节；12 LABEL 单位，分钟未测量；DEV/HARD/REG及provider/Judge仍0，付费执行未授权。v1/v2历史保留，真实DEV结果不得修改v3 |
 | 历史：DEV v3；TEST_FIRST_READY_FOR_HUMAN_FREEZE | [完整人审表](V02_DEV_DATA_REVIEW.md)、[针对性重审](V02_DEV_TEST_FIRST_AUDIT_V3.md)、[交付](V02_DEV_READINESS.md)：Owner 明确 D1.V2 return 与 pending/active State 为不同维度；其他11题不变。v2 字节及历史保留；人审未签，DEV/provider/Judge=0，无付费授权工作 |
 | 历史：DEV revision 2；HUMAN_DATA_REVIEW_REQUIRED | [HANDOFF](../HANDOFF.md)、[v2 交付与付费门禁](V02_DEV_READINESS.md)、[完整 12-view 人审表](V02_DEV_DATA_REVIEW.md)、[v1 人审历史](V02_DEV_DATA_REVIEW_V1.md)、[Owner 澄清记录](V02_DEV_READINESS_BLOCKER.md)：首次人审 REVISE；D1.V2/D3.V1 A 可用当前 State 解析意图（评测输出，无旧原文/B 分/生产 Acceptance）；D3.V2 保持完整纠正组，D4.V2 覆盖分母 N/A。付费门禁仍未解决，Provider=0，DEV/HARD/REG NOT_RUN，#5d NOT_STARTED |

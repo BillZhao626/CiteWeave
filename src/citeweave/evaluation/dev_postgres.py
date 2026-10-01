@@ -60,8 +60,8 @@ def require_isolated():
 class PgBackend(DtoBackend):
     authority = "EXISTING_POSTGRES_ADMISSION_ACCEPTANCE"
 
-    def __init__(self, data, view, config, *, mode="FIXED_PREFIX_L1"):
-        require_isolated()
+    def __init__(self, data, view, config, *, mode="FIXED_PREFIX_L1", isolation_check=require_isolated):
+        isolation_check()
         self.data, self.view, self.config = data, view, config
         self.mode = mode
         self.workspace = identity("workspace")

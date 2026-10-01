@@ -163,6 +163,7 @@ def create(workspace, kb, policy):
                 deadline=policy.deadline,
             )
         )
+        db.flush()  # Establish DEV ownership before the case INSERT triggers run.
         for key in policy.cases:
             db.add(EvalCaseRow(eval_run_id=policy.campaign_id, case_id=key, max_attempts=1))
     return policy.campaign_id
@@ -308,12 +309,18 @@ def prepare(workspace, campaign_id, key, owner, purpose, body, accounting):
                 reserved_yuan=maximum_cost(measured["input_tokens"], slot.output_tokens),
             )
             _budget(phases, policy.proposed if policy.mode == "SYNTHETIC" else policy.grant, phase)
+            reservation = db.begin_nested()
             db.add(phase)
             db.flush()
-            failure = _check(db, row, policy, db.scalar(select(func.clock_timestamp())), case)
+            checked_at = db.scalar(select(func.clock_timestamp()))
+            failure = _check(db, row, policy, checked_at, case)
             if failure:
-                db.delete(phase)
+                # A failed, never-committed INSERT is rolled back, not DELETEd.
+                # Reapply the durable stop outside the rolled-back savepoint.
+                reservation.rollback()
+                failure = _check(db, row, policy, checked_at, case)
             else:
+                reservation.commit()
                 phase_id = phase.id
     if failure:
         raise CoreConflict(failure)

@@ -1,5 +1,10 @@
 # v0.2a DEV v3 — Paid execution authorization packet
 
+修订说明（2026-10-01）：本页候选/环境收据属于历史提交 `4cd7390`；该版0012未接受。
+另行授权的 provider-free schema 修订及新候选见 [0012修订人审包](V02_0012_REVISION_REVIEW.md)。
+历史 DEV 库/收据未覆盖或升级，不构成修订版 schema 证明；旧候选身份不能授权新代码。
+schema/ADR 仍 PENDING，金额/provider 授权仍0；此页不是修订候选的执行安装许可。
+
 状态：**V02A_DEV_PAID_REMEDIATION_BLOCKED** · 2026-10-01。仅 provider-free implementation/verification；当前真实授权 **0 calls / 0 tokens / 0 CNY**。DEV/HARD/REG NOT_RUN；external LLM/Judge/account API=0，支出0。技术实装/本地验证完成，但用户指定的accepted head0011不能默认为接受新head0012。评测专用持久policy需要的additive migration0012尚待Human接受；本候选可供实现审阅，当前不具备付费执行资格。金额/账户确认不能越过该额外门禁。
 
 ## 保留 BLOCKED 证据与冻结身份

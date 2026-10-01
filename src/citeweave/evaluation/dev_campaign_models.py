@@ -26,4 +26,4 @@ class DevCampaignRow(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     stop_reason: Mapped[str | None] = mapped_column(String(80))
-    review: Mapped[dict] = mapped_column(JSONB, default=dict)
+    review: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")

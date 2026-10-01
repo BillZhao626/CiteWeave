@@ -1,4 +1,16 @@
-# Current milestone — Migration 0012 revision (provider-free)
+# Current milestone — Provider Observation remediation (provider-free)
+
+Status: **V02A_PROVIDER_OBSERVATION_REMEDIATION_READY_FOR_HUMAN_REVIEW** · 2026-10-01. [Review packet](docs/V02_PROVIDER_OBSERVATION_REMEDIATION_REVIEW.md) records the bounded response-side repair. Shared Observation/Usage DTO and schema0012 unchanged; no provider/model/Judge/account API or positive grant this task. New candidate still requires Human review and independent paid authorization.
+
+Starting accepted candidate `0af752d3f7b6cc2178d2fac7a52e2e55f26690cc` / tree `6264028b6c1f5412c26ae5216c581189a6ab870e`; revised0012 schema accepted as `d0048834-cae6-4aa7-8ec0-faedc63be9bd` at2026-10-01T10:31:09.670489Z. Accepted runtime receipts are ignored in `.runtime/evaluation/0012-accepted-runtime/`; earlier pending navigation below is historical.
+
+DEV campaign `73bd8f72-dcda-4c79-8458-d19e3a5da07e` / phase `5c649ca0-b6a7-4a26-92c5-2bdfe1fc0b59` remain STOPPED/UNKNOWN, one dispatched call,23 pending targets. Historical actual tokens/CNY unavailable; unresolved exposure≤0.016110 CNY permanently reserved. No retry/reconciliation-as-known. Full campaign/phase row preservation and seven source/index/blob/physical citations verified read-only; normal app0005/28 versions unchanged.
+
+DEV maps stream provider_id→request_id and excludes diagnostic served-model metadata; immutable phase provider/model alias remains authoritative. Known receipt persistence now shares error protection; unsupported values fail closed to UNKNOWN, whereas invalid local output after known transport stays COMPLETED/accounted. Deterministic fake-stream/mock-HTTP and isolated PG regressions cover the original failure shape; real answer semantics/billing remain unverified.
+
+23 accepted concrete bodies and36 older reference bodies retain exact production-order request hashes/token counts. Frozen prompts/runtime/config/source/environment,38 slots and input6196897/output777079/total6973976/CNY18.610426 proposal unchanged. Future maximum cumulative exposure≤18.626536 CNY including the old UNKNOWN. Neither proposal nor this remediation authorizes execution. #5d NOT_STARTED; v0.2a incomplete. Final focused222 passed/0 failed/0 skipped; release backend452 passed/327 integration deselected,frontend41/5 files; backend lint/format/generated contracts/frontend lint/typecheck/build pass. Existing Python/Vite warnings retained; counts overlap, deselection is not PASS. Local final validation/candidate receipts: `.runtime/evaluation/provider-observation-remediation/`.
+
+## Previous milestone — Migration 0012 revision (provider-free, subsequently accepted)
 
 Status: **V02A_0012_REVISED_READY_FOR_HUMAN_REVIEW** · 2026-10-01. [Revision review packet](docs/V02_0012_REVISION_REVIEW.md) and [ADR0012](docs/adr/0012-dev-campaign-settlement.md) record the authorized repairs. Schema/ADR NOT_ACCEPTED; paid DEV remains BLOCKED. Provider/model/Judge/spend0; no positive Human grant; #5d NOT_STARTED.
 

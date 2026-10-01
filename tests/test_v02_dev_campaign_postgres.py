@@ -288,11 +288,24 @@ def test_call_bridge_known_invalid_and_unknown_with_zero_grant(monkeypatch, raw,
     class SyntheticTransport:
         async def stream_request(self, body, *, before_send):
             before_send()
+            with transaction() as db:
+                assert (
+                    db.scalar(
+                        select(ProviderPhaseRow.state).where(ProviderPhaseRow.eval_run_id == p.campaign_id)
+                    )
+                    == "DISPATCHED"
+                )
             sent.append(body)
+            yield dict(provider_id="synthetic-request-id")
             yield dict(text=raw)
+            yield dict(
+                usage=dict(prompt_tokens=100, completion_tokens=1),
+                provider_id="synthetic-request-id",
+                model="synthetic-served-alias-diagnostic",
+                diagnostic="not a durable receipt field",
+            )
             if uncertain:
                 raise TimeoutError("synthetic truncated stream")
-            yield dict(usage=dict(prompt_tokens=100, completion_tokens=1))
 
     monkeypatch.setattr(dev_launcher, "DeepSeekProvider", SyntheticTransport)
     calls = dev_launcher.Calls(w, p, KEY, token, Accounting(), {})
@@ -314,6 +327,14 @@ def test_call_bridge_known_invalid_and_unknown_with_zero_grant(monkeypatch, raw,
         phase = db.scalar(select(ProviderPhaseRow).where(ProviderPhaseRow.eval_run_id == p.campaign_id))
         assert phase.reserved_yuan == Decimal("0.001")
         assert phase.state == ("UNKNOWN" if uncertain else "COMPLETED")
+        assert phase.request_id == "synthetic-request-id"
+        assert (phase.provider, phase.model) == ("deepseek", "deepseek-flash")
+        assert phase.usage == dict(prompt_tokens=100, completion_tokens=1)
+        assert phase.estimated_yuan is not None
+        if not uncertain:
+            import hashlib
+
+            assert phase.result_hash == hashlib.sha256(raw.encode()).hexdigest()
 
 
 def test_synthetic_marker_never_authorizes_real_transport():
@@ -333,3 +354,68 @@ def test_synthetic_marker_never_authorizes_real_transport():
         )
     with transaction() as db:
         assert db.get(ProviderPhaseRow, phase).state == "PREPARED"
+
+
+@pytest.mark.parametrize(
+    "part",
+    [
+        dict(provider_id=""),
+        dict(provider_id="x" * 201),
+        dict(usage={"prompt_tokens": -1}),
+        dict(usage={"completion_tokens": "1"}),
+        dict(usage={"unsupported": 1}),
+    ],
+)
+def test_invalid_stream_receipt_is_unknown_no_same_key_redispatch(monkeypatch, part):
+    from pydantic import ValidationError
+
+    from citeweave.evaluation import dev_launcher
+    from citeweave.settings import settings
+
+    w, p, token = start()
+    monkeypatch.setattr(dev_launcher, "require_human", lambda supplied: supplied)
+    monkeypatch.setattr(dev_launcher, "live_identities", lambda packet: p.identities)
+    monkeypatch.setattr(settings(), "provider_attempts", 1)
+    original_dispatch = campaign.dispatch
+
+    def synthetic_dispatch(*args, **kwargs):
+        kwargs["real_transport"] = False
+        return original_dispatch(*args, **kwargs)
+
+    monkeypatch.setattr(campaign, "dispatch", synthetic_dispatch)
+    sent = []
+
+    class SyntheticTransport:
+        async def stream_request(self, body, *, before_send):
+            before_send()
+            sent.append(body)
+            yield dict(text="known text but unsupported receipt")
+            yield part
+
+    monkeypatch.setattr(dev_launcher, "DeepSeekProvider", SyntheticTransport)
+    calls = dev_launcher.Calls(w, p, KEY, token, Accounting(), {})
+    with pytest.raises(ValidationError):
+        calls.call("generation", BODY["messages"])
+    assert campaign.begin(w, p.campaign_id, KEY)["status"] == "OUTCOME_UNKNOWN"
+    # An explicit second invocation is fenced before fake transport construction.
+    with pytest.raises(CoreConflict):
+        calls.call("generation", BODY["messages"])
+    assert len(sent) == 1 and p.grant.calls == 0 and p.grant.yuan == 0
+    with transaction() as db:
+        phase = db.scalar(select(ProviderPhaseRow).where(ProviderPhaseRow.eval_run_id == p.campaign_id))
+        assert phase.state == "UNKNOWN" and phase.reserved_yuan == Decimal("0.001")
+        assert phase.usage is None and phase.result_hash is None
+        before = db.scalar(
+            text("SELECT to_jsonb(p) FROM cw4_provider_phases p WHERE id=:id"), {"id": phase.id}
+        )
+        phase_id = phase.id
+        assert db.get(DevCampaignRow, p.campaign_id).status == "STOPPED"
+    with pytest.raises(CoreConflict, match="observation_conflict"):
+        campaign.observe(w, p.campaign_id, KEY, token["owner"], phase_id, {}, known=True)
+    with pytest.raises(IntegrityError), transaction() as db:
+        db.execute(text("UPDATE cw4_provider_phases SET usage='{}'::jsonb WHERE id=:id"), {"id": phase_id})
+    with transaction() as db:
+        assert (
+            db.scalar(text("SELECT to_jsonb(p) FROM cw4_provider_phases p WHERE id=:id"), {"id": phase_id})
+            == before
+        )

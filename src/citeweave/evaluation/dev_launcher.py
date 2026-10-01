@@ -13,11 +13,14 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from uuid import uuid5
 
+from pydantic import ValidationError
+
 from citeweave.answering import REFUSAL, validate_citations
 from citeweave.conversation_contract import Admission, CoreConflict
 from citeweave.conversation_evidence import assemble, make_result
 from citeweave.conversation_evidence_pg import StructuralEvidenceRetriever
 from citeweave.conversation_interpretation import InterpretationDraft, interpret
+from citeweave.conversation_provider import Observation
 from citeweave.conversation_runtime import generation_messages
 from citeweave.costs import RATE_CARD
 from citeweave.db import transaction
@@ -155,14 +158,30 @@ class Calls:
                     async for part in stream:
                         if part.get("text"):
                             text_parts.append(part["text"])
-                        for key in ("usage", "model", "provider_id"):
-                            if part.get(key) is not None:
-                                observation[key if key != "model" else "observed_model"] = part[key]
+                        # Same mapping as the production conversation adapter:
+                        # stream id -> receipt request_id; served-model metadata
+                        # is diagnostic, not the immutable reserved model alias.
+                        if part.get("usage") is not None:
+                            observation["usage"] = part["usage"]
+                        if part.get("provider_id") is not None:
+                            observation["request_id"] = part["provider_id"]
                         if sum(len(v.encode()) for v in text_parts) > slot.output_tokens * 128:
                             raise CoreConflict("dev_stream_output_bytes_exceeded")
 
         try:
             asyncio.run(consume())
+            raw = "".join(text_parts)
+            observation["result_hash"] = hashlib.sha256(raw.encode()).hexdigest()
+            campaign.observe(
+                self.workspace,
+                self.policy.campaign_id,
+                self.key,
+                self.token["owner"],
+                phase,
+                observation,
+                known=True,
+                output=raw,
+            )
         except BaseException:
             # May fail before send: only a durable DISPATCHED phase is UNKNOWN.
             from citeweave.domain import ProviderPhaseRow
@@ -170,6 +189,12 @@ class Calls:
             with transaction() as db:
                 dispatched = db.get(ProviderPhaseRow, phase).state == "DISPATCHED"
             if dispatched:
+                # An unsupported receipt cannot be accepted or reused to retry.
+                # Keep its reservation UNKNOWN without coercing invalid usage.
+                try:
+                    Observation.model_validate(observation)
+                except ValidationError:
+                    observation = {}
                 campaign.observe(
                     self.workspace,
                     self.policy.campaign_id,
@@ -181,18 +206,6 @@ class Calls:
                 )
             campaign.cancel(self.workspace, self.policy.campaign_id)
             raise
-        raw = "".join(text_parts)
-        observation["result_hash"] = hashlib.sha256(raw.encode()).hexdigest()
-        campaign.observe(
-            self.workspace,
-            self.policy.campaign_id,
-            self.key,
-            self.token["owner"],
-            phase,
-            observation,
-            known=True,
-            output=raw,
-        )
         # Invalid structured/answer output is known transport completion. Retain
         # its charge, fail the target, never attempt a JSON repair/provider retry.
         return decode_output(

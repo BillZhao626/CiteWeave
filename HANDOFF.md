@@ -1,4 +1,10 @@
-# Current milestone — selective runtime reconciliation and one final DEV rerun
+# Current milestone — RC narrow closure and one Full24 validation
+
+Human approves Reconciled5400a3c at19/24 PASS with five specified failures. [Narrow closure](docs/V02_RC_NARROW_CLOSURE.md), [ADR0017](docs/adr/0017-rc-narrow-closure.md). All19 successes are regression locks. Wire v5 exposes exact structured origins, inherited-subject and same-task explicit-selection rules while retaining the v4 decoder; generation v2 adds general proposition polarity instructions. No guard relaxation, output repair, retrieval/ranking or shared schema change.
+
+Provider-free gates pass:84 focused offline /71 isolated PG /610 release backend /41 frontend, zero failures/skips;365 integration deselected separately.19 exact locks,96 old case replays and20 target traces are recorded. Exactly one fresh isolated Full24 HUMAN campaign is authorized: calls38/input6225635/output777079/total7002714/derived peak18.667902 CNY/fresh hard18.70; output reserves unchanged. Judge/retry/repair/refetch0, repeat1; UNKNOWN immediately stops/no redispatch. Prior known estimates0.38203608 plus historical unresolved<=0.016110 remain separate. Exact candidate/ceilings/admission/execution/Reconciled→RC Human packet live in ignored `.runtime/evaluation/rc-closure/`. No code/prompt changes after execution begins, automatic new Human labels, further tuning cycle or Final Compare.
+
+## Previous milestone — selective runtime reconciliation and one final DEV rerun
 
 Human-approved P0 review16/24 is the behavioral anchor; stabilization15/24 has selective gains/regressions. [Reconciliation](docs/V02_RUNTIME_RECONCILIATION.md), [ADR0016](docs/adr/0016-selective-runtime-reconciliation.md). Preserve all16 P0 PASS locks and the unique-localization gain. General explicit candidate/selection semantics, optional descriptive wording and exact current-origin resolution normalize into existing validators/Acceptance. Historical labels/campaigns, Gold, accepted0012, retrieval/ranking/EvidencePack/generation policy and arm definitions stay frozen.
 

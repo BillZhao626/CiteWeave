@@ -1,5 +1,7 @@
 # 架构与职责
 
+Authorized isolated RC validation uses [wire v5 narrow closure](adr/0017-rc-narrow-closure.md): explicit supported-origin metadata and inherited-subject/same-task-selection instructions, with unchanged strict v4 validation. A separately versioned generation prompt adds proposition polarity consistency. Shared schema/Acceptance, retrieval/ranking, evidence authority and provider accounting remain unchanged; real semantic quality awaits external Human review.
+
 Authorized isolated DEV uses [P0-anchored reconciliation v4](adr/0016-selective-runtime-reconciliation.md), with explicit entity mode and resolution into the existing validator/reducer. Shared schema/Acceptance, documentary authority and generation policy are unchanged; new semantic outputs need external Human review.
 
 Authorized isolated DEV interpretation now uses [wire v3 stabilization](adr/0015-interpretation-runtime-stabilization.md): unique bookkeeping normalization, explicit head context and existing correction mapping. Shared Acceptance/schema0012/retrieval/EvidencePack/generation policy are unchanged; semantic review remains pending. Public runtime availability is unchanged.

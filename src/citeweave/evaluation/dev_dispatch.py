@@ -90,7 +90,15 @@ def decode_output(
     if len(accounting.tokenizer.encode(raw, add_special_tokens=False).ids) > reserve:
         raise CoreConflict("dev_output_reserve_exceeded")
     if purpose == "interpretation":
+        if format_revision is not None and format_context is None:
+            raise CoreConflict("dev_format_context_missing")
         if format_context is not None:
+            if format_revision == "interpretation-rc-closure-v5":
+                from citeweave.runtime_rc_closure import decode_closure
+
+                if not isinstance(fact_bytes_cap, int) or fact_bytes_cap <= 0:
+                    raise CoreConflict("dev_normalized_fact_cap_missing")
+                return decode_closure(raw, format_context, fact_bytes_cap=fact_bytes_cap)
             if format_revision == "interpretation-reconciled-v4":
                 from citeweave.runtime_reconciliation import decode_reconciled
 
@@ -105,6 +113,8 @@ def decode_output(
                 return decode_stabilized(raw, format_context, fact_bytes_cap=fact_bytes_cap)
             from citeweave.interpretation_format import decode_format
 
+            if format_revision not in {None, "interpretation-format-v2"}:
+                raise CoreConflict("dev_interpretation_revision_unsupported")
             return decode_format(raw, format_context)
         try:
             return InterpretationDraft.model_validate_json(raw)

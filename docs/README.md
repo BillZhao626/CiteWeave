@@ -1,6 +1,8 @@
 # 工程文档
 
-Current authorized milestone: [Selective runtime reconciliation](V02_RUNTIME_RECONCILIATION.md) / [ADR0016](adr/0016-selective-runtime-reconciliation.md). Exact execution state and Human packet remain local.
+Current authorized milestone: [RC Narrow Closure](V02_RC_NARROW_CLOSURE.md) / [ADR0017](adr/0017-rc-narrow-closure.md). Exact candidate, finite accounting and external Human review packet remain local.
+
+Previous milestone: [Selective runtime reconciliation](V02_RUNTIME_RECONCILIATION.md) / [ADR0016](adr/0016-selective-runtime-reconciliation.md).
 
 Previous milestone: [Runtime stabilization](V02_RUNTIME_STABILIZATION.md) / [ADR0015](adr/0015-interpretation-runtime-stabilization.md); exact execution receipts and Human review remain local.
 

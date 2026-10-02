@@ -48,8 +48,30 @@ from citeweave.schemas import Answer
 from citeweave.settings import ROOT, settings
 from citeweave.trace import bounded_stage
 
-CONTRACTS = ROOT / ".runtime/evaluation/reconciliation/contracts.json"
+CONTRACTS = ROOT / ".runtime/evaluation/rc-closure/contracts.json"
 ARMS = ("cp-a-v1", "cp-ab0-v1")
+
+
+def generation_identity(packet):
+    revision = packet.get("interpretation_format_intervention", {}).get("revision")
+    if revision == "interpretation-rc-closure-v5":
+        from citeweave.evaluation.dev_rc_closure import GENERATION_PROMPT, GENERATION_REVISION
+
+        expected = dict(path=GENERATION_PROMPT, revision=GENERATION_REVISION)
+        supplied = packet.get("generation_prompt")
+    elif revision in {
+        None,
+        "interpretation-format-v2",
+        "interpretation-stabilized-v3",
+        "interpretation-reconciled-v4",
+    }:
+        expected = dict(path="prompts/answer-telecom-v1.txt", revision="answer-telecom-v1")
+        supplied = packet.get("generation_prompt", expected)
+    else:
+        raise CoreConflict("dev_interpretation_revision_unsupported")
+    if supplied != expected:
+        raise CoreConflict("dev_candidate_generation_prompt_drift")
+    return expected
 
 
 def code_identity():
@@ -62,6 +84,7 @@ def code_identity():
 
 
 def live_identities(packet):
+    prompt_identity = generation_identity(packet)  # Validate the allowlist before reading any prompt.
     commit, tree = code_identity()
     data, _, _ = load_human_gold(ROOT)
     verify_original_sources(ROOT, data)
@@ -92,7 +115,7 @@ def live_identities(packet):
             {
                 n: hashlib.sha256((ROOT / n).read_bytes()).hexdigest()
                 for n in (
-                    "prompts/answer-telecom-v1.txt",
+                    prompt_identity["path"],
                     "prompts/conversation-interpretation-v1.txt",
                     "src/citeweave/evaluation/dev_state.py",
                 )
@@ -107,16 +130,24 @@ def live_identities(packet):
     if packet.get("revision") == REVISION:
         identities["semantic_contract"] = packet["semantic_contract_sha256"]
     if packet.get("interpretation_format_intervention"):
-        if packet["interpretation_format_intervention"]["revision"] == "interpretation-reconciled-v4":
+        if packet["interpretation_format_intervention"]["revision"] == "interpretation-rc-closure-v5":
+            from citeweave.evaluation.dev_rc_closure import intervention_identity
+        elif packet["interpretation_format_intervention"]["revision"] == "interpretation-reconciled-v4":
             from citeweave.evaluation.dev_reconciliation import intervention_identity
         elif packet["interpretation_format_intervention"]["revision"] == "interpretation-stabilized-v3":
             from citeweave.evaluation.dev_stabilization import intervention_identity
-        else:
+        elif packet["interpretation_format_intervention"]["revision"] == "interpretation-format-v2":
             from citeweave.evaluation.dev_p0 import intervention_identity
+        else:
+            raise CoreConflict("dev_interpretation_revision_unsupported")
 
         current = intervention_identity(ROOT)
         if current != packet["interpretation_format_intervention"]:
             raise CoreConflict("dev_candidate_format_intervention_drift")
+        if current["revision"] == "interpretation-rc-closure-v5" and packet.get("generation_prompt") != dict(
+            path=current["generation_prompt"], revision=current["generation_revision"]
+        ):
+            raise CoreConflict("dev_candidate_generation_prompt_drift")
         identities["interpretation_format"] = digest(current)
     return identities
 
@@ -332,7 +363,8 @@ def launch(policy):
     accounting = DeepSeekAccounting(
         ROOT / ".runtime/provider-accounting/static_tokenizers_v41_tokenizer.json"
     )
-    prompt = (ROOT / "prompts/answer-telecom-v1.txt").read_text(encoding="utf-8")
+    prompt_identity = generation_identity(packet)
+    prompt = (ROOT / prompt_identity["path"]).read_text(encoding="utf-8")
     receipts = []
     for view in data.views:
         for aid in ARMS:
@@ -391,6 +423,11 @@ def launch(policy):
                         if "interpretation" in slots_for_view(view, aid):
                             if (
                                 packet.get("interpretation_format_intervention", {}).get("revision")
+                                == "interpretation-rc-closure-v5"
+                            ):
+                                from citeweave.runtime_rc_closure import format_messages
+                            elif (
+                                packet.get("interpretation_format_intervention", {}).get("revision")
                                 == "interpretation-reconciled-v4"
                             ):
                                 from citeweave.runtime_reconciliation import format_messages
@@ -399,8 +436,13 @@ def launch(policy):
                                 == "interpretation-stabilized-v3"
                             ):
                                 from citeweave.runtime_stabilization import format_messages
-                            else:
+                            elif packet.get("interpretation_format_intervention", {}).get("revision") in {
+                                None,
+                                "interpretation-format-v2",
+                            }:
                                 from citeweave.interpretation_format import format_messages
+                            else:
+                                raise CoreConflict("dev_interpretation_revision_unsupported")
 
                             messages = (
                                 format_messages(context)
@@ -440,7 +482,7 @@ def launch(policy):
                                 run_id=assembled.run_id,
                                 text=raw,
                                 citations=validate_citations(raw, evidence.citations),
-                                prompt_version="answer-telecom-v1",
+                                prompt_version=prompt_identity["revision"],
                                 estimated_yuan=None,
                             )
                             produced = make_result(assembled, answer)

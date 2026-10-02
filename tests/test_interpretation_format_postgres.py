@@ -20,7 +20,13 @@ pytestmark = pytest.mark.integration
 
 @pytest.mark.parametrize("invalid", [False, True])
 @pytest.mark.parametrize(
-    "revision", ["synthetic-v2", "interpretation-stabilized-v3", "interpretation-reconciled-v4"]
+    "revision",
+    [
+        "interpretation-format-v2",
+        "interpretation-stabilized-v3",
+        "interpretation-reconciled-v4",
+        "interpretation-rc-closure-v5",
+    ],
 )
 def test_known_completion_and_format_rejection_never_redispatch(monkeypatch, invalid, revision):
     w, p, token = start()
@@ -65,7 +71,7 @@ def test_known_completion_and_format_rejection_never_redispatch(monkeypatch, inv
     if invalid:
         error = (
             "reconciliation_schema"
-            if revision == "interpretation-reconciled-v4"
+            if revision in {"interpretation-reconciled-v4", "interpretation-rc-closure-v5"}
             else (
                 "stabilization_schema"
                 if revision == "interpretation-stabilized-v3"

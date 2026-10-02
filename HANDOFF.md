@@ -1,4 +1,10 @@
-# Current milestone — P0 interpretation contract repair and one full DEV rerun
+# Current milestone — runtime stabilization and one full DEV rerun
+
+Human authorization2026-10-02 covers provider-free P0.5 and P1, then one full24 isolated campaign. [Runtime stabilization](docs/V02_RUNTIME_STABILIZATION.md), [ADR0015](docs/adr/0015-interpretation-runtime-stabilization.md). Exact unique bookkeeping derivation, current head context and explicit resolution preserve shared Acceptance, accepted0012, Gold, retrieval/ranking/EvidencePack and generation policy.
+
+New finite envelope: calls38/input6207864/output777079/total6984943/derived peak18.632360 CNY/fresh hard18.70. Judge/retry/provider repair/refetch0, repeat1. Historical campaigns/Human labels are immutable; historical UNKNOWN≤0.016110 is separate. Both gates precede campaign creation. Exact candidate/authorization/terminal outcomes/accounting/triple comparison live in ignored `.runtime/evaluation/stabilization/`; consult durable receipts. No tuning on live results, automatic Human labels, winner, final Compare, promotion or #5d.
+
+## Previous milestone — P0 interpretation contract repair and one full DEV rerun
 
 Human Adjudication v1 freezes all24 baseline cases (nine PASS/eight P0/seven P1) from completed campaign f9863f8c-416f-4b23-86fa-045cd6c67f29. [P0 audit and format intervention](docs/V02_P0_INTERPRETATION_REPAIR.md), [ADR0014](docs/adr/0014-interpretation-wire-format.md). Explicit origins and exact quote occurrence replace model numeric spans; code serializes the existing completion-only rewrite. Shared validators/DTOs, Acceptance, source/ranking/evidence/citation and schema0012 stay unchanged. Three baseline claims are format-fixable; five retain invalid claims and are assessed RECLASSIFIED_NOT_ENGINEERING without changing Human labels.
 

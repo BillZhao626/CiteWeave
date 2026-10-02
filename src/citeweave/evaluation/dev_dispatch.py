@@ -72,7 +72,17 @@ def request_contract(purpose, messages, input_cap, output_cap, accounting):
     return body, measurement
 
 
-def decode_output(purpose, raw, *, finish_reason, reserve, accounting, format_context=None):
+def decode_output(
+    purpose,
+    raw,
+    *,
+    finish_reason,
+    reserve,
+    accounting,
+    format_context=None,
+    format_revision=None,
+    fact_bytes_cap=None,
+):
     if finish_reason != "stop":
         raise CoreConflict("dev_output_truncated_or_incomplete")
     if any(t in raw for t in accounting.reserved):
@@ -81,6 +91,12 @@ def decode_output(purpose, raw, *, finish_reason, reserve, accounting, format_co
         raise CoreConflict("dev_output_reserve_exceeded")
     if purpose == "interpretation":
         if format_context is not None:
+            from citeweave.runtime_stabilization import REVISION, decode_stabilized
+
+            if format_revision == REVISION:
+                if not isinstance(fact_bytes_cap, int) or fact_bytes_cap <= 0:
+                    raise CoreConflict("dev_normalized_fact_cap_missing")
+                return decode_stabilized(raw, format_context, fact_bytes_cap=fact_bytes_cap)
             from citeweave.interpretation_format import decode_format
 
             return decode_format(raw, format_context)

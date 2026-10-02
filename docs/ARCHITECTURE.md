@@ -1,5 +1,7 @@
 # 架构与职责
 
+Authorized isolated DEV interpretation now uses [wire v3 stabilization](adr/0015-interpretation-runtime-stabilization.md): unique bookkeeping normalization, explicit head context and existing correction mapping. Shared Acceptance/schema0012/retrieval/EvidencePack/generation policy are unchanged; semantic review remains pending. Public runtime availability is unchanged.
+
 CiteWeave 使用 React + TypeScript 工作台和 FastAPI API。v0.1 单轮查询通过 SSE 返回草稿及最终结果，v0.2a 会话 UI 读取持久 Run/result（其 SSE endpoint 仅为有限快照）；文档摄取交给异步 worker。前端类型由 Pydantic / OpenAPI 生成。
 
 ```mermaid

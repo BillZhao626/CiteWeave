@@ -48,7 +48,7 @@ from citeweave.schemas import Answer
 from citeweave.settings import ROOT, settings
 from citeweave.trace import bounded_stage
 
-CONTRACTS = ROOT / ".runtime/evaluation/p0-rerun/contracts.json"
+CONTRACTS = ROOT / ".runtime/evaluation/stabilization/contracts.json"
 ARMS = ("cp-a-v1", "cp-ab0-v1")
 
 
@@ -107,7 +107,10 @@ def live_identities(packet):
     if packet.get("revision") == REVISION:
         identities["semantic_contract"] = packet["semantic_contract_sha256"]
     if packet.get("interpretation_format_intervention"):
-        from citeweave.evaluation.dev_p0 import intervention_identity
+        if packet["interpretation_format_intervention"]["revision"] == "interpretation-stabilized-v3":
+            from citeweave.evaluation.dev_stabilization import intervention_identity
+        else:
+            from citeweave.evaluation.dev_p0 import intervention_identity
 
         current = intervention_identity(ROOT)
         if current != packet["interpretation_format_intervention"]:
@@ -294,6 +297,8 @@ class Calls:
             reserve=slot.output_tokens,
             accounting=self.accounting,
             format_context=self.context if self.packet.get("interpretation_format_intervention") else None,
+            format_revision=self.packet.get("interpretation_format_intervention", {}).get("revision"),
+            fact_bytes_cap=self.packet.get("normalized_fact_bytes_cap"),
         )
 
 
@@ -382,7 +387,13 @@ def launch(policy):
                             run=run,
                         )
                         if "interpretation" in slots_for_view(view, aid):
-                            from citeweave.interpretation_format import format_messages
+                            if (
+                                packet.get("interpretation_format_intervention", {}).get("revision")
+                                == "interpretation-stabilized-v3"
+                            ):
+                                from citeweave.runtime_stabilization import format_messages
+                            else:
+                                from citeweave.interpretation_format import format_messages
 
                             messages = (
                                 format_messages(context)

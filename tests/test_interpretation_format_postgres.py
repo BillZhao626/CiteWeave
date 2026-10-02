@@ -19,7 +19,8 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.parametrize("invalid", [False, True])
-def test_known_v2_completion_and_format_rejection_never_redispatch(monkeypatch, invalid):
+@pytest.mark.parametrize("revision", ["synthetic-v2", "interpretation-stabilized-v3"])
+def test_known_completion_and_format_rejection_never_redispatch(monkeypatch, invalid, revision):
     w, p, token = start()
     monkeypatch.setattr(dev_launcher, "require_human", lambda supplied: supplied)
     monkeypatch.setattr(dev_launcher, "live_identities", lambda packet: p.identities)
@@ -43,7 +44,12 @@ def test_known_v2_completion_and_format_rejection_never_redispatch(monkeypatch, 
 
     monkeypatch.setattr(dev_launcher, "DeepSeekProvider", SyntheticTransport)
     context = SimpleNamespace(
-        conversation_id=uuid4(), turn_id=uuid4(), history=SimpleNamespace(state_projection=[])
+        conversation_id=uuid4(),
+        turn_id=uuid4(),
+        history=SimpleNamespace(state_projection=[], selected=[]),
+        previous=None,
+        required=(),
+        request=SimpleNamespace(question="Independent question"),
     )
     calls = dev_launcher.Calls(
         w,
@@ -51,11 +57,16 @@ def test_known_v2_completion_and_format_rejection_never_redispatch(monkeypatch, 
         KEY,
         token,
         Accounting(),
-        {"interpretation_format_intervention": {"revision": "synthetic-v2"}},
+        {"interpretation_format_intervention": {"revision": revision}, "normalized_fact_bytes_cap": 400000},
         context=context,
     )
     if invalid:
-        with pytest.raises(CoreConflict, match="interpretation_format_schema"):
+        error = (
+            "stabilization_schema"
+            if revision == "interpretation-stabilized-v3"
+            else "interpretation_format_schema"
+        )
+        with pytest.raises(CoreConflict, match=error):
             calls.call("interpretation", BODY["messages"])
         campaign.settle(
             w, p.campaign_id, KEY, token["owner"], {"error_code": "interpretation_format_schema"}, failed=True

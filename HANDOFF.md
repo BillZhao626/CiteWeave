@@ -1,3 +1,13 @@
+# Current milestone — dynamic provenance re-freeze and one authorized real DEV campaign
+
+Human Product Owner ACCEPTS campaign isolation6f9ccac (2026-10-02) and withdraws cross-campaign byte equality only for execution UUIDs. [Dynamic contract and sound token envelope](docs/V02_DYNAMIC_PROVENANCE_CONTRACT.md), [accepted ADR0013](docs/adr/0013-dev-campaign-execution-namespace.md). Semantic data/Gold, prompts, ranking, shared core and accepted0012 stay unchanged; historical STOPPED/UNKNOWN/FAILED evidence is immutable.
+
+Certified UUID locality adds1464 input tokens: calls38/input6198361/output777079/total6975440, derived peak18.613354 CNY; fresh hard18.70 and separate historical≤0.016110, cumulative hard18.716110. Each concrete request is measured and its semantic/wire/execution evidence persisted before DISPATCHED. Frozen prefix-role enumeration restores original wire order without changing core groups or rankings. Known accounted target failures may continue; UNKNOWN/no-redispatch/deadlines remain fail-closed.
+
+Execution readiness, exact clean candidate, fresh authorization/expiry/deadline, actual outcomes and final Human packet live in ignored `.runtime/evaluation/dynamic-provenance/`. Refer to durable execution-report/review packet for terminal status; this contract does not claim a real campaign completed. No Judge/retry/repair/refetch/tuning/#5d/winner/promotion. Previous negative admission below is historical and its receipts remain preserved.
+
+## Previous milestone — campaign identity repair and withdrawn byte-equality gate
+
 # Current milestone — DEV campaign identity repair; paid admission rejected
 
 Status: **V02A_DEV_EXECUTION_NOT_STARTED**. [Identity repair and negative admission evidence](docs/V02_DEV_CAMPAIGN_IDENTITY_REVIEW.md), [ADR0013](docs/adr/0013-dev-campaign-execution-namespace.md). Starting accepted Observation repair be12e0797b7908cd42ba03aa53e079593db053f4 / tree3a2ae99a176edcbebe566f2696cc40a51d5562a8; Owner permits autonomous evaluation-only repairs with conditional paid execution.

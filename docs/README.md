@@ -14,7 +14,8 @@
 
 | 当前任务 | 按需阅读 |
 | --- | --- |
-| 当前：DEV campaign identity修复；付费门禁FAIL | [修复与反例](V02_DEV_CAMPAIGN_IDENTITY_REVIEW.md)、[ADR0013](adr/0013-dev-campaign-execution-namespace.md)：24目标隔离和同campaign恢复通过；新prefix UUID改变冻结请求hash/token，条件授权不适用，NOT_STARTED。无新HUMAN campaign/provider/支出，旧UNKNOWN和≤0.016110 CNY暴露不改 |
+| 当前：动态provenance合约与一次有界真实DEV | [合约/上界证明](V02_DYNAMIC_PROVENANCE_CONTRACT.md)、[ADR0013](adr/0013-dev-campaign-execution-namespace.md)：仅明确执行UUID字段可变；输入增量1464，input6198361/output777079/total6975440/calls38，推导18.613354 CNY、硬上限18.70。真实状态/授权/结果由忽略目录durable receipts与Human packet记录；UNKNOWN立即停，已知失败是人审证据 |
+| 历史：DEV campaign identity修复；旧付费门禁FAIL | [修复与反例](V02_DEV_CAMPAIGN_IDENTITY_REVIEW.md)、[ADR0013](adr/0013-dev-campaign-execution-namespace.md)：24目标隔离和同campaign恢复通过；新prefix UUID改变冻结请求hash/token，条件授权不适用，NOT_STARTED。无新HUMAN campaign/provider/支出，旧UNKNOWN和≤0.016110 CNY暴露不改 |
 | 历史：Provider Observation修复（随后接受） / provider-free | [修复人审包](V02_PROVIDER_OBSERVATION_REMEDIATION_REVIEW.md)：DEV provider_id→request_id、诊断model不进入共享DTO、畸形receipt保守UNKNOWN；旧campaign STOPPED/UNKNOWN及≤0.016110 CNY预留不改，未来完整campaign提案≤18.610426、最大累计≤18.626536 CNY；请求/Gold/schema/七源绑定不变，新候选无付费授权 |
 | 历史：0012修订交付（随后接受） / provider-free | [修订人审包](V02_0012_REVISION_REVIEW.md)、[ADR0012](adr/0012-dev-campaign-settlement.md)：OLD/NEW归属、完整终态回执、永久reservation与DELETE/TRUNCATE保护；新库populated0011→修订0012/metadata/functions/triggers；新SQL94例，相关PG211通过，release443/前端41。应用库0005/28 versions不变、零冻结DEV version；七源持久绑定只读复核。旧DEV库0012仍是旧定义，不是修订版执行安装；schema未接受、model/provider/Judge/spend0 |
 | 冻结数据：DEV v3 Human Gold APPROVED / FROZEN | [冻结记录与12个view哈希](V02_DEV_HUMAN_GOLD_FREEZE.md)、[批准的人审表](V02_DEV_DATA_REVIEW.md)、[readiness](V02_DEV_READINESS.md)：外部不可变 attestation 绑定原 v3 字节；12 LABEL 单位，分钟未测量；DEV/HARD/REG及provider/Judge仍0，付费执行未授权。v1/v2历史保留，真实DEV结果不得修改v3 |

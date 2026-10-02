@@ -196,7 +196,11 @@ def _unknown_case(db, row, key, now):
     case = db.get(EvalCaseRow, (row.id, key))
     if case and case.status == "RUNNING":
         case.status, case.completed_at = "OUTCOME_UNKNOWN", now
-        case.result = dict(publication="EVALUATION_ONLY_NOT_PRODUCT_ACCEPTED", outcome="UNKNOWN")
+        case.result = dict(
+            **{k: v for k, v in (case.result or {}).items() if k in {"request_evidence", "target_context"}},
+            publication="EVALUATION_ONLY_NOT_PRODUCT_ACCEPTED",
+            outcome="UNKNOWN",
+        )
 
 
 def _check(db, row, policy, now, case=None):
@@ -304,9 +308,16 @@ def prepare(workspace, campaign_id, key, owner, purpose, body, accounting):
                 reserved_at=now,
                 request_hash=request_hash(body),
                 prompt_revision=ACCOUNTING_REVISION,
-                input_tokens=measured["input_tokens"],
+                input_tokens=slot.input_tokens
+                if policy.identities.get("semantic_contract")
+                else measured["input_tokens"],
                 output_tokens=slot.output_tokens,
-                reserved_yuan=maximum_cost(measured["input_tokens"], slot.output_tokens),
+                reserved_yuan=maximum_cost(
+                    slot.input_tokens
+                    if policy.identities.get("semantic_contract")
+                    else measured["input_tokens"],
+                    slot.output_tokens,
+                ),
             )
             _budget(phases, policy.proposed if policy.mode == "SYNTHETIC" else policy.grant, phase)
             reservation = db.begin_nested()
@@ -346,6 +357,11 @@ def dispatch(
             ):
                 raise CoreConflict("dev_durable_human_authorization_required")
             phase = db.get(ProviderPhaseRow, phase_id)
+            slot = (
+                next((s for s in policy.slots if s.case == key and s.purpose == phase.phase), None)
+                if phase
+                else None
+            )
             if (
                 not phase
                 or phase.eval_run_id != campaign_id
@@ -355,10 +371,25 @@ def dispatch(
                 or phase.state != "PREPARED"
                 or phase.dispatched_at is not None
                 or phase.request_hash != request_hash(body)
-                or phase.input_tokens != measured["input_tokens"]
+                or phase.input_tokens
+                != (
+                    slot.input_tokens
+                    if slot and policy.identities.get("semantic_contract")
+                    else measured["input_tokens"]
+                )
+                or measured["input_tokens"] > phase.input_tokens
                 or policy.identities != identities
             ):
                 raise CoreConflict("dev_dispatch_identity_or_no_redispatch")
+            if policy.identities.get("semantic_contract"):
+                recorded = (case.result or {}).get("request_evidence", {}).get(phase.phase)
+                if (
+                    not recorded
+                    or recorded["phase_id"] != str(phase_id)
+                    or recorded["identities"] != policy.identities
+                    or recorded["measurement"] != measured
+                ):
+                    raise CoreConflict("dev_dispatch_request_evidence_missing_or_drift")
             _budget(_phases(db, campaign_id), policy.proposed if policy.mode == "SYNTHETIC" else policy.grant)
             phase.state, phase.outcome, phase.dispatched_at = "DISPATCHED", "unknown", now
             db.flush()
@@ -366,6 +397,66 @@ def dispatch(
             if failure:
                 phase.state, phase.outcome = "UNKNOWN", "unknown"
                 _stop(db, row, "UNKNOWN")
+    if failure:
+        raise CoreConflict(failure)
+
+
+def record_request(workspace, campaign_id, key, owner, phase_id, evidence):
+    """Bind semantic/wire evidence durably before DISPATCHED; existing JSON only."""
+    with transaction() as db:
+        row, policy, now = _lock(db, campaign_id, workspace)
+        case = db.get(EvalCaseRow, (campaign_id, key))
+        failure = _check(db, row, policy, now, case)
+        if failure:
+            raise CoreConflict(failure)
+        phase = db.get(ProviderPhaseRow, phase_id)
+        if (
+            not phase
+            or phase.eval_run_id != campaign_id
+            or phase.case_id != key
+            or phase.owner != owner
+            or case.owner != owner
+            or phase.state != "PREPARED"
+            or evidence["campaign_id"] != str(campaign_id)
+            or evidence["measurement"]["request_hash"] != phase.request_hash
+            or evidence["measurement"]["input_tokens"] > phase.input_tokens
+            or (
+                not policy.identities.get("semantic_contract")
+                and evidence["measurement"]["input_tokens"] != phase.input_tokens
+            )
+            or evidence["measurement"]["output_tokens"] != phase.output_tokens
+        ):
+            raise CoreConflict("dev_request_evidence_identity_conflict")
+        prior = (case.result or {}).get("request_evidence", {})
+        if phase.phase in prior:
+            raise CoreConflict("dev_request_evidence_already_recorded")
+        case.result = {
+            **(case.result or {}),
+            "request_evidence": {
+                **prior,
+                phase.phase: {
+                    **evidence,
+                    "phase_id": str(phase_id),
+                    "rate": RATE_CARD,
+                    "reservation_input_cap": phase.input_tokens,
+                    "reservation_output_cap": phase.output_tokens,
+                    "identities": policy.identities,
+                },
+            },
+        }
+
+
+def record_context(workspace, campaign_id, key, owner, context):
+    """Keep actual History/State/B attribution even if the provider becomes UNKNOWN."""
+    failure = None
+    with transaction() as db:
+        row, policy, now = _lock(db, campaign_id, workspace)
+        case = db.get(EvalCaseRow, (campaign_id, key))
+        failure = _check(db, row, policy, now, case)
+        if not failure:
+            if not case or case.owner != owner or "target_context" in (case.result or {}):
+                raise CoreConflict("dev_target_context_identity_conflict")
+            case.result = {**(case.result or {}), "target_context": context}
     if failure:
         raise CoreConflict(failure)
 
@@ -449,6 +540,11 @@ def settle(workspace, campaign_id, key, owner, result, *, failed=False):
             case.status = "FAILED" if failed else "COMPLETED"
             case.completed_at = now
             case.result = dict(
+                **{
+                    k: v
+                    for k, v in (case.result or {}).items()
+                    if k in {"request_evidence", "provider_outputs", "target_context"}
+                },
                 publication="PRODUCT_ACCEPTED"
                 if result.get("product_acceptance")
                 else "EVALUATION_ONLY_NOT_PRODUCT_ACCEPTED",
@@ -476,7 +572,7 @@ def close_execution(workspace, campaign_id):
         if row.status not in {"ACTIVE", "SYNTHETIC", "COMPLETE"}:
             raise CoreConflict("dev_campaign_not_complete")
         cases = [db.get(EvalCaseRow, (campaign_id, key)) for key in policy.cases]
-        if row.active_case or any(c.status != "COMPLETED" for c in cases):
+        if row.active_case or any(c.status not in {"COMPLETED", "FAILED"} for c in cases):
             raise CoreConflict("dev_campaign_not_complete")
         if any(p.state != "COMPLETED" for p in _phases(db, campaign_id)):
             raise CoreConflict("dev_campaign_provider_not_known")

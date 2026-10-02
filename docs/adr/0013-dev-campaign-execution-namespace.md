@@ -1,6 +1,6 @@
 # ADR 0013 — Evaluation campaign execution namespace
 
-Status: **PROVIDER-FREE CANDIDATE; NOT PAID-ELIGIBLE**. No migration0013. No amendment to accepted ADR0012, product provenance semantics or the frozen DEV request contract.
+Status: **ACCEPTED — Human campaign-isolation decision incorporated, 2026-10-02**. No migration0013. Accepted ADR0012 and shared product provenance semantics remain unchanged. The Owner withdraws cross-campaign byte equality only for campaign execution UUIDs and separately authorizes the [bounded dynamic-provenance contract](../V02_DYNAMIC_PROVENANCE_CONTRACT.md).
 
 ## Context
 
@@ -10,7 +10,9 @@ The existing DEV conversation key identifies dataset/view/arm/runtime/mode but o
 
 Add an optional campaign UUID only at the evaluation PgBackend/RealDevBackend seam and pass the paid policy campaign ID from the launcher. Combine the UUID with a digest of the existing semantic key, staying within the existing128-character key limit. Different campaigns isolate conversations and target Runs; the same campaign resolves the same stored prefix and execution. Existing unscoped callers retain their path; shared core behavior is unchanged.
 
-Provider-free isolated PG tests prove isolation and recovery across24 cases. They also disprove conditional paid eligibility: new prefix provenance UUIDs enter existing production interpretation serialization. Request hashes and official tokenizer counts differ from the frozen contract. The candidate repairs the collision but cannot be used for the currently authorized paid campaign.
+The original provider-free candidate6f9ccac proved isolation/recovery and rejected its then-current byte-invariant paid admission. That negative evidence remains preserved. The subsequent Human decision explicitly accepts different execution UUIDs and permits a new, finite provenance envelope, without changing Gold, prompts, schemas or source semantics.
+
+The new evaluation serializer restores frozen History/Working State enumeration by semantic prefix role. Core group members enumerate by random Acceptance UUID; namespace changes otherwise invert the same correction group's wire order. Selection, ranks, groups, Context and core guards are untouched. Actual new UUIDs stay on the wire; no old SourceRef is remapped. Semantic canonicalization replaces only explicitly listed UUID value paths and still compares arrays in order.
 
 ## Alternatives
 
@@ -21,4 +23,4 @@ Provider-free isolated PG tests prove isolation and recovery across24 cases. The
 
 ## Consequences and migration impact
 
-No schema, DTO, shared core, Gold, prompt or ranking change. No historical row mutation. New namespace requires new prefix provenance and therefore a separately reviewed solution for wire identity before paid use. Retain the provider-free candidate and negative admission evidence; do not grant money or generate outputs under a substituted contract.
+No schema, DTO, shared core, Gold, prompt or ranking change. Historical STOPPED/UNKNOWN/FAILED rows remain immutable. Concrete wire hashes and pinned-tokenizer counts are retained per dispatch; certified UUID locality adds1464 input tokens across38 slots. New input6198361/output777079/total6975440; derived peak18.613354 CNY, fresh hard ceiling18.70 and separate historical exposure≤0.016110. Unknown immediately stops; known target failures may continue only under intact campaign accounting/deadlines. No retries, Judge, repair or refetch calls are added. Execution evidence and Human quality review are separate.

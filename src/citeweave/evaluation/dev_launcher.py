@@ -32,6 +32,13 @@ from citeweave.evaluation.dev_dataset import digest, identity, verify_original_s
 from citeweave.evaluation.dev_dispatch import decode_output, request_contract, slots_for_view
 from citeweave.evaluation.dev_environment import bind_environment, model_binding, verify_environment
 from citeweave.evaluation.dev_execution import frozen_runtime
+from citeweave.evaluation.dev_provenance import (
+    REVISION,
+    align_wire_order,
+    generation_shell,
+    prefix_roles,
+    request_evidence,
+)
 from citeweave.evaluation.dev_real import RealDevBackend, context_for
 from citeweave.evaluation.dev_state import evaluation_messages, state_intent
 from citeweave.llm import DeepSeekProvider
@@ -41,7 +48,7 @@ from citeweave.schemas import Answer
 from citeweave.settings import ROOT, settings
 from citeweave.trace import bounded_stage
 
-CONTRACTS = ROOT / ".runtime/evaluation/v02-dev-paid-remediation/contracts-head0012.json"
+CONTRACTS = ROOT / ".runtime/evaluation/dynamic-provenance/contracts.json"
 ARMS = ("cp-a-v1", "cp-ab0-v1")
 
 
@@ -77,7 +84,7 @@ def live_identities(packet):
                 or index.bm25_hash != binding["bm25_hash"]
             ):
                 raise CoreConflict("dev_live_index_binding_drift")
-    return dict(
+    identities = dict(
         commit=commit,
         tree=tree,
         config=digest({"arms": {a: arm(a).config_hash for a in ARMS}, "runtime_files": frozen_runtime(ROOT)}),
@@ -97,6 +104,9 @@ def live_identities(packet):
         index=packet["environment_sha256"],
         protocol=hashlib.sha256((ROOT / "docs/V02_COMPARISON_PROTOCOL.md").read_bytes()).hexdigest(),
     )
+    if packet.get("revision") == REVISION:
+        identities["semantic_contract"] = packet["semantic_contract_sha256"]
+    return identities
 
 
 def require_human(policy):
@@ -107,16 +117,60 @@ def require_human(policy):
 
 
 class Calls:
-    def __init__(self, workspace, policy, key, token, accounting, packet):
+    def __init__(
+        self, workspace, policy, key, token, accounting, packet, *, context=None, prefixes=None, run=None
+    ):
         self.policy = require_human(policy)  # Before any provider construction.
         self.workspace, self.key, self.token = workspace, key, token
         self.accounting, self.packet = accounting, packet
+        self.context = context
+        self.roles = prefix_roles(prefixes) if prefixes is not None else None
+        self.execution_context = (
+            dict(
+                conversation_id=str(context.conversation_id),
+                target_turn_id=str(context.turn_id),
+                product_run_id=str(run.id) if run else None,
+            )
+            if context is not None
+            else None
+        )
+        if self.policy.mode == "HUMAN" and (
+            packet.get("revision") != REVISION or context is None or prefixes is None
+        ):
+            raise CoreConflict("dev_dynamic_provenance_contract_required")
 
     def call(self, purpose, messages):
         slot = next((s for s in self.policy.slots if s.case == self.key and s.purpose == purpose), None)
         if not slot:
             raise CoreConflict("dev_phase_not_in_frozen_slots")
+        if self.packet.get("revision") == REVISION:
+            from citeweave.llm import completion_payload
+
+            probe = next(p for p in self.packet["probes"] if p["view"] + ":" + p["arm"] == self.key)
+            aligned = align_wire_order(
+                completion_payload(messages, "deepseek-flash", slot.output_tokens), purpose, probe, self.roles
+            )
+            messages = aligned["messages"]
         body, _ = request_contract(purpose, messages, slot.input_tokens, slot.output_tokens, self.accounting)
+        proof = None
+        if self.packet.get("revision") == REVISION:
+            probe = next(p for p in self.packet["probes"] if p["view"] + ":" + p["arm"] == self.key)
+            shell = (
+                generation_shell(self.context, messages[0]["content"], slot.output_tokens)
+                if purpose == "generation"
+                else None
+            )
+            if shell is not None:
+                shell = align_wire_order(shell, purpose, probe, self.roles)
+            proof = request_evidence(
+                body,
+                purpose,
+                probe,
+                self.accounting,
+                self.policy.campaign_id,
+                approved_shell=shell,
+                execution_context=self.execution_context,
+            )
         phase = campaign.prepare(
             self.workspace,
             self.policy.campaign_id,
@@ -126,8 +180,26 @@ class Calls:
             body,
             self.accounting,
         )
+        if proof is not None:
+            campaign.record_request(
+                self.workspace, self.policy.campaign_id, self.key, self.token["owner"], phase, proof
+            )
 
         def before_send():
+            if (
+                proof is not None
+                and request_evidence(
+                    body,
+                    purpose,
+                    probe,
+                    self.accounting,
+                    self.policy.campaign_id,
+                    approved_shell=shell,
+                    execution_context=self.execution_context,
+                )
+                != proof
+            ):
+                raise CoreConflict("dev_semantic_request_prepost_drift")
             identities = live_identities(self.packet)
             if settings().deepseek_model != "deepseek-flash" or settings().provider_attempts != 1:
                 raise CoreConflict("dev_provider_configuration_drift")
@@ -220,6 +292,8 @@ def launch(policy):
     bind_environment()
     environment = verify_environment()  # Real PG/Qdrant and local E5/BGE/citations.
     packet = json.loads(CONTRACTS.read_bytes())
+    if packet.get("revision") != REVISION:
+        raise CoreConflict("dev_dynamic_provenance_contract_required")
     if digest(environment) != packet["environment_sha256"]:
         raise CoreConflict("dev_frozen_environment_drift")
     if policy.identities != live_identities(packet):
@@ -252,6 +326,7 @@ def launch(policy):
                 continue
             backend = RealDevBackend(data, view, arm(aid), campaign_id=policy.campaign_id)
             run, result = None, None
+            context, draft, decision, evidence = None, None, None, None
             state_only = aid == "cp-a-v1" and view.id in {"D1.V2", "D3.V1"}
             try:
                 with bounded_stage(max(0, (token["deadline"] - datetime.now(timezone.utc)).total_seconds())):
@@ -266,12 +341,34 @@ def launch(policy):
                         )
                         run = backend.begin(request)
                         context = context_for(backend, run=run, purpose="target")
+                    campaign.record_context(
+                        backend.workspace,
+                        policy.campaign_id,
+                        key,
+                        token["owner"],
+                        dict(
+                            input=context.model_dump(mode="json"),
+                            raw_fetches=[r.model_dump(mode="json") for r in backend.raw_fetches],
+                            state_only=state_only,
+                            product_run_id=str(run.id) if run else None,
+                        ),
+                    )
                     if not purposes:
                         if context.history.failure != "incomplete_group":
                             raise CoreConflict("dev_zero_call_guard_drift")
                         result = {"guard": "incomplete_group", "calls": 0}
                     else:
-                        calls = Calls(backend.workspace, policy, key, token, accounting, packet)
+                        calls = Calls(
+                            backend.workspace,
+                            policy,
+                            key,
+                            token,
+                            accounting,
+                            packet,
+                            context=context,
+                            prefixes=backend.prefix_acceptances,
+                            run=run,
+                        )
                         if "interpretation" in slots_for_view(view, aid):
                             draft = calls.call("interpretation", evaluation_messages(context))
                         else:
@@ -332,12 +429,17 @@ def launch(policy):
                         policy.campaign_id,
                         key,
                         token["owner"],
-                        {"error_type": type(exc).__name__},
+                        {
+                            "error_type": type(exc).__name__,
+                            "error_code": str(exc) if isinstance(exc, CoreConflict) else type(exc).__name__,
+                            "interpretation_draft": draft.model_dump(mode="json") if draft else None,
+                            "interpretation": decision.model_dump(mode="json") if decision else None,
+                            "evidence": evidence.model_dump(mode="json") if evidence else None,
+                        },
                         failed=True,
                     )
                 except CoreConflict as conflict:
                     terminal_error = conflict
-                campaign.cancel(backend.workspace, policy.campaign_id)
                 if run:
                     from citeweave import conversations as core
                     from citeweave.conversation_contract import RunStatus
@@ -352,8 +454,40 @@ def launch(policy):
                         run.id,
                         run.owner,
                         run.fence,
-                        RunStatus.OUTCOME_UNKNOWN if unknown else RunStatus.FAILED,
+                        RunStatus.UNKNOWN if unknown else RunStatus.FAILED,
                     )
+                if terminal_error is None and can_continue_known_failure(
+                    backend.workspace, policy.campaign_id, key, exc
+                ):
+                    receipts.append(campaign.begin(backend.workspace, policy.campaign_id, key))
+                    continue
+                campaign.cancel(backend.workspace, policy.campaign_id)
                 raise exc from terminal_error
     campaign.close_execution(identity("workspace"), policy.campaign_id)
     return receipts
+
+
+def can_continue_known_failure(workspace, campaign_id, key, error):
+    """Only terminal known target failures, never safety/drift/accounting errors."""
+    from sqlalchemy import select
+
+    from citeweave.domain import EvalCaseRow, EvalRunRow, ProviderPhaseRow
+    from citeweave.evaluation.dev_campaign_models import DevCampaignRow
+
+    if isinstance(error, CoreConflict) and str(error).startswith(
+        ("dev_semantic", "dev_request", "dev_candidate", "dev_dispatch", "dev_provider_configuration")
+    ):
+        return False
+    if not isinstance(error, (ValueError, CoreConflict)):
+        return False
+    with transaction() as db:
+        row = db.get(DevCampaignRow, campaign_id)
+        case = db.get(EvalCaseRow, (campaign_id, key))
+        phases = db.scalars(select(ProviderPhaseRow).where(ProviderPhaseRow.eval_run_id == campaign_id)).all()
+        return bool(
+            db.get(EvalRunRow, campaign_id).workspace_id == workspace
+            and row.status in {"ACTIVE", "SYNTHETIC"}
+            and case.status == "FAILED"
+            and phases
+            and all(p.state == "COMPLETED" for p in phases)
+        )

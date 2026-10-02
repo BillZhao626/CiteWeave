@@ -1,4 +1,10 @@
-# Current milestone — runtime stabilization and one full DEV rerun
+# Current milestone — selective runtime reconciliation and one final DEV rerun
+
+Human-approved P0 review16/24 is the behavioral anchor; stabilization15/24 has selective gains/regressions. [Reconciliation](docs/V02_RUNTIME_RECONCILIATION.md), [ADR0016](docs/adr/0016-selective-runtime-reconciliation.md). Preserve all16 P0 PASS locks and the unique-localization gain. General explicit candidate/selection semantics, optional descriptive wording and exact current-origin resolution normalize into existing validators/Acceptance. Historical labels/campaigns, Gold, accepted0012, retrieval/ranking/EvidencePack/generation policy and arm definitions stay frozen.
+
+Both provider-free gates precede exactly one full24 campaign: calls38/input6210204/output777079/total6987283/derived peak18.637040 CNY/fresh hard18.70. Judge/retry/repair/refetch0, repeat1; historical UNKNOWN<=0.016110 separate. Exact candidate/authorization/execution/accounting/four-way Human packet live in ignored `.runtime/evaluation/reconciliation/`; consult durable receipts. No tuning after partial execution, automatic Human labels, winner, Final Compare, v0.3 or another broad pass.
+
+## Previous milestone — runtime stabilization and one full DEV rerun
 
 Human authorization2026-10-02 covers provider-free P0.5 and P1, then one full24 isolated campaign. [Runtime stabilization](docs/V02_RUNTIME_STABILIZATION.md), [ADR0015](docs/adr/0015-interpretation-runtime-stabilization.md). Exact unique bookkeeping derivation, current head context and explicit resolution preserve shared Acceptance, accepted0012, Gold, retrieval/ranking/EvidencePack and generation policy.
 

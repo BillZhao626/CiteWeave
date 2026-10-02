@@ -48,7 +48,7 @@ from citeweave.schemas import Answer
 from citeweave.settings import ROOT, settings
 from citeweave.trace import bounded_stage
 
-CONTRACTS = ROOT / ".runtime/evaluation/stabilization/contracts.json"
+CONTRACTS = ROOT / ".runtime/evaluation/reconciliation/contracts.json"
 ARMS = ("cp-a-v1", "cp-ab0-v1")
 
 
@@ -107,7 +107,9 @@ def live_identities(packet):
     if packet.get("revision") == REVISION:
         identities["semantic_contract"] = packet["semantic_contract_sha256"]
     if packet.get("interpretation_format_intervention"):
-        if packet["interpretation_format_intervention"]["revision"] == "interpretation-stabilized-v3":
+        if packet["interpretation_format_intervention"]["revision"] == "interpretation-reconciled-v4":
+            from citeweave.evaluation.dev_reconciliation import intervention_identity
+        elif packet["interpretation_format_intervention"]["revision"] == "interpretation-stabilized-v3":
             from citeweave.evaluation.dev_stabilization import intervention_identity
         else:
             from citeweave.evaluation.dev_p0 import intervention_identity
@@ -388,6 +390,11 @@ def launch(policy):
                         )
                         if "interpretation" in slots_for_view(view, aid):
                             if (
+                                packet.get("interpretation_format_intervention", {}).get("revision")
+                                == "interpretation-reconciled-v4"
+                            ):
+                                from citeweave.runtime_reconciliation import format_messages
+                            elif (
                                 packet.get("interpretation_format_intervention", {}).get("revision")
                                 == "interpretation-stabilized-v3"
                             ):

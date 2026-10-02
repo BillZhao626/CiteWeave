@@ -1,6 +1,8 @@
 # 工程文档
 
-Current authorized milestone: [Runtime stabilization](V02_RUNTIME_STABILIZATION.md) / [ADR0015](adr/0015-interpretation-runtime-stabilization.md); exact execution receipts and Human review remain local.
+Current authorized milestone: [Selective runtime reconciliation](V02_RUNTIME_RECONCILIATION.md) / [ADR0016](adr/0016-selective-runtime-reconciliation.md). Exact execution state and Human packet remain local.
+
+Previous milestone: [Runtime stabilization](V02_RUNTIME_STABILIZATION.md) / [ADR0015](adr/0015-interpretation-runtime-stabilization.md); exact execution receipts and Human review remain local.
 
 上一里程碑：[P0 interpretation 契约修复与完整 DEV 重跑](V02_P0_INTERPRETATION_REPAIR.md)，[ADR0014](adr/0014-interpretation-wire-format.md)。实际结果与人工审阅包见 HANDOFF 指向的本地持久化 receipts。
 

@@ -19,7 +19,9 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.parametrize("invalid", [False, True])
-@pytest.mark.parametrize("revision", ["synthetic-v2", "interpretation-stabilized-v3"])
+@pytest.mark.parametrize(
+    "revision", ["synthetic-v2", "interpretation-stabilized-v3", "interpretation-reconciled-v4"]
+)
 def test_known_completion_and_format_rejection_never_redispatch(monkeypatch, invalid, revision):
     w, p, token = start()
     monkeypatch.setattr(dev_launcher, "require_human", lambda supplied: supplied)
@@ -62,9 +64,13 @@ def test_known_completion_and_format_rejection_never_redispatch(monkeypatch, inv
     )
     if invalid:
         error = (
-            "stabilization_schema"
-            if revision == "interpretation-stabilized-v3"
-            else "interpretation_format_schema"
+            "reconciliation_schema"
+            if revision == "interpretation-reconciled-v4"
+            else (
+                "stabilization_schema"
+                if revision == "interpretation-stabilized-v3"
+                else "interpretation_format_schema"
+            )
         )
         with pytest.raises(CoreConflict, match=error):
             calls.call("interpretation", BODY["messages"])

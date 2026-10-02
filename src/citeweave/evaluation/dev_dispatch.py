@@ -91,6 +91,12 @@ def decode_output(
         raise CoreConflict("dev_output_reserve_exceeded")
     if purpose == "interpretation":
         if format_context is not None:
+            if format_revision == "interpretation-reconciled-v4":
+                from citeweave.runtime_reconciliation import decode_reconciled
+
+                if not isinstance(fact_bytes_cap, int) or fact_bytes_cap <= 0:
+                    raise CoreConflict("dev_normalized_fact_cap_missing")
+                return decode_reconciled(raw, format_context, fact_bytes_cap=fact_bytes_cap)
             from citeweave.runtime_stabilization import REVISION, decode_stabilized
 
             if format_revision == REVISION:

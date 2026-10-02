@@ -1,6 +1,8 @@
 # 工程文档
 
-Current authorized milestone: [RC Narrow Closure](V02_RC_NARROW_CLOSURE.md) / [ADR0017](adr/0017-rc-narrow-closure.md). Exact candidate, finite accounting and external Human review packet remain local.
+Current authorized milestone: [Residual root-cause closure](V02_RESIDUAL_ROOT_CAUSE_CLOSURE.md) / [ADR0018](adr/0018-residual-runtime-normal-form.md). RC Human truth is22 PASS/two residuals after explicit correction. Provider-free repair/regression only; fresh paid authorization pending. Exact candidate, tests and zero-grant execution proposal remain local.
+
+Previous milestone: [RC Narrow Closure](V02_RC_NARROW_CLOSURE.md) / [ADR0017](adr/0017-rc-narrow-closure.md).
 
 Previous milestone: [Selective runtime reconciliation](V02_RUNTIME_RECONCILIATION.md) / [ADR0016](adr/0016-selective-runtime-reconciliation.md).
 

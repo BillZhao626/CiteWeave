@@ -26,6 +26,7 @@ pytestmark = pytest.mark.integration
         "interpretation-stabilized-v3",
         "interpretation-reconciled-v4",
         "interpretation-rc-closure-v5",
+        "interpretation-residual-v6",
     ],
 )
 def test_known_completion_and_format_rejection_never_redispatch(monkeypatch, invalid, revision):
@@ -71,7 +72,8 @@ def test_known_completion_and_format_rejection_never_redispatch(monkeypatch, inv
     if invalid:
         error = (
             "reconciliation_schema"
-            if revision in {"interpretation-reconciled-v4", "interpretation-rc-closure-v5"}
+            if revision
+            in {"interpretation-reconciled-v4", "interpretation-rc-closure-v5", "interpretation-residual-v6"}
             else (
                 "stabilization_schema"
                 if revision == "interpretation-stabilized-v3"

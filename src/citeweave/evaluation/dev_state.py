@@ -32,20 +32,46 @@ def state_intent(context, draft):
         draft.dependency != "required"
         or draft.topic_relation not in {"continue", "return"}
         or draft.ambiguities
-        or draft.references
         or draft.corrections
         or draft.put
         or any(s.relations for g in context.history.selected for s in g.sources)
     ):
         raise CoreConflict("evaluation_state_intent_contract")
     entries = {e.item.id: e for e in context.history.state_projection if e.active}
+    if any(e.item.kind == "ambiguity" for e in entries.values()):
+        # This adapter cannot resolve pending ambiguity or publish its removal.
+        # A singleton declaration must not bypass the accepted State control.
+        raise CoreConflict("evaluation_state_intent_contract")
+    facts = list(draft.facts)
+    mentions = {}
+    for reference in draft.references:
+        span = reference.mention
+        if span.start >= span.end or span.end > len(context.request.question):
+            raise CoreConflict("interpretation_span_invalid")
+        mentions.setdefault(span, []).extend(reference.candidates)
+    bindings = []
+    for mention, proposals in mentions.items():
+        candidates = tuple(dict.fromkeys(proposals))
+        if len(candidates) != 1:
+            raise CoreConflict("evaluation_state_intent_reference_unresolved")
+        candidate = candidates[0]
+        # A singleton declaration does not license a current-text candidate or
+        # raw History origin. It must be the same exact active State origin that
+        # ordinary State-only facts already require below.
+        if candidate.source is None or candidate.state_item_id is None:
+            raise CoreConflict("evaluation_state_intent_origin_invalid")
+        reference = next(r for r in draft.references if r.mention == mention)
+        bindings.append(reference.model_copy(update={"candidates": candidates}))
+        facts.append(candidate)
+    facts = tuple(dict.fromkeys(facts))
     inherited = []
     state_used = False
-    for fact in draft.facts:
+    for fact in facts:
         if fact.source is None:
             span = fact.span
             if (
-                span.end > len(context.request.question)
+                span.start >= span.end
+                or span.end > len(context.request.question)
                 or context.request.question[span.start : span.end] != fact.value
             ):
                 raise CoreConflict("interpretation_span_invalid")
@@ -58,6 +84,10 @@ def state_intent(context, draft):
                 or entry.item.kind != fact.kind
             ):
                 raise CoreConflict("evaluation_state_intent_origin_invalid")
+            if entry.item.replaces:
+                # Using a replacement requires its complete raw correction
+                # group; ordinary State-only intent cannot stand in for it.
+                raise CoreConflict("evaluation_state_intent_correction_group_required")
             inherited.append(fact.value)
             state_used |= fact.source not in raw
     rewrite = draft.rewrite
@@ -86,8 +116,8 @@ def state_intent(context, draft):
         scope=context.request.scope,
         topic_relation=draft.topic_relation,
         sources=(),
-        bindings=(),
-        facts=draft.facts,
+        bindings=tuple(bindings),
+        facts=facts,
         ambiguities=(),
         delta=delta,
         delta_identity=fingerprint(delta.model_dump(mode="json")),

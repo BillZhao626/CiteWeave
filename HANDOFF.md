@@ -1,4 +1,10 @@
-# Current milestone — RC narrow closure and one Full24 validation
+# Current milestone — residual root-cause closure; provider-free candidate
+
+Latest external Human truth is RC 22/24 PASS after the Owner's explicit D5.V1/AB0 correction; 22 formal locks, only D1.V2 A/AB0 residuals. [Root-cause closure](docs/V02_RESIDUAL_ROOT_CAUSE_CLOSURE.md), [ADR0018](docs/adr/0018-residual-runtime-normal-form.md). Exact singleton State binding and uniquely proved older-task normal form preserve strict provenance/core validation. A's unsupported shift is still rejected; no older-task/History reconstruction, N/C/K or ranking tuning. Pending ambiguity retains CLARIFY, and the State-only adapter refuses active ambiguity/used replacement State.
+
+Current engineering authorization is provider-free. Historical RC campaign82c611b5-0e7a-4845-a80e-1f677d3124a2 completed all24 targets mechanically (22 COMPLETED/2 FAILED),34 known phases,input57302/output4584/estimated0.12593712 CNY; its paid allowance is consumed and not transferable. All historical campaigns and UNKNOWN<=0.016110 CNY remain immutable. New candidate/diagnostic/regression/test receipts and zero-grant proposal are local in `.runtime/evaluation/residual-closure/`. Fresh semantic execution requires a new explicit Human authorization for the exact candidate, finite five-dimensional budget and deadline. No provider call, HUMAN campaign, automatic new label, winner, Final Compare or #5d in this provider-free task.
+
+## Previous milestone — RC narrow closure and one Full24 validation
 
 Human approves Reconciled5400a3c at19/24 PASS with five specified failures. [Narrow closure](docs/V02_RC_NARROW_CLOSURE.md), [ADR0017](docs/adr/0017-rc-narrow-closure.md). All19 successes are regression locks. Wire v5 exposes exact structured origins, inherited-subject and same-task explicit-selection rules while retaining the v4 decoder; generation v2 adds general proposition polarity instructions. No guard relaxation, output repair, retrieval/ranking or shared schema change.
 

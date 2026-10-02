@@ -93,6 +93,12 @@ def decode_output(
         if format_revision is not None and format_context is None:
             raise CoreConflict("dev_format_context_missing")
         if format_context is not None:
+            if format_revision == "interpretation-residual-v6":
+                from citeweave.runtime_residual_closure import decode_residual
+
+                if not isinstance(fact_bytes_cap, int) or fact_bytes_cap <= 0:
+                    raise CoreConflict("dev_normalized_fact_cap_missing")
+                return decode_residual(raw, format_context, fact_bytes_cap=fact_bytes_cap)
             if format_revision == "interpretation-rc-closure-v5":
                 from citeweave.runtime_rc_closure import decode_closure
 

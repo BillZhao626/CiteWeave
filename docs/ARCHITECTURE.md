@@ -1,5 +1,7 @@
 # 架构与职责
 
+Provider-free residual closure adds [wire v6](adr/0018-residual-runtime-normal-form.md): strict singleton active-State references and a unique validated older-task normal form in the evaluation path. Existing ambiguity/core/provenance checks and generation prompt remain authoritative. RC Human truth is22 PASS/two residuals; a fresh paid grant is required for new semantic outputs. Shared schema/Acceptance,0012,History N/C/K/ranking and Evidence/Citation authority remain unchanged.
+
 Authorized isolated RC validation uses [wire v5 narrow closure](adr/0017-rc-narrow-closure.md): explicit supported-origin metadata and inherited-subject/same-task-selection instructions, with unchanged strict v4 validation. A separately versioned generation prompt adds proposition polarity consistency. Shared schema/Acceptance, retrieval/ranking, evidence authority and provider accounting remain unchanged; real semantic quality awaits external Human review.
 
 Authorized isolated DEV uses [P0-anchored reconciliation v4](adr/0016-selective-runtime-reconciliation.md), with explicit entity mode and resolution into the existing validator/reducer. Shared schema/Acceptance, documentary authority and generation policy are unchanged; new semantic outputs need external Human review.

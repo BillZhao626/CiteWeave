@@ -48,13 +48,13 @@ from citeweave.schemas import Answer
 from citeweave.settings import ROOT, settings
 from citeweave.trace import bounded_stage
 
-CONTRACTS = ROOT / ".runtime/evaluation/rc-closure/contracts.json"
+CONTRACTS = ROOT / ".runtime/evaluation/residual-closure/contracts.json"
 ARMS = ("cp-a-v1", "cp-ab0-v1")
 
 
 def generation_identity(packet):
     revision = packet.get("interpretation_format_intervention", {}).get("revision")
-    if revision == "interpretation-rc-closure-v5":
+    if revision in {"interpretation-rc-closure-v5", "interpretation-residual-v6"}:
         from citeweave.evaluation.dev_rc_closure import GENERATION_PROMPT, GENERATION_REVISION
 
         expected = dict(path=GENERATION_PROMPT, revision=GENERATION_REVISION)
@@ -130,7 +130,9 @@ def live_identities(packet):
     if packet.get("revision") == REVISION:
         identities["semantic_contract"] = packet["semantic_contract_sha256"]
     if packet.get("interpretation_format_intervention"):
-        if packet["interpretation_format_intervention"]["revision"] == "interpretation-rc-closure-v5":
+        if packet["interpretation_format_intervention"]["revision"] == "interpretation-residual-v6":
+            from citeweave.evaluation.dev_residual_closure import intervention_identity
+        elif packet["interpretation_format_intervention"]["revision"] == "interpretation-rc-closure-v5":
             from citeweave.evaluation.dev_rc_closure import intervention_identity
         elif packet["interpretation_format_intervention"]["revision"] == "interpretation-reconciled-v4":
             from citeweave.evaluation.dev_reconciliation import intervention_identity
@@ -144,7 +146,10 @@ def live_identities(packet):
         current = intervention_identity(ROOT)
         if current != packet["interpretation_format_intervention"]:
             raise CoreConflict("dev_candidate_format_intervention_drift")
-        if current["revision"] == "interpretation-rc-closure-v5" and packet.get("generation_prompt") != dict(
+        if current["revision"] in {
+            "interpretation-rc-closure-v5",
+            "interpretation-residual-v6",
+        } and packet.get("generation_prompt") != dict(
             path=current["generation_prompt"], revision=current["generation_revision"]
         ):
             raise CoreConflict("dev_candidate_generation_prompt_drift")
@@ -422,6 +427,11 @@ def launch(policy):
                         )
                         if "interpretation" in slots_for_view(view, aid):
                             if (
+                                packet.get("interpretation_format_intervention", {}).get("revision")
+                                == "interpretation-residual-v6"
+                            ):
+                                from citeweave.runtime_residual_closure import format_messages
+                            elif (
                                 packet.get("interpretation_format_intervention", {}).get("revision")
                                 == "interpretation-rc-closure-v5"
                             ):

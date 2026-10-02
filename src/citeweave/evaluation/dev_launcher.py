@@ -48,7 +48,7 @@ from citeweave.schemas import Answer
 from citeweave.settings import ROOT, settings
 from citeweave.trace import bounded_stage
 
-CONTRACTS = ROOT / ".runtime/evaluation/dynamic-provenance/contracts.json"
+CONTRACTS = ROOT / ".runtime/evaluation/p0-rerun/contracts.json"
 ARMS = ("cp-a-v1", "cp-ab0-v1")
 
 
@@ -106,6 +106,13 @@ def live_identities(packet):
     )
     if packet.get("revision") == REVISION:
         identities["semantic_contract"] = packet["semantic_contract_sha256"]
+    if packet.get("interpretation_format_intervention"):
+        from citeweave.evaluation.dev_p0 import intervention_identity
+
+        current = intervention_identity(ROOT)
+        if current != packet["interpretation_format_intervention"]:
+            raise CoreConflict("dev_candidate_format_intervention_drift")
+        identities["interpretation_format"] = digest(current)
     return identities
 
 
@@ -281,7 +288,12 @@ class Calls:
         # Invalid structured/answer output is known transport completion. Retain
         # its charge, fail the target, never attempt a JSON repair/provider retry.
         return decode_output(
-            purpose, raw, finish_reason="stop", reserve=slot.output_tokens, accounting=self.accounting
+            purpose,
+            raw,
+            finish_reason="stop",
+            reserve=slot.output_tokens,
+            accounting=self.accounting,
+            format_context=self.context if self.packet.get("interpretation_format_intervention") else None,
         )
 
 
@@ -370,7 +382,14 @@ def launch(policy):
                             run=run,
                         )
                         if "interpretation" in slots_for_view(view, aid):
-                            draft = calls.call("interpretation", evaluation_messages(context))
+                            from citeweave.interpretation_format import format_messages
+
+                            messages = (
+                                format_messages(context)
+                                if packet.get("interpretation_format_intervention")
+                                else evaluation_messages(context)
+                            )
+                            draft = calls.call("interpretation", messages)
                         else:
                             probe = next(
                                 p for p in packet["probes"] if p["view"] == view.id and p["arm"] == aid

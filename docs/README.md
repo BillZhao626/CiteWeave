@@ -1,5 +1,7 @@
 # 工程文档
 
+当前：[P0 interpretation 契约修复与完整 DEV 重跑](V02_P0_INTERPRETATION_REPAIR.md)，[ADR0014](adr/0014-interpretation-wire-format.md)。实际结果与人工审阅包见 HANDOFF 指向的本地持久化 receipts。
+
 首次阅读请从以下页面开始：
 
 - [快速开始](QUICKSTART.md)：离线检查、完整本地运行、公开语料摄取。

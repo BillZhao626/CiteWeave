@@ -72,7 +72,7 @@ def request_contract(purpose, messages, input_cap, output_cap, accounting):
     return body, measurement
 
 
-def decode_output(purpose, raw, *, finish_reason, reserve, accounting):
+def decode_output(purpose, raw, *, finish_reason, reserve, accounting, format_context=None):
     if finish_reason != "stop":
         raise CoreConflict("dev_output_truncated_or_incomplete")
     if any(t in raw for t in accounting.reserved):
@@ -80,6 +80,10 @@ def decode_output(purpose, raw, *, finish_reason, reserve, accounting):
     if len(accounting.tokenizer.encode(raw, add_special_tokens=False).ids) > reserve:
         raise CoreConflict("dev_output_reserve_exceeded")
     if purpose == "interpretation":
+        if format_context is not None:
+            from citeweave.interpretation_format import decode_format
+
+            return decode_format(raw, format_context)
         try:
             return InterpretationDraft.model_validate_json(raw)
         except ValueError as exc:

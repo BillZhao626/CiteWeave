@@ -1,4 +1,10 @@
-# Current milestone — dynamic provenance re-freeze and one authorized real DEV campaign
+# Current milestone — P0 interpretation contract repair and one full DEV rerun
+
+Human Adjudication v1 freezes all24 baseline cases (nine PASS/eight P0/seven P1) from completed campaign f9863f8c-416f-4b23-86fa-045cd6c67f29. [P0 audit and format intervention](docs/V02_P0_INTERPRETATION_REPAIR.md), [ADR0014](docs/adr/0014-interpretation-wire-format.md). Explicit origins and exact quote occurrence replace model numeric spans; code serializes the existing completion-only rewrite. Shared validators/DTOs, Acceptance, source/ranking/evidence/citation and schema0012 stay unchanged. Three baseline claims are format-fixable; five retain invalid claims and are assessed RECLASSIFIED_NOT_ENGINEERING without changing Human labels.
+
+One full24 campaign is authorized after provider-free exit gate: input6202651/output777079/total6979730/calls38/derived peak18.621934/fresh hard18.70 CNY. Judge/retry/provider repair/refetch0, repeat1. Exact candidate, tests, authorization, actual terminal status and side-by-side Human packet live in ignored `.runtime/evaluation/p0-rerun/`; consult durable receipts rather than inferring completion from this contract. All prior campaigns/exposures are preserved. P1 policies not optimized; no winner/promotion/#5d.
+
+## Previous milestone — dynamic provenance re-freeze and completed baseline DEV campaign
 
 Human Product Owner ACCEPTS campaign isolation6f9ccac (2026-10-02) and withdraws cross-campaign byte equality only for execution UUIDs. [Dynamic contract and sound token envelope](docs/V02_DYNAMIC_PROVENANCE_CONTRACT.md), [accepted ADR0013](docs/adr/0013-dev-campaign-execution-namespace.md). Semantic data/Gold, prompts, ranking, shared core and accepted0012 stay unchanged; historical STOPPED/UNKNOWN/FAILED evidence is immutable.
 

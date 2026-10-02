@@ -1,0 +1,9 @@
+Wire format v2 only; the intent decision rules above are unchanged. Follow output_schema exactly.
+Each fact has kind, exact value and exactly one tagged origin:
+- current: {"type":"current","occurrence":0}. Value MUST be an exact substring of question. occurrence is its zero-based occurrence in question, counting overlapping occurrences. No numeric character offsets are emitted.
+- history: {"type":"history","source":{"acceptance_id":"...","turn_id":"..."}}. Copy the exact selected source pair. Value MUST be a literal supplied signal for that kind (topic/task signal, entity from entities, other kinds from constraints); historical free text alone is not a structured signal.
+- state: {"type":"state","source":{"acceptance_id":"...","turn_id":"..."},"state_item_id":"..."}. Copy the active working_state item's exact value, item ID and introduced_by pair. Do not mix source IDs or use superseded items.
+Do not output a fact without its origin. Do not paraphrase current fact values. Abstract intent labels without a literal current substring or authorized structured historical/state origin cannot be facts.
+Reference/ambiguity/correction mentions use {"quote":"exact substring","occurrence":0}; candidates use the same fact contract. Do not choose a candidate merely to satisfy the schema.
+Do not emit rewrite, scope or retained fields. Code constructs the existing exact completion-only rewrite from the unchanged question, followed by newline-separated distinct explicitly inherited values; scope and protected retention come from the supplied request. This does not change dependency or topic decisions. Inherited facts are incompatible with dependency none.
+Emit only a compact JSON object. No Markdown, explanation or semantic repair request.

@@ -3471,6 +3471,16 @@
             "type": "boolean",
             "title": "Reliability Truncated",
             "default": false
+          },
+          "operational": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OperationalTrace"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -3752,6 +3762,65 @@
           "documents"
         ],
         "title": "DocumentaryAnswer"
+      },
+      "Duration": {
+        "properties": {
+          "phase": {
+            "type": "string",
+            "enum": [
+              "admission_queue",
+              "history",
+              "interpretation",
+              "retrieval",
+              "generation",
+              "validation",
+              "publication",
+              "provider",
+              "total"
+            ],
+            "title": "Phase"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "AVAILABLE",
+              "UNAVAILABLE",
+              "INCOMPLETE",
+              "UNKNOWN",
+              "CANCELLED"
+            ],
+            "title": "Availability"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "measurement": {
+            "type": "string",
+            "enum": [
+              "db_timestamp_difference",
+              "local_monotonic",
+              "not_recorded"
+            ],
+            "title": "Measurement",
+            "default": "not_recorded"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "phase",
+          "availability"
+        ],
+        "title": "Duration"
       },
       "EvalCase": {
         "properties": {
@@ -4925,6 +4994,91 @@
         ],
         "title": "Operation"
       },
+      "OperationalTrace": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "const": "operational-trace-v1",
+            "title": "Revision",
+            "default": "operational-trace-v1"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineItem"
+            },
+            "type": "array",
+            "title": "Timeline",
+            "default": []
+          },
+          "truncated": {
+            "type": "boolean",
+            "title": "Truncated",
+            "default": false
+          },
+          "durations": {
+            "items": {
+              "$ref": "#/components/schemas/Duration"
+            },
+            "type": "array",
+            "title": "Durations",
+            "default": []
+          },
+          "total": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "provider_phases": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderDiagnostic"
+            },
+            "type": "array",
+            "title": "Provider Phases",
+            "default": []
+          },
+          "retry_decision": {
+            "type": "string",
+            "enum": [
+              "BLOCKED_UNKNOWN",
+              "TERMINAL_NO_DISPATCH",
+              "EXPLICIT_NEW_AUTHORIZATION_REQUIRED",
+              "POLICY_AND_KNOWN_PROOF_REQUIRED"
+            ],
+            "title": "Retry Decision"
+          },
+          "publication": {
+            "type": "string",
+            "enum": [
+              "ACCEPTED",
+              "NOT_ACCEPTED"
+            ],
+            "title": "Publication"
+          },
+          "unknown_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PROVIDER_UNCERTAIN",
+                  "KNOWN_RESULT_NOT_ACCEPTED",
+                  "CANCELLED_WITH_UNRESOLVED_PROVIDER",
+                  "LEGACY_REASON_UNAVAILABLE"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unknown Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "total",
+          "retry_decision",
+          "publication"
+        ],
+        "title": "OperationalTrace"
+      },
       "PackSpan": {
         "properties": {
           "label": {
@@ -5097,6 +5251,153 @@
           "error_code"
         ],
         "title": "PhaseView"
+      },
+      "ProviderDiagnostic": {
+        "properties": {
+          "provider_phase_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Provider Phase Id"
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "interpretation",
+              "generation"
+            ],
+            "title": "Phase"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "attempt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attempt"
+          },
+          "attempt_limit": {
+            "type": "integer",
+            "title": "Attempt Limit"
+          },
+          "dispatch": {
+            "type": "string",
+            "enum": [
+              "NOT_RECORDED",
+              "MARKER_COMMITTED_SEND_UNCONFIRMED",
+              "RESPONSE_OBSERVED",
+              "KNOWN_NOT_EXECUTED"
+            ],
+            "title": "Dispatch"
+          },
+          "retry_classification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry Classification"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "error_category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "admission",
+                  "validation",
+                  "database_transaction",
+                  "retrieval",
+                  "provider_known_safe",
+                  "provider_unknown",
+                  "provider_permanent",
+                  "cancellation",
+                  "deadline",
+                  "reconciliation",
+                  "stale_fenced",
+                  "internal_invariant"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Category"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usage"
+          },
+          "estimated_yuan": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Yuan"
+          },
+          "price_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "provider_phase_id",
+          "phase",
+          "state",
+          "attempt",
+          "attempt_limit",
+          "dispatch",
+          "retry_classification",
+          "error_code",
+          "error_category",
+          "usage",
+          "estimated_yuan",
+          "price_revision"
+        ],
+        "title": "ProviderDiagnostic"
       },
       "PublicConversation": {
         "properties": {
@@ -5346,13 +5647,47 @@
               "accepted",
               "finished",
               "cancelled",
-              "recovered"
+              "recovered",
+              "stage_started",
+              "stage_completed",
+              "stage_failed",
+              "stale_result_rejected"
             ],
             "title": "Kind"
           },
           "fence": {
             "type": "integer",
             "title": "Fence"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "history",
+                  "interpretation",
+                  "retrieval",
+                  "generation",
+                  "validation",
+                  "publication"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "current_fence": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Fence"
           },
           "provider_phase_id": {
             "anyOf": [
@@ -6398,6 +6733,221 @@
           "column_header"
         ],
         "title": "TableCell"
+      },
+      "TimelineItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "admitted",
+              "execution_started",
+              "provider_prepared",
+              "provider_attempt",
+              "provider_dispatched",
+              "provider_completed",
+              "provider_failure",
+              "provider_retry",
+              "accepted",
+              "finished",
+              "cancelled",
+              "recovered",
+              "stage_started",
+              "stage_completed",
+              "stage_failed",
+              "stale_result_rejected"
+            ],
+            "title": "Kind"
+          },
+          "fence": {
+            "type": "integer",
+            "title": "Fence"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "history",
+                  "interpretation",
+                  "retrieval",
+                  "generation",
+                  "validation",
+                  "publication"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "current_fence": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Fence"
+          },
+          "provider_phase_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Phase Id"
+          },
+          "attempt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attempt"
+          },
+          "from_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From State"
+          },
+          "to_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To State"
+          },
+          "retry_classification": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "BEFORE_DISPATCH",
+                  "RETRYABLE_KNOWN",
+                  "PERMANENT",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry Classification"
+          },
+          "error_class": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Class"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usage"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "error_category": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "admission",
+                  "validation",
+                  "database_transaction",
+                  "retrieval",
+                  "provider_known_safe",
+                  "provider_unknown",
+                  "provider_permanent",
+                  "cancellation",
+                  "deadline",
+                  "reconciliation",
+                  "stale_fenced",
+                  "internal_invariant"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Category"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "kind",
+          "fence"
+        ],
+        "title": "TimelineItem"
       },
       "TurnSubmit": {
         "properties": {

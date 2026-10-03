@@ -139,6 +139,79 @@ const doc: Doc = {
 };
 
 describe("accepted product surfaces", () => {
+  it("shows durable UNKNOWN, retry, cancellation and fencing with absent usage distinct from zero", () => {
+    render(
+      <TraceInspector
+        trace={{
+          ...trace,
+          status: "CANCELLED",
+          operational: {
+            revision: "operational-trace-v1",
+            publication: "NOT_ACCEPTED",
+            retry_decision: "BLOCKED_UNKNOWN",
+            truncated: true,
+            total: {
+              phase: "total",
+              availability: "CANCELLED",
+              latency_ms: 0,
+              measurement: "db_timestamp_difference",
+            },
+            durations: [
+              {
+                phase: "retrieval",
+                availability: "UNAVAILABLE",
+                latency_ms: null,
+                measurement: "not_recorded",
+              },
+            ],
+            provider_phases: [
+              {
+                provider_phase_id: "p",
+                phase: "generation",
+                state: "UNKNOWN",
+                attempt: 1,
+                attempt_limit: 2,
+                dispatch: "MARKER_COMMITTED_SEND_UNCONFIRMED",
+                retry_classification: "UNKNOWN",
+                error_code: "cancel_requested",
+                error_category: "provider_unknown",
+                usage: null,
+                estimated_yuan: null,
+                price_revision: null,
+              },
+            ],
+            timeline: [
+              {
+                id: "e",
+                created_at: "2026-10-03T01:00:00Z",
+                kind: "stale_result_rejected",
+                phase: "generation",
+                fence: 1,
+                current_fence: 2,
+                attempt: 1,
+                from_state: "ADMITTED",
+                to_state: "CANCELLED",
+                retry_classification: "UNKNOWN",
+                error_class: "stale_owner",
+                error_code: "stale_owner",
+                error_category: "stale_fenced",
+                latency_ms: 0,
+                usage: null,
+              },
+            ],
+          },
+        }}
+      />,
+    );
+    expect(screen.getByRole("region", { name: "运行时间线" })).toBeTruthy();
+    expect(screen.getByText(/发布：NOT_ACCEPTED/)).toBeTruthy();
+    expect(screen.getByText(/总时长：0 ms/)).toBeTruthy();
+    expect(screen.getByText(/仅显示最近 64/)).toBeTruthy();
+    expect(screen.getByText(/stale_result_rejected/)).toBeTruthy();
+    expect(screen.getByText(/当前 2/)).toBeTruthy();
+    expect(screen.getByText(/usage：未记录/)).toBeTruthy();
+    expect(screen.queryByText("Answer [E1]")).toBeNull();
+  });
   it("renders documentary text with the existing citation parser and exact location", () => {
     const onSelect = vi.fn();
     render(<AcceptedAnswer run={run} selected={null} onSelect={onSelect} />);

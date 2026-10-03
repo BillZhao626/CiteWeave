@@ -62,6 +62,13 @@ test("documentary → PDF → durable follow-up → Trace → reload → insuffi
     .locator(".evidence-highlight")
     .getAttribute("data-evidence-id");
   await page.getByText("Trace Inspector · 持久记录", { exact: true }).click();
+  await expect(page.getByRole("region", { name: "运行时间线" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "运行时间线" })).toContainText(
+    "admitted",
+  );
+  await expect(page.getByRole("region", { name: "运行时间线" })).toContainText(
+    "ACCEPTED",
+  );
   await expect(
     page.getByText("CURRENT_PACK_PHYSICAL_ONLY", { exact: true }),
   ).toBeVisible();

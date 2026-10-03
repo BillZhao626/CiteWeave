@@ -134,24 +134,121 @@ export function TraceInspector({ trace }: { trace?: ConversationTrace }) {
       {!trace ? (
         <p>未记录 / 不可用</p>
       ) : (
+        <>
+          <OperationalTimeline trace={trace} />
+          <dl>
+            {traceFields.map(([field, label]) => (
+              <div key={field}>
+                <dt>{label}</dt>
+                <dd>
+                  {trace[field] == null ? (
+                    "未记录 / 不可用"
+                  ) : typeof trace[field] === "object" ? (
+                    <pre>{JSON.stringify(trace[field], null, 2)}</pre>
+                  ) : (
+                    String(trace[field])
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      )}
+    </details>
+  );
+}
+
+export function OperationalTimeline({ trace }: { trace: ConversationTrace }) {
+  const operational = trace.operational;
+  if (!operational) return <p>运行时间线：未记录 / 不可用</p>;
+  const duration = (value: number | null | undefined) =>
+    value == null ? "未记录 / 不可用" : `${value} ms`;
+  return (
+    <section aria-label="运行时间线">
+      <h4>运行时间线 · {trace.status}</h4>
+      <p>
+        发布：{operational.publication} · 重试：{operational.retry_decision}
+      </p>
+      {operational.unknown_reason && (
+        <p>UNKNOWN 原因：{operational.unknown_reason}</p>
+      )}
+      <p>
+        总时长：{duration(operational.total.latency_ms)} ·{" "}
+        {operational.total.availability}
+      </p>
+      {operational.truncated && (
+        <p role="status">仅显示最近 64 条持久事件；阶段时长可能不完整。</p>
+      )}
+      <ol className="operational-timeline">
+        {operational.timeline.map((event) => (
+          <li key={event.id}>
+            <time dateTime={event.created_at}>{event.created_at}</time>
+            <strong>
+              {event.kind} · {event.phase ?? "Run"}
+            </strong>
+            <span>
+              attempt {event.attempt ?? "未记录"} · fence {event.fence}
+              {event.current_fence != null && ` → 当前 ${event.current_fence}`}
+            </span>
+            {(event.from_state || event.to_state) && (
+              <span>
+                {event.from_state ?? "未记录"} → {event.to_state ?? "未记录"}
+              </span>
+            )}
+            {event.retry_classification && (
+              <span>重试分类：{event.retry_classification}</span>
+            )}
+            {event.error_code && (
+              <span>
+                {event.error_category ?? "未分类"} · {event.error_code}
+              </span>
+            )}
+            {event.latency_ms != null && (
+              <span>{duration(event.latency_ms)}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+      <details>
+        <summary>阶段时长与 Provider 回执</summary>
+        <p>
+          阶段时长可重叠；发布阶段截至最后 flush 前，排除 commit 确认。dispatch
+          标记先于网络发送提交。
+        </p>
         <dl>
-          {traceFields.map(([field, label]) => (
-            <div key={field}>
-              <dt>{label}</dt>
+          {operational.durations.map((item) => (
+            <div key={item.phase}>
+              <dt>{item.phase}</dt>
               <dd>
-                {trace[field] == null ? (
-                  "未记录 / 不可用"
-                ) : typeof trace[field] === "object" ? (
-                  <pre>{JSON.stringify(trace[field], null, 2)}</pre>
-                ) : (
-                  String(trace[field])
-                )}
+                {duration(item.latency_ms)} · {item.availability} ·{" "}
+                {item.measurement}
               </dd>
             </div>
           ))}
         </dl>
-      )}
-    </details>
+        {operational.provider_phases.map((phase) => (
+          <div key={phase.provider_phase_id}>
+            <p>
+              {phase.phase} · {phase.state} · {phase.dispatch}
+            </p>
+            <p>
+              attempt {phase.attempt ?? "未记录"} / {phase.attempt_limit} ·{" "}
+              {phase.retry_classification ?? "未记录"}
+            </p>
+            <p>
+              usage：
+              {phase.usage == null
+                ? "未记录 / 不可用"
+                : JSON.stringify(phase.usage)}
+            </p>
+            <p>
+              估算费用：{phase.estimated_yuan ?? "未记录 / 不可用"} CNY ·{" "}
+              {phase.price_revision ?? "未记录"}（非账单）
+            </p>
+          </div>
+        ))}
+      </details>
+    </section>
   );
 }
 

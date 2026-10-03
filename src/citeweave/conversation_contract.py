@@ -210,6 +210,7 @@ class Readback(DurableDTO):
     deadline_elapsed: bool
     reliability_events: tuple[dict, ...] = ()
     reliability_truncated: bool = False
+    operational: dict | None = None
 
 
 def fingerprint(body: Admission) -> str:

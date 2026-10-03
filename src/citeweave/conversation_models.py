@@ -129,6 +129,8 @@ class ConversationRunEventRow(Base):
     run_id: Mapped[UUID] = mapped_column(ForeignKey("cw5_runs.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     kind: Mapped[str] = mapped_column(String(40))
+    phase: Mapped[str | None] = mapped_column(String(24))
+    current_fence: Mapped[int | None] = mapped_column(Integer)
     fence: Mapped[int] = mapped_column(Integer)
     provider_phase_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw4_provider_phases.id"))
     attempt: Mapped[int | None] = mapped_column(Integer)

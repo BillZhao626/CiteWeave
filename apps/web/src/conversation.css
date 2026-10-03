@@ -80,3 +80,20 @@
     gap: 8px;
   }
 }
+.operational-timeline {
+  padding-left: 1.5rem;
+  max-height: 28rem;
+  overflow: auto;
+}
+.operational-timeline li {
+  margin: 0.75rem 0;
+  padding-left: 0.25rem;
+}
+.operational-timeline li > * {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.operational-timeline time {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}

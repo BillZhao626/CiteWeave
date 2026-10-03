@@ -18,6 +18,7 @@ from citeweave.conversation_contract import (
     Scope,
     SourceRef,
 )
+from citeweave.operational_trace import OperationalTrace
 from citeweave.runtime_reliability import ReliabilitySignal
 from citeweave.schemas import Citation
 
@@ -128,6 +129,7 @@ class ConversationTrace(DurableDTO):
     request_fingerprint: str | None = None
     reliability_events: tuple[ReliabilitySignal, ...] = ()
     reliability_truncated: bool = False
+    operational: OperationalTrace | None = None
 
 
 class LifecycleEvent(DurableDTO):
@@ -250,5 +252,6 @@ def trace_view(read: Readback) -> ConversationTrace:
         request_fingerprint=read.run.fingerprint,
         reliability_events=read.reliability_events,
         reliability_truncated=read.reliability_truncated,
+        operational=read.operational,
         **fields,
     )

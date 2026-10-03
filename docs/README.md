@@ -1,6 +1,6 @@
 # 工程文档
 
-Current Owner-authorized milestone: [v0.2b Runtime Reliability & Recovery M1](V02B_RUNTIME_RELIABILITY_M1.md), [ADR0023](adr/0023-runtime-reliability-and-recovery.md), [evidence / claim matrix](V02B_RUNTIME_RELIABILITY_EVIDENCE.md). Champion8184 retained; rejected challengers not promoted. PostgreSQL authority, bounded known-safe retries, cancellation, attempt fencing and callable recovery are tested provider-free. Default availability and semantic baseline are unchanged. Latest state is [HANDOFF](../HANDOFF.md).
+Current Owner-authorized milestone: [v0.2b Operational Observability & Recovery Drill M2](V02B_OPERATIONAL_OBSERVABILITY_M2.md), [ADR0024](adr/0024-operational-trace-and-recovery-inspection.md). Starts on verified main M1 baseline18caafbb; reuses retained PG Run events/Trace, typed stage diagnostics and bounded read-only operator inspection. Provider-free isolated recovery drills; no semantic tuning, new infrastructure, benchmarking. Owner authorizes M2 review, commits, push and PR; stop before merge/auto-merge and M3. M1 foundations: [runtime reliability](V02B_RUNTIME_RELIABILITY_M1.md), [ADR0023](adr/0023-runtime-reliability-and-recovery.md). Default runtime unavailable; latest gates in [HANDOFF](../HANDOFF.md).
 
 Previous milestone: [Residual root-cause closure](V02_RESIDUAL_ROOT_CAUSE_CLOSURE.md) / [ADR0018](adr/0018-residual-runtime-normal-form.md). Its historical22-PASS status is superseded by the Human v6 record described above.
 

@@ -78,7 +78,7 @@ def test_populated_0012_upgrade_preserves_rows_and_grant_capacity():
             assert db.scalar(text("SELECT transport_attempt FROM cw4_provider_phases")) == 0
             assert db.scalar(text("SELECT execution_started_at FROM cw5_runs")) is None
             assert db.scalar(text("SELECT count(*) FROM cw5_run_events")) == 0
-            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
+            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0014"
     finally:
         engine().dispose()
         engine.cache_clear()

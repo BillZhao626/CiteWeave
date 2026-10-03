@@ -244,7 +244,7 @@ def test_migration_policy_immutable_and_completion_readback():
             dict(id=p.campaign_id, patch='{"increased":true}'),
         )
     with transaction() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0014"
         assert db.get(EvalCaseRow, (p.campaign_id, KEY)).execution_attempt == 1
 
 

@@ -161,7 +161,7 @@ def test_populated_0009_upgrade_repeat_constraints_and_legacy_readers():
                 )
                 assert all(current[key] == value for key, value in old.items())
                 assert row.conversation_run_id is None and row.authorization_id is None
-            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
+            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0014"
         # Audit DB constraint itself, rather than only the service's input checks.
         from test_conversation_provider_postgres import authorization
 

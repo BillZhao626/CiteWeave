@@ -451,13 +451,16 @@ def test_acceptance_final_write_cannot_cross_deadline(evidence_case, monkeypatch
 
     def shortly_expiring(*args, **kwargs):
         with transaction() as db:
-            db.get(Run, args[3]).deadline = core._clock(db) + timedelta(seconds=2)
+            db.get(Run, args[3]).deadline = core._clock(db) + timedelta(seconds=30)
         return accept(*args, **kwargs)
 
     def slow_final_write(session, context, instances):
-        if any(isinstance(row, Run) and row.status == "ACCEPTED" for row in session.dirty):
-            delayed.set()
-            time.sleep(2.1)
+        for row in session.dirty:
+            if isinstance(row, Run) and row.status == "ACCEPTED":
+                # Deterministically cross the DB deadline at the final flush,
+                # after prior guards passed. No host-clock/sleep margin assumption.
+                row.deadline = datetime(2000, 1, 1, tzinfo=timezone.utc)
+                delayed.set()
 
     monkeypatch.setattr(core, "accept", shortly_expiring)
     event.listen(Session, "before_flush", slow_final_write)

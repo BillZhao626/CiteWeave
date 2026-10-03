@@ -161,11 +161,11 @@ def terminal(state):
 def test_fresh_head_repeat_and_unsupported_downgrade(fresh_0011):
     cfg, _, _ = fresh_0011
     with transaction() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0014"
     with pytest.raises(RuntimeError, match="use_fix_forward"):
         command.downgrade(cfg, "0011")
     with transaction() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0014"
         assert db.scalar(text("SELECT count(*) FROM cw2_eval_cases")) >= 1
 
 

@@ -44,7 +44,7 @@ def create_app(
         migrate()
         yield
 
-    app = FastAPI(title="CiteWeave", version="0.3.0-alpha.1", lifespan=lifespan)
+    app = FastAPI(title="CiteWeave", version="0.2.0", lifespan=lifespan)
     bearer = HTTPBearer(auto_error=False)
 
     def signature(expiry):

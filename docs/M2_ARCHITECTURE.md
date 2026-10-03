@@ -1,6 +1,6 @@
 # M2 Production Core 架构
 
-在 M1 Golden Path 上增量演进。API / React 仍完全解耦；没有新增基础设施。API 版本 0.3.0-alpha，默认仍是 Windows 单人单机。
+在 M1 Golden Path 上增量演进。API / React 仍完全解耦；没有新增基础设施。此页保留历史架构；当前 API 版本与安装入口见 [QUICKSTART](QUICKSTART.md)，默认支持 Windows 本地工作台。
 
 ```mermaid
 flowchart LR

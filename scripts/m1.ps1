@@ -12,7 +12,7 @@ $cwPython = Join-Path $cwRoot '.venv/Scripts/python.exe'
 $cwCompose = @('compose','-p',$ProjectName,'--env-file','.env','-f','deploy/compose.m0.yml','-f','deploy/compose.m1.yml')
 if ($Setup) {
     if (-not (Test-Path -LiteralPath $cwPython)) { Invoke-Cw 'python' @('-m','venv','.venv') }
-    Invoke-Cw $cwPython @('-m','pip','install','uv')
+    Invoke-Cw $cwPython @('-m','pip','install','uv==0.12.13')
     Invoke-Cw (Join-Path $cwRoot '.venv/Scripts/uv.exe') @('sync','--frozen')
     if (-not (Test-Path -LiteralPath '.runtime/ml/Scripts/python.exe')) { Invoke-Cw 'python' @('-m','venv','.runtime/ml') }
     # The complete flat lock is installed from explicit registries. Only torch comes from

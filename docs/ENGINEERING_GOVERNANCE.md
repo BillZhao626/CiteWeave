@@ -9,7 +9,7 @@ Status: **ACCEPTED — Human Review incorporated** · 2026-09-27
 2026-09-27 通过 Git fetch / GitHub API 读取：
 
 - 本地工作树起始干净，所在分支 `main`；HEAD、`origin/main`、解引用的 `v0.1.0` 均为 `d29a324a06c07799a11ed642e370c5e6d5a2e6db`。公开仓库默认分支为 main。
-- [v0.1.0 Release](https://github.com/BillZhao626/CiteWeave/releases/tag/v0.1.0) 已公开，非 draft / prerelease，发布时间为 2026-09-25。现有包 / API 的历史 `0.3.0a1` / `0.3.0-alpha.1` 标识与公开发行版本不同，见 [QUICKSTART](QUICKSTART.md)；本轮不修改这些冻结标识。v0.2 发布前必须审阅版本映射与兼容说明，不能假装已经统一。
+- [v0.1.0 Release](https://github.com/BillZhao626/CiteWeave/releases/tag/v0.1.0) 已公开，非 draft / prerelease，发布时间为 2026-09-25。当时包 / API 标识尚未与公开发行版本统一；这一历史审计并不要求后续永久保留旧标识。当前 release-readiness 候选已按 Owner 授权统一为 `0.2.0`，未来标签为 `v0.2.0`，见 [发布准备](V02_RELEASE_READINESS.md)；历史标签与实验产物不变。
 - [该提交 CI](https://github.com/BillZhao626/CiteWeave/actions/runs/36022514759) 的 `Offline checks (ubuntu-latest)` 与 `Offline checks (windows-latest)` 均 success；这是已观测的公开离线证据，不是多轮、GPU、provider 或生产容量证据。
 - main 的 `protected=false`，branch protection 查询返回 404 “Branch not protected”，repository rulesets 列表为空；本次成功读取不属于“无权限无法判断”。Squash / merge commit / rebase 三种合并均允许，自动删除合并分支未开启。这里只记录快照，不声称持续监控。
 - 既有入口为根 README、CONTRIBUTING、AGENTS 和 docs/README；ARCHITECTURE / QUICKSTART 描述当前实现。M1/M2/M3 文档与 ADR 保留历史约束；部分旧报告链接指向不随源码发布的本地产物，不适合作为新治理门禁的公开证据。

@@ -1,16 +1,12 @@
 # 架构与职责
 
-Current bounded increment: [v0.2b M3](V02B_CONCURRENCY_PERFORMANCE_M3.md) / [ADR0025](adr/0025-acceptance-evidence-session.md) / [ADR0026](adr/0026-shared-conversation-scope-readers.md), based on exact main `8da4d1778a7f88e4d21b43ce5f9ff51426c386e6`. A provider-free loopback HTTP/PG benchmark exercises the active Conversation path at concurrency1/5/10/20 and separates synthetic components from real Qdrant branches. Durable Acceptance passes its existing Session to `StructuralRepository` and `citation_for`, avoiding recursive pool borrowing. Read-only scope guards use `FOR SHARE` on KB/Document/Version rows through commit, still blocking non-key source changes; Conversation ownership and catalog writers retain exclusive locks. Current-version/authorization checks, caller-owned transaction lifecycle and final-flush deadline remain authoritative. Existing retrieval readers retain their own short transactions. No schema/OpenAPI, provider authorization, retry/UNKNOWN/cancellation/fence, ranking, evidence offsets or event-persistence semantics change. Default public runtime remains unavailable; final measured evidence and gate counts are in HANDOFF/M3. Owner separately authorizes M3 review, provider-free gates, logical commits and push/PR; no merge/auto-merge, tag/release or final delivery milestone.
+当前源码为 `0.2.0` 发布候选，基于合并 PR #19 `80796e56d98631071ce87333339a13e3cbf40067`。M1 / M2 / M3 是该基线已有实现；发布验证见 [Release Readiness](V02_RELEASE_READINESS.md)。
 
-Current operational increment: [v0.2b M2](V02B_OPERATIONAL_OBSERVABILITY_M2.md) / [ADR0024](adr/0024-operational-trace-and-recovery-inspection.md), based on main M1 baseline18caafbb. Existing M1 Run/provider retry, cancellation/fencing and transactional publication remain authoritative ([ADR0023](adr/0023-runtime-reliability-and-recovery.md)). Alembic0014 adds nullable phase/current-fence facts to existing retained Run events, without backfill. Authenticated Conversation Trace exposes a deterministic bounded timeline, derived error categories, local phase timing and existing safe receipt usage/estimates. The existing Trace Inspector renders this projection. `scripts/reconcile_conversations.py --inspect` uses a bounded workspace-scoped read-only PG snapshot and never dispatches; ordinary explicit reconciliation remains separate. Synchronous queries do not use Redis/Celery. Default runtime remains unavailable; no live policy or grant is installed. Historical implementation records below do not define current milestone authority.
+[运行可靠性](V02B_RUNTIME_RELIABILITY_M1.md) / [ADR0023](adr/0023-runtime-reliability-and-recovery.md)覆盖幂等准入、有限安全 retry、UNKNOWN no-redispatch、取消、owner/fence/head/deadline 及原子 Acceptance。默认 Conversation runtime 仍 unavailable，没有安装 live policy；恢复显式人工执行，不自动派发。
 
-Provider-free residual closure adds [wire v6](adr/0018-residual-runtime-normal-form.md): strict singleton active-State references and a unique validated older-task normal form in the evaluation path. Existing ambiguity/core/provenance checks and generation prompt remain authoritative. RC Human truth is22 PASS/two residuals; a fresh paid grant is required for new semantic outputs. Shared schema/Acceptance,0012,History N/C/K/ranking and Evidence/Citation authority remain unchanged.
+[可观察性与恢复](V02B_OPERATIONAL_OBSERVABILITY_M2.md) / [ADR0024](adr/0024-operational-trace-and-recovery-inspection.md)复用持久 Run events 和认证 Trace，记录有界 timeline、阶段/fence、错误分类、可用耗时和安全 usage/estimate。Alembic `0014` 添加两个 nullable event 字段，不回填。`scripts/reconcile_conversations.py --inspect` 只读、workspace-scoped；同步会话不使用 Redis/Celery。
 
-Authorized isolated RC validation uses [wire v5 narrow closure](adr/0017-rc-narrow-closure.md): explicit supported-origin metadata and inherited-subject/same-task-selection instructions, with unchanged strict v4 validation. A separately versioned generation prompt adds proposition polarity consistency. Shared schema/Acceptance, retrieval/ranking, evidence authority and provider accounting remain unchanged; real semantic quality awaits external Human review.
-
-Authorized isolated DEV uses [P0-anchored reconciliation v4](adr/0016-selective-runtime-reconciliation.md), with explicit entity mode and resolution into the existing validator/reducer. Shared schema/Acceptance, documentary authority and generation policy are unchanged; new semantic outputs need external Human review.
-
-Authorized isolated DEV interpretation now uses [wire v3 stabilization](adr/0015-interpretation-runtime-stabilization.md): unique bookkeeping normalization, explicit head context and existing correction mapping. Shared Acceptance/schema0012/retrieval/EvidencePack/generation policy are unchanged; semantic review remains pending. Public runtime availability is unchanged.
+[并发/性能](V02B_CONCURRENCY_PERFORMANCE_M3.md) / [ADR0025](adr/0025-acceptance-evidence-session.md) / [ADR0026](adr/0026-shared-conversation-scope-readers.md)中，Acceptance 将现有 Session 传给 `StructuralRepository` / `citation_for`，避免递归借连接；只读 KB/Document/Version scope guard 使用 `FOR SHARE` 到 commit，仍阻止非 key 来源修改，Conversation 与 catalog writer 保持独占锁。scope/current-version/owner/fence/deadline 与事务归属不弱化。冻结 HTTP/PG synthetic benchmark 与真实小型 Qdrant Profile B 分开；不是生产容量或真实模型吞吐。
 
 CiteWeave 使用 React + TypeScript 工作台和 FastAPI API。v0.1 单轮查询通过 SSE 返回草稿及最终结果，v0.2a 会话 UI 读取持久 Run/result（其 SSE endpoint 仅为有限快照）；文档摄取交给异步 worker。前端类型由 Pydantic / OpenAPI 生成。
 
@@ -52,9 +48,21 @@ flowchart LR
 
 当前产品验证覆盖真实检索、DeepSeek 问答、引用到 PDF 和独立样本的异步摄取成功路径。评测调度和恢复的实现可供阅读，但不能由摄取测试推出生产评测 consumer 已验证。
 
-## 实现入口
+## 历史实现增量记录
 
-### 当前任务：#5c-2 单次授权真实 smoke 已通过，待 Human Implementation Review
+以下保留当时审阅、执行和计数；其中“当前”仅指该历史阶段。当前实现与运行权限以上文及 HANDOFF 为准。
+
+Provider-free residual closure adds [wire v6](adr/0018-residual-runtime-normal-form.md): strict singleton active-State references and a unique validated older-task normal form in the evaluation path. Existing ambiguity/core/provenance checks and generation prompt remain authoritative. RC Human truth is22 PASS/two residuals; a fresh paid grant is required for new semantic outputs. Shared schema/Acceptance,0012,History N/C/K/ranking and Evidence/Citation authority remain unchanged.
+
+Authorized isolated RC validation uses [wire v5 narrow closure](adr/0017-rc-narrow-closure.md): explicit supported-origin metadata and inherited-subject/same-task-selection instructions, with unchanged strict v4 validation. A separately versioned generation prompt adds proposition polarity consistency. Shared schema/Acceptance, retrieval/ranking, evidence authority and provider accounting remain unchanged; real semantic quality awaits external Human review.
+
+Authorized isolated DEV uses [P0-anchored reconciliation v4](adr/0016-selective-runtime-reconciliation.md), with explicit entity mode and resolution into the existing validator/reducer. Shared schema/Acceptance, documentary authority and generation policy are unchanged; new semantic outputs need external Human review.
+
+Authorized isolated DEV interpretation now uses [wire v3 stabilization](adr/0015-interpretation-runtime-stabilization.md): unique bookkeeping normalization, explicit head context and existing correction mapping. Shared Acceptance/schema0012/retrieval/EvidencePack/generation policy are unchanged; semantic review remains pending. Public runtime availability is unchanged.
+
+
+
+### 历史任务：#5c-2 单次授权真实 smoke 已通过，待 Human Implementation Review
 
 accepted baseline 为 `01858bf`（PR #14）。此前累计授权存储阻塞已由 Human Review 显式批准的一次 additive `0011` 迁移解决。下方 #1–#5c-1 节是历史增量记录；当前状态以本节和 [HANDOFF](../HANDOFF.md) 为准。
 
@@ -72,7 +80,7 @@ ProductionRuntime 连接 Public Turn → durable admission → 有界 PG History
 
 真实 smoke 保持原请求 hash、306-token 离线输入计量、1024 输出硬上限与 0.008804 CNY 最大预留；provider 实报输入 306、输出 11、总计 317、cache hit 0 / miss 306，finish reason stop。按固定 revision 的非高峰价格精确估计 0.00035000 CNY，未声称拿到实际扣款。既有 ProviderPhase 持久化 COMPLETED/known、request ID/usage/cost/result hash/timestamps；既有 ProviderEvent 记录烟测 finish reason。Citation 校验及原子 Acceptance 成功，head 仅前进一次，Acceptance 将 Conversation fence 从 1 增至 2；完成在绝对期限前，无 stale/late writeback。真实隔离 PG 的独立读回已通过。只证明接线，不证明语义质量。持久烟测数据库保留供审阅；请求、账本身份、时刻及局限见 [HANDOFF](../HANDOFF.md)。本次执行无需产品代码修复，也没有重跑无关广泛测试。
 
-### 当前增量：#5c-1 Durable Provider Ledger / Recovery
+### 历史增量：#5c-1 Durable Provider Ledger / Recovery
 
 在 accepted main `3502981`（#5b）上，Product Owner 单独批准的 #5c-1 只实现 provider 账本与恢复基础设施；Human Implementation Review pending。此前各节描述对应增量当时的边界，本节为当前计量/恢复状态。**#5c-2 runtime 接线与 #5d 均 NOT_STARTED；默认生产 runtime 不可用，production history 仍 fail-closed。**
 

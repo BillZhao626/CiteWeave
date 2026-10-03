@@ -1,6 +1,6 @@
 # M3 API
 
-API version `0.3.0-alpha.1`. [Generated OpenAPI](../contracts/openapi.json) defines schemas, constraints and errors; `/docs` serves the running API. Authenticate with the local workspace Bearer token or same-origin HttpOnly session cookie. Keep provider credentials server-side. [M1 upload/SSE examples](M1_API_USAGE.md) and [M2 governance endpoints](M2_API_USAGE.md) remain applicable.
+Current API version `0.2.0`. [Generated OpenAPI](../contracts/openapi.json) defines schemas, constraints and errors; `/docs` serves the running API. Authenticate with the local workspace Bearer token or same-origin HttpOnly session cookie. Keep provider credentials server-side. [M1 upload/SSE examples](M1_API_USAGE.md) and [M2 governance endpoints](M2_API_USAGE.md) remain applicable.
 
 | Operation | Contract |
 |---|---|

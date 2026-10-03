@@ -1,5 +1,7 @@
 # v0.2b M3 — Conversation concurrency and performance
 
+Current source status: **MERGED** in [PR #19](https://github.com/BillZhao626/CiteWeave/pull/19), main commit `80796e56`; included in release-readiness base `80796e56d98631071ce87333339a13e3cbf40067`. Historical implementation/review status, gates and stop boundaries below remain records of their original tasks. Current release scope: [v0.2.0 readiness](V02_RELEASE_READINESS.md).
+
 Status: **V02B_CONCURRENCY_PERFORMANCE_M3_COMPLETE** — provider-free implementation,
 measurement and correctness gates complete; Human Implementation Review pending.
 The implementation task stopped before delivery. The subsequent Owner-authorized
@@ -438,7 +440,7 @@ uncommitted source byte, not just the unchanged HEAD.
 
 ## Limits and claims
 
-GitHub Implementation Truth >= Portfolio Demonstration Truth >= Resume Claim Truth.
+Public technical claims must not exceed demonstrated behavior or the verified implementation evidence.
 Local synthetic measurements cannot establish production QPS/SLO/availability,
 cloud-scale capacity, real DeepSeek/E5/BGE latency, semantic support, physical
 exactly-once delivery or a deployment recommendation. Timing differences between

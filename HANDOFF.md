@@ -1,4 +1,162 @@
+# Current milestone — residual root-cause closure; provider-free candidate
+
+Latest external Human truth is RC 22/24 PASS after the Owner's explicit D5.V1/AB0 correction; 22 formal locks, only D1.V2 A/AB0 residuals. [Root-cause closure](docs/V02_RESIDUAL_ROOT_CAUSE_CLOSURE.md), [ADR0018](docs/adr/0018-residual-runtime-normal-form.md). Exact singleton State binding and uniquely proved older-task normal form preserve strict provenance/core validation. A's unsupported shift is still rejected; no older-task/History reconstruction, N/C/K or ranking tuning. Pending ambiguity retains CLARIFY, and the State-only adapter refuses active ambiguity/used replacement State.
+
+Current engineering authorization is provider-free. Historical RC campaign82c611b5-0e7a-4845-a80e-1f677d3124a2 completed all24 targets mechanically (22 COMPLETED/2 FAILED),34 known phases,input57302/output4584/estimated0.12593712 CNY; its paid allowance is consumed and not transferable. All historical campaigns and UNKNOWN<=0.016110 CNY remain immutable. New candidate/diagnostic/regression/test receipts and zero-grant proposal are local in `.runtime/evaluation/residual-closure/`. Fresh semantic execution requires a new explicit Human authorization for the exact candidate, finite five-dimensional budget and deadline. No provider call, HUMAN campaign, automatic new label, winner, Final Compare or #5d in this provider-free task.
+
+## Previous milestone — RC narrow closure and one Full24 validation
+
+Human approves Reconciled5400a3c at19/24 PASS with five specified failures. [Narrow closure](docs/V02_RC_NARROW_CLOSURE.md), [ADR0017](docs/adr/0017-rc-narrow-closure.md). All19 successes are regression locks. Wire v5 exposes exact structured origins, inherited-subject and same-task explicit-selection rules while retaining the v4 decoder; generation v2 adds general proposition polarity instructions. No guard relaxation, output repair, retrieval/ranking or shared schema change.
+
+Provider-free gates pass:84 focused offline /71 isolated PG /610 release backend /41 frontend, zero failures/skips;365 integration deselected separately.19 exact locks,96 old case replays and20 target traces are recorded. Exactly one fresh isolated Full24 HUMAN campaign is authorized: calls38/input6225635/output777079/total7002714/derived peak18.667902 CNY/fresh hard18.70; output reserves unchanged. Judge/retry/repair/refetch0, repeat1; UNKNOWN immediately stops/no redispatch. Prior known estimates0.38203608 plus historical unresolved<=0.016110 remain separate. Exact candidate/ceilings/admission/execution/Reconciled→RC Human packet live in ignored `.runtime/evaluation/rc-closure/`. No code/prompt changes after execution begins, automatic new Human labels, further tuning cycle or Final Compare.
+
+## Previous milestone — selective runtime reconciliation and one final DEV rerun
+
+Human-approved P0 review16/24 is the behavioral anchor; stabilization15/24 has selective gains/regressions. [Reconciliation](docs/V02_RUNTIME_RECONCILIATION.md), [ADR0016](docs/adr/0016-selective-runtime-reconciliation.md). Preserve all16 P0 PASS locks and the unique-localization gain. General explicit candidate/selection semantics, optional descriptive wording and exact current-origin resolution normalize into existing validators/Acceptance. Historical labels/campaigns, Gold, accepted0012, retrieval/ranking/EvidencePack/generation policy and arm definitions stay frozen.
+
+Both provider-free gates precede exactly one full24 campaign: calls38/input6210204/output777079/total6987283/derived peak18.637040 CNY/fresh hard18.70. Judge/retry/repair/refetch0, repeat1; historical UNKNOWN<=0.016110 separate. Exact candidate/authorization/execution/accounting/four-way Human packet live in ignored `.runtime/evaluation/reconciliation/`; consult durable receipts. No tuning after partial execution, automatic Human labels, winner, Final Compare, v0.3 or another broad pass.
+
+## Previous milestone — runtime stabilization and one full DEV rerun
+
+Human authorization2026-10-02 covers provider-free P0.5 and P1, then one full24 isolated campaign. [Runtime stabilization](docs/V02_RUNTIME_STABILIZATION.md), [ADR0015](docs/adr/0015-interpretation-runtime-stabilization.md). Exact unique bookkeeping derivation, current head context and explicit resolution preserve shared Acceptance, accepted0012, Gold, retrieval/ranking/EvidencePack and generation policy.
+
+New finite envelope: calls38/input6207864/output777079/total6984943/derived peak18.632360 CNY/fresh hard18.70. Judge/retry/provider repair/refetch0, repeat1. Historical campaigns/Human labels are immutable; historical UNKNOWN≤0.016110 is separate. Both gates precede campaign creation. Exact candidate/authorization/terminal outcomes/accounting/triple comparison live in ignored `.runtime/evaluation/stabilization/`; consult durable receipts. No tuning on live results, automatic Human labels, winner, final Compare, promotion or #5d.
+
+## Previous milestone — P0 interpretation contract repair and one full DEV rerun
+
+Human Adjudication v1 freezes all24 baseline cases (nine PASS/eight P0/seven P1) from completed campaign f9863f8c-416f-4b23-86fa-045cd6c67f29. [P0 audit and format intervention](docs/V02_P0_INTERPRETATION_REPAIR.md), [ADR0014](docs/adr/0014-interpretation-wire-format.md). Explicit origins and exact quote occurrence replace model numeric spans; code serializes the existing completion-only rewrite. Shared validators/DTOs, Acceptance, source/ranking/evidence/citation and schema0012 stay unchanged. Three baseline claims are format-fixable; five retain invalid claims and are assessed RECLASSIFIED_NOT_ENGINEERING without changing Human labels.
+
+One full24 campaign is authorized after provider-free exit gate: input6202651/output777079/total6979730/calls38/derived peak18.621934/fresh hard18.70 CNY. Judge/retry/provider repair/refetch0, repeat1. Exact candidate, tests, authorization, actual terminal status and side-by-side Human packet live in ignored `.runtime/evaluation/p0-rerun/`; consult durable receipts rather than inferring completion from this contract. All prior campaigns/exposures are preserved. P1 policies not optimized; no winner/promotion/#5d.
+
+## Previous milestone — dynamic provenance re-freeze and completed baseline DEV campaign
+
+Human Product Owner ACCEPTS campaign isolation6f9ccac (2026-10-02) and withdraws cross-campaign byte equality only for execution UUIDs. [Dynamic contract and sound token envelope](docs/V02_DYNAMIC_PROVENANCE_CONTRACT.md), [accepted ADR0013](docs/adr/0013-dev-campaign-execution-namespace.md). Semantic data/Gold, prompts, ranking, shared core and accepted0012 stay unchanged; historical STOPPED/UNKNOWN/FAILED evidence is immutable.
+
+Certified UUID locality adds1464 input tokens: calls38/input6198361/output777079/total6975440, derived peak18.613354 CNY; fresh hard18.70 and separate historical≤0.016110, cumulative hard18.716110. Each concrete request is measured and its semantic/wire/execution evidence persisted before DISPATCHED. Frozen prefix-role enumeration restores original wire order without changing core groups or rankings. Known accounted target failures may continue; UNKNOWN/no-redispatch/deadlines remain fail-closed.
+
+Execution readiness, exact clean candidate, fresh authorization/expiry/deadline, actual outcomes and final Human packet live in ignored `.runtime/evaluation/dynamic-provenance/`. Refer to durable execution-report/review packet for terminal status; this contract does not claim a real campaign completed. No Judge/retry/repair/refetch/tuning/#5d/winner/promotion. Previous negative admission below is historical and its receipts remain preserved.
+
+## Previous milestone — campaign identity repair and withdrawn byte-equality gate
+
+# Current milestone — DEV campaign identity repair; paid admission rejected
+
+Status: **V02A_DEV_EXECUTION_NOT_STARTED**. [Identity repair and negative admission evidence](docs/V02_DEV_CAMPAIGN_IDENTITY_REVIEW.md), [ADR0013](docs/adr/0013-dev-campaign-execution-namespace.md). Starting accepted Observation repair be12e0797b7908cd42ba03aa53e079593db053f4 / tree3a2ae99a176edcbebe566f2696cc40a51d5562a8; Owner permits autonomous evaluation-only repairs with conditional paid execution.
+
+Optional campaign namespace at PgBackend/RealDevBackend plus launcher wiring isolates all24 cases; same-campaign recovery and FAILED/no-retry retain their guards. Shared core/schema/Gold/prompts/ranking remain unchanged. **Conditional paid eligibility FAIL**: new prefix Turn/Acceptance/State UUIDs enter production request bodies. D1.V1/A frozen1811 input tokens/hash3aa1e273… becomes1815/1824 with different hashes in final isolated counterexamples. No request/hash/reserve was re-frozen. Owner's explicit HUMAN_STOP for request/hash/token changes applies; no new HUMAN campaign, authorization, provider POST or real outputs.
+
+300 focused tests passed, zero failures/skips. Full release and exact new candidate commit/tree are recorded in ignored `.runtime/evaluation/campaign-identity-repair/`. Seven PG/Qdrant/blob/citation bindings, accepted0012 definitions, historical STOPPED/UNKNOWN evidence and application0005/28 versions verified read-only; before/after full DEV product rows preserved. Historical HUMAN campaign count1 / ACTIVE0 / ProviderPhase1. New provider/model/Judge0, usage0/0, spend0; historical unresolved exposure≤0.016110 CNY remains separate and nonzero. No #5d, push/PR/merge/tag/release or winner. A reviewed resolution of frozen wire provenance versus campaign isolation is needed before paid execution.
+
+## Previous milestone — Provider Observation remediation (subsequently accepted)
+
+# Current milestone — Provider Observation remediation (provider-free)
+
+Status: **V02A_PROVIDER_OBSERVATION_REMEDIATION_READY_FOR_HUMAN_REVIEW** · 2026-10-01. [Review packet](docs/V02_PROVIDER_OBSERVATION_REMEDIATION_REVIEW.md) records the bounded response-side repair. Shared Observation/Usage DTO and schema0012 unchanged; no provider/model/Judge/account API or positive grant this task. New candidate still requires Human review and independent paid authorization.
+
+Starting accepted candidate `0af752d3f7b6cc2178d2fac7a52e2e55f26690cc` / tree `6264028b6c1f5412c26ae5216c581189a6ab870e`; revised0012 schema accepted as `d0048834-cae6-4aa7-8ec0-faedc63be9bd` at2026-10-01T10:31:09.670489Z. Accepted runtime receipts are ignored in `.runtime/evaluation/0012-accepted-runtime/`; earlier pending navigation below is historical.
+
+DEV campaign `73bd8f72-dcda-4c79-8458-d19e3a5da07e` / phase `5c649ca0-b6a7-4a26-92c5-2bdfe1fc0b59` remain STOPPED/UNKNOWN, one dispatched call,23 pending targets. Historical actual tokens/CNY unavailable; unresolved exposure≤0.016110 CNY permanently reserved. No retry/reconciliation-as-known. Full campaign/phase row preservation and seven source/index/blob/physical citations verified read-only; normal app0005/28 versions unchanged.
+
+DEV maps stream provider_id→request_id and excludes diagnostic served-model metadata; immutable phase provider/model alias remains authoritative. Known receipt persistence now shares error protection; unsupported values fail closed to UNKNOWN, whereas invalid local output after known transport stays COMPLETED/accounted. Deterministic fake-stream/mock-HTTP and isolated PG regressions cover the original failure shape; real answer semantics/billing remain unverified.
+
+23 accepted concrete bodies and36 older reference bodies retain exact production-order request hashes/token counts. Frozen prompts/runtime/config/source/environment,38 slots and input6196897/output777079/total6973976/CNY18.610426 proposal unchanged. Future maximum cumulative exposure≤18.626536 CNY including the old UNKNOWN. Neither proposal nor this remediation authorizes execution. #5d NOT_STARTED; v0.2a incomplete. Final focused222 passed/0 failed/0 skipped; release backend452 passed/327 integration deselected,frontend41/5 files; backend lint/format/generated contracts/frontend lint/typecheck/build pass. Existing Python/Vite warnings retained; counts overlap, deselection is not PASS. Local final validation/candidate receipts: `.runtime/evaluation/provider-observation-remediation/`.
+
+## Previous milestone — Migration 0012 revision (provider-free, subsequently accepted)
+
+Status: **V02A_0012_REVISED_READY_FOR_HUMAN_REVIEW** · 2026-10-01. [Revision review packet](docs/V02_0012_REVISION_REVIEW.md) and [ADR0012](docs/adr/0012-dev-campaign-settlement.md) record the authorized repairs. Schema/ADR NOT_ACCEPTED; paid DEV remains BLOCKED. Provider/model/Judge/spend0; no positive Human grant; #5d NOT_STARTED.
+
+Historical reviewed commit4cd7390ee7ed7e5e8b0dea3491de1444b4bcfd9c/tree8c464205299cfbfbb3a14fd81d4af229b09fb549 and original ignored receipts remain intact. The unaccepted0012 is revised in place, no0013. OLD/NEW ownership, reservation identity, explicit finite transitions, whole-row terminal receipts and DELETE/TRUNCATE retention are now enforced. prepare rolls back a never-committed reservation via savepoint and persists stop separately; case insertion follows envelope flush. ORM/server defaults agree; no product/prompt/ranking changes.
+
+Fresh populated disposable0011→revised0012, repeated head upgrade, unsupported downgrade and metadata/all three function bodies/six triggers verified. New SQL module94 cases; combined migration/campaign/Core/provider/budget/runtime211 passed, no failures/skips. Release backend443 passed/322 integration deselected, frontend41/5files;233-file lint/format, contracts/typecheck/lint/build pass. Existing Python/Vite warnings remain. Development failures and limits are in the review packet.
+
+Application DB read-only snapshot remains0005/28 versions; zero frozen DEV versions. Seven historical PG/blob/Qdrant bindings and saved physical citations reverified without model calls. Historical DEV DB still has OLD0012 definitions and is not revised schema proof or an eligible revised paid runtime. No re-ingestion or fresh model retrieval; future execution must prepare an explicitly approved revised-schema runtime and rebind identities. Disposable DBs are removed; project services stopped after verification; old RAGFlow stays stopped/preserved. Ignored evidence/new exact commit/tree: .runtime/evaluation/0012-revision/{fresh-schema.json,persisted-bindings.json,candidate.json}.
+
+Human schema/ADR review is next; accepting it would not grant money or provider execution, nor authorize normal application/unrelated migrations. Do not reuse the old candidate.json as a grant. No push/PR/merge/tag/release. v0.2a remains incomplete.
+
+## Previous milestone — BLOCKED paid readiness (preserved)
+
+# Current milestone — Paid DEV execution readiness (provider-free)
+
+Status: **V02A_DEV_PAID_READINESS_BLOCKED** · 2026-10-01. [One authorization packet](docs/V02_DEV_PAID_EXECUTION_AUTHORIZATION.md) records frozen Gold/checkpoint, exact A/AB0 population, request specimens, rates, deadlines, real binding blockers and future Human fields. No positive authorization or paid launcher exists.
+
+Start HEAD `c905bb55489108aa118e669d576e037ba5c81ca1` / tree `b6dadc84fd530bdc7fd2a22bb453b4058669d3b3` / clean; v3, approval, all12 view hashes, pinned v1/v2 history and7 original PDF/canonical sources reverified unchanged. Only explicitly authorized readiness code/tests/docs/navigation now differ; no commit/push/PR/merge/tag/release.
+
+Paid proposal: V0/R0; A/AB0 each12 views,24 logical targets; expected36 physical calls, conditional38 under exact skip/guard, protocol48 (24 interpretation +24 generation); Judge/retry/refetch0, saved allowances not reusable. All36 full reference specimens serialized with pinned official tokenizer; input40538 tokens (not live cap), reference output4074 (not reserve). Live dynamic input/output/total-token and expected/protocol CNY ceilings remain UNKNOWN; no arbitrary reserve/margin or1024 reuse. Current authorization0 calls/0 CNY. Public official pricing freshly verified byte-identical2026-10-01; peak cache-miss2/output8 CNY/M; account CNY applicability/alias limitation still Human gate.
+
+Read-only real application PG is migration0005, exact DEV versions0/7; Qdrant HTTP200 has no DEV business bindings; local E5/BGE manifests match expected revisions but model gateway stopped. REAL_DEV_CORPUS_QDRANT NOT_VERIFIED, no fixture substitution. State-only A's existing fake artifact path cannot close a completed paid phase as FAILED (`provider_outcome_requires_unknown`); two real isolated-PG tests prove no target Acceptance. Proper evaluation-only durable settlement/campaign reservations/watchdog/cancellation and review-capacity reconciliation remain blockers. Production API/runtime/prompt/ranking/schema unchanged; #5d NOT_STARTED.
+
+Validation: backend433 passed/209 integration deselected; frontend41/5 files; lint/format220 files, generated contracts/typecheck/build passed; real UUID-isolated DEV/ledger/budget/UNKNOWN/State boundary45 passed,0 failures/skips. New12 proposal tests overlap offline count. Existing Python/Vite warnings retained; initial missing-module TDD collection failure corrected, not counted PASS. Project PG/Qdrant started for read-only metadata and own testDBs, stopped afterward; application data/collections/old stopped RAGFlow resources untouched. No sealed content accessed; DEV/HARD/REG NOT_RUN; external provider/model/Judge0/spend0.
+
+Next: review bounded reserve/dynamic-input derivation, separately prepare exact realDEV bindings and evaluation-only settlement/campaign protections, reconcile cumulative Human review capacity and account applicability; then freeze a candidate and request one explicit finite calls/tokens/CNY/model/campaign/dataset/approval authorization. Money approval alone cannot bypass technical blockers. No further execution is authorized here.
+
+## Previous milestone — frozen DEV v3 Human Gold
+
+Status: **V02A_DEV_HUMAN_GOLD_FROZEN** · 2026-10-01. Human Product Owner APPROVE, 12 LABEL units, duration NOT_MEASURED; no personal name invented.
+
+Exact dataset `citeweave-v02a-development-v3` / version3 / SHA256 `a01953930e2893065dc6f724b6ce896015124744d6614ac14a6354f087636023` unchanged. External approval `citeweave-v02a-development-v3-human-gold-20261001` / SHA256 `df55c120f92ee4998083872cb6bea421101fc1c9eb89c3dd730242b064debd66`; [freeze/12 exact view hashes/blockers](docs/V02_DEV_HUMAN_GOLD_FREEZE.md), [approved review](docs/V02_DEV_DATA_REVIEW.md), [readiness](docs/V02_DEV_READINESS.md). Small pinned `dev_approval.load_human_gold` verifies dataset/view/approval/reference identities and rejects drift/REG/Holdout before any forbidden reads. No manifest approval rewrite or v4.
+
+Full provider-free release: backend421 passed/207 integration deselected; frontend41 passed/5 files; lint/format216 files/typecheck/build/OpenAPI types passed. Isolated DEV PG9 passed; final focused readiness **62 passed** (overlapping counts). Existing Python/Vite warnings retained. One initial PG path error ran no tests; corrected suite passed. Project PG stopped; application DB/old RAGFlow untouched.
+
+V1/v2 and their histories/audits plus v3 pre-freeze surface preserved. Real DEV results must never mutate v3: retain data/results, record defect, create new version/hash and obtain review. Data minutes are unmeasured; earlier cumulative review workload remains unreconciled. Outputs NOT_RUN. Remaining paid gates: live reserves/input/deadlines/cumulative finite tokens/CNY/authorization/balance/model/rate/new-corpus real bindings/paid policy/State-only A publication integration. Gold is not execution authority. DEV/HARD/REG NOT_RUN; provider/model/Judge=0; spend0; #5d NOT_STARTED; production behavior unchanged.
+
+Create exactly one local Gold/readiness checkpoint after checks; exact commit/tree reported by final Git readback and local receipt. No push/PR/merge/tag/release authorized.
+
+## Previous v3 Test-first milestone (preserved)
+
+# Current milestone — v3 targeted Test-first re-audit
+
+Status: **V02A_DEV_TEST_FIRST_READY_FOR_HUMAN_FREEZE** · 2026-10-01. Human Gold PENDING; no DEV/provider/model/Judge or paid-authorization work.
+
+Owner resolves D1.V2 topic_relation=return relative to current focus, independently of still-valid pending State. New proposal `citeweave-v02a-development-v3` / version 3 / SHA256 `a01953930e2893065dc6f724b6ce896015124744d6614ac14a6354f087636023`. [Complete unsigned 12-view review](docs/V02_DEV_DATA_REVIEW.md), [targeted re-audit](docs/V02_DEV_TEST_FIRST_AUDIT_V3.md), [v3 delivery](docs/V02_DEV_READINESS.md).
+
+Other eleven views/source bytes and all R/A/AB0 structural results remain unchanged. A active Ferrule-Q State is independent of return, with zero old-raw/B credit and no product Acceptance. AB0 durable return/B recovery preserves valid Ferrule-Q State. Provider-free readiness 48 passed; isolated PG 9 passed; no production/API/prompt/schema/frontend behavior change. V2 exact manifest/review/readiness/report and v1 history preserved. Stop for Owner full data/hash/reference review; do not sign Gold or run DEV.
+
+## Previous v2 Test-first audit (preserved)
+
+# Current milestone — Test-first / bias audit
+
+Status: **V02A_DEV_TEST_FIRST_REVISE_REQUIRED** · 2026-10-01.
+
+[Full 12-view arm-independent audit, capability mapping, leakage/coverage/reference review](docs/V02_DEV_TEST_FIRST_AUDIT.md). Exact affected view: **D1.V2** — its `continue` label lacks a fixed criterion after T3 moves to tray-display and the target names D1-task again. Core Ferrule-Q/nine-minute answer remains supported; active State availability does not settle topic classification. Owner must clarify the relation and corresponding interpretation/scoring independently of arm performance before freezing labels. Other 11 views KEEP under the stated limited premises; this is an AI audit, not Human Gold or independent blind review.
+
+V2 ID/version/hash and v1/REVISE history preserved unchanged. No dataset/code/reference file regenerated or edited; only this navigation and the audit record added. Read-only manifest/source/span/fake-receipt checks passed; no DEV/model/provider/Judge, sealed access, services, tests rerun or spending. Stop here; no paid-gate work included.
+
+## Previous revised provider-free readiness record (preserved)
+
+# Current milestone — DEV proposal revision 2
+
+Status: **V02A_DEV_HUMAN_DATA_REVIEW_REQUIRED** · 2026-10-01. Owner first data review returned REVISE; paid execution is still blocked separately.
+
+Current manifest `citeweave-v02a-development-v2` / version 2 / SHA256 `3b1ef5dc37376cf26b5fb20aa8367d76ed2af5ccf376a312a62fc2d6dbcd20a7`. [Complete revised 12-view review](docs/V02_DEV_DATA_REVIEW.md), [revision implementation/accounting/gates](docs/V02_DEV_READINESS.md), [preserved v1 review](docs/V02_DEV_DATA_REVIEW_V1.md) and [v1 readiness](docs/V02_DEV_READINESS_V1.md).
+
+D1.V2/D3.V1: R cannot resolve old intent; A uses active bounded State without reading old T1 or raw/B coverage; AB0 recovers raw T1 through B. A State answers are explicit evaluation artifacts, never product Acceptance. D3.V2 R/A still fail incomplete_group before model seams; AB0 recovers the complete group. D4.V2 removes artificial T2 required-history coverage (N/A), keeping branch provenance and South evidence.
+
+Full offline backend 405 passed/206 integration deselected (two existing deprecations); isolated PG 8 passed; affected execution/accounting after common evaluation message clarification 18 passed; final focused readiness 46 passed and final PG repeat 8 passed (overlapping counts). Required Ruff lint/format 214 files and 30-file publication audit passed. Extra root format check exposed an unchanged older documentation code block; recorded, not altered. Original dataset/source hashes and production/protocol bytes preserved. Final audit results are in current readiness delivery. PG started only for own UUID test databases and stopped afterward; application DB and old stopped RAGFlow volumes untouched.
+
+Owner fields remain PENDING: full labels/references/source semantic support/branch/connectivity, exact reviewed hashes/reviewer/date/reasons/minutes; prior REVISE cumulative actual workload must be reconciled (48 units/384 minutes unchanged). Paid gates remain unresolved: live reserves/input caps/deadlines/cumulative finite tokens/CNY/balance/model/rates/new-corpus real bindings/paid policy and State-only publication integration. Fake accounting is not authority: conditional 38 calls; accepted ceiling 48; actual calls/spend 0. DEV/HARD/REG NOT_RUN; #5d NOT_STARTED; production behavior unchanged; no commit/push/PR/merge/tag/release. Stop at revised Human Data Review; preserve this branch.
+
+## Historical v1 readiness delivery (superseded for data review by revision 2)
+
 # Current milestone
+
+Status: **V02A_DEV_READINESS_BLOCKED — provider-free implementation delivered; data and execution-envelope gates remain** · 2026-10-01
+
+The separately authorized provider-free readiness task started from clean HEAD/main/origin-main `0bfca12302067b9883644def6d313fefdbd78a7e` (tree `78f44cd46114e1c6d3688612045e09ceb7d1987f`), independently matched remote main, verified single Alembic head `0011`, and created `eval/v0.2a-dev-readiness`.
+
+Human Owner resolved the R window/provenance ambiguity on 2026-10-01 and resumed this same task: R/A recent-2 limits ALL materialized raw members; no outside provenance expansion/partial correction groups; fail incomplete/search-incomplete. A may carry bounded current state but cannot rematerialize old text; state is non-Evidence. AB0 recovers relevant old sources/groups through B. Production AB0 is unchanged. The [historical stop and exact Owner clarification](docs/V02_DEV_READINESS_BLOCKER.md) are preserved; accepted protocol text was not rewritten.
+
+The [complete provider-free delivery](docs/V02_DEV_READINESS.md) and [12-view Owner review surface](docs/V02_DEV_DATA_REVIEW.md) are ready to inspect. DEV manifest `citeweave-v02a-development-v1` / complete SHA256 `f33f96f51f1e5bf310bc9034e673c40ffd74f6a1fe91a4a62d2a1af45be0dd44`; D1–D6/12 views, original seven PDF/canonical source proposals, accepted seven HARD identities, exact scope/source/group/support/view hashes. Owner labels/references/branch/connectivity approval **PENDING**. REG/Holdout absent/inaccessible. Manifest is a byte-locked proposal, not accepted Human Gold.
+
+Executable evaluation identities V0/R/A/AB0; shared provider-neutral target and deterministic fake L1 seams; V0 delegates existing single-turn execution, AB0 PG delegates existing production History. Real isolated PG proves admission/atomic acceptance/same-key no-regeneration recovery, strict R/A raw-read boundaries, B complete-group recovery, V0 durable result and D4 clarification closed-loop head clearing. Fixed-prefix and closed-loop have separate mode/Conversation identities. Metrics retain complete-group A/B/union/old/raw/state attribution, semantic Human inputs, physical citation/critical gates, planned denominators, descriptive strata/resources/comparison/futility/INCONCLUSIVE; fakes cannot become semantic candidates. No paid DEV entrypoint or positive server policy installed.
+
+Provider-free accounting uses pinned official offline tokenizer/framing (`tokenizers 0.23.2`) and exact full-message/reference request bytes. Fixed A/AB0 input specimens: interpretation1735–2241 / generation335–925 tokens; proposed output maxima471 /22, still unreviewed references, not reserves. Future protocol max48 calls; conditional fixed-manifest max34=13 interpretation+21 generation, expected fake path32=13+19. Official model/CNY pricing HTML fetched read-only/hash-saved; rates match existing identity. Published provider maxima yield a conditional technical ceiling243.456 CNY/48calls (172.448/34), not an affordable/authorized DEV envelope. **Live input/reserves/combined deadlines/finite agreed CNY/balance/alias/new-corpus real bindings remain DEFERRED/NOT_VERIFIED.** Worst-case agreed DEV exposure UNKNOWN. Thus Human Data Review is not the only gate, and READY/HUMAN_DATA_REVIEW_REQUIRED would be inaccurate. Review pool max48units/384minutes; no owner decisions/minutes signed.
+
+Final focused DEV tests: **38 passed, 0 failed, 0 skipped**. Final full backend `pytest -q -m "not integration"`: **397 passed, 0 failed, 0 skipped; 204 integration deselected** (25.89s). Final isolated DEV PG: **6 passed, 0 failed, 0 skipped** (4.56s); earlier related Core/Evidence/API/Runtime/Budget PG regressions: **112 passed** (43.09s), overlaps focused runs and is not additive. `scripts/check_release.py` passed before the final backend-only extensions: backend391 passed/203 deselected; frontend41 passed (5 files), lint/typecheck/build/OpenAPI/generated TypeScript all passed. After extensions, affected/full backend rerun as above; frontend unchanged and not rerun gratuitously. Final Ruff lint/format **213 files** passed. Existing two Python deprecations and Vite >500kB warning remain. Intermediate PG connection/setup and TDD/format failures were fixed and are not passing counts; details in readiness delivery. New-corpus REAL_QDRANT/E5/BGE/model/semantic output verification not run or claimed.
+
+Runtime receipts/review-plan/official snapshots/source PDFs remain under ignored `.runtime/evaluation/`; publication payload is an explicit allowlist of new eval code/scripts/tests/original manifest/current docs. Credential/private-artifact, source/manifest/hash, local-link and whitespace audits passed. PostgreSQL was stopped initially; Docker Desktop and only this project's PostgreSQL were started to run isolated UUID databases. All test databases cleaned by fixtures; configured application DB was not migrated/seeded. The project PostgreSQL was stopped afterward, preserving its volume; old RAGFlow containers/volumes stayed stopped/preserved. No prune/reset.
+
+**Provider/model/Judge calls=0; provider cost=0 CNY; DEV/HARD/REG NOT_RUN; #5d NOT_STARTED; no production/API/prompt/ranking/offset/schema/frontend change; no commit/push/PR/merge/tag/release.** Preserve this uncommitted branch. Next: Owner reviews the complete 12-view labels/reference/branch/connectivity surface, then separately resolves accepted execution-envelope/real-binding gates and authorizes any actual DEV. No additional preimplementation Calibration, provider pilot or tuning is authorized.
+
+## Accepted #5c-2 baseline record
 
 Status: **v0.2a Implementation #5c-2 — one authorized real smoke PASSED; ready for Human Implementation Review** · 2026-09-30
 

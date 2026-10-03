@@ -6,4 +6,8 @@ prompts/*.txt -text
 evals/public-standards-v1.json -text
 evals/public-protocols-holdout-v1.json -text
 evals/citeweave-public-telecom-eval-v1.json -text
+evals/citeweave-v02a-development-v1.json -text
+evals/citeweave-v02a-development-v2.json -text
+evals/citeweave-v02a-development-v3.json -text
+evals/approvals/citeweave-v02a-development-v3-human-gold-20261001.json -text
 corpus/public_telecom_manifest.json -text

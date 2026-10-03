@@ -354,13 +354,24 @@ unchanged, with no sampler errors. Final A/B source hashes match the reviewed
 five product files and frozen harness; A20 flags remain false. The observed
 5-concurrency percentages independently recompute to31.2%/52.4%.
 
-No runtime, locking, benchmark or deterministic-test blocker was found, and no
-product/harness/test/contract fix was required. One unsupported documentation
+No runtime, locking or deterministic-test blocker was found, and no
+product/harness/test/contract byte change was required. One unsupported documentation
 claim about observed container memory headroom was removed: retained structured
 receipts prove configured caps and API/host/PG activity, not container peak memory.
 Reproduction and navigation now distinguish the historical implementation stop
 from this separate PR authorization. These documentation-only changes cannot
 affect the measured execution path, so no new load/optimization run is justified.
+
+Publication checkout review found a reproducibility blocker: `core.autocrlf=true`
+can convert all three new contract/harness files to CRLF, invalidating their raw
+byte hashes on a fresh Windows checkout. An isolated Git index/checkout round-trip
+reproduced all three mismatches before the fix and preserved all three exact
+frozen hashes afterward. `.gitattributes` now marks only the contract `-text` and
+the two harness modules `text eol=lf`. Existing files/attributes are unchanged;
+this cannot alter the measured source bytes or workload. No contract regeneration,
+new freeze, receipt rewrite or load rerun was used. The focused metadata fix adds
+one file to the initial18-file allowlist: final19 (5 product/3 benchmark/3 tests/
+7 docs/1 Git metadata), in three initial commits plus one focused follow-up.
 
 Final review gates were rerun on the unchanged measured product/harness/tests:
 747 offline backend passes /436 integration deselected (1183 collected),340
@@ -382,11 +393,14 @@ and untouched. No new Qdrant/load experiment or provider authorization occurred.
 | `candidate-audit.json` | `bebfd5810ad2e93d1b02fcfd85e3b7ebc39513f6d68cf7c58de23da60e10bf84` |
 | `release.xml` | `fff1c002d1453607c7d300e32814ab4e9184a12e4a5e312eb348a25d94521dc3` |
 | `pg.xml` | `4be3df4576b918df02b70e771009d9e7fd2dcf011ed4a612e9a5924e0a872b06` |
+| `line-endings.json` | `5c1670b115dbbe354442c23bd739dac67b69c4b545c952da6e4dc0762bf12a3e` |
 
-`review/verification.json` binds final18-file reviewed allowlist and gate/resource
-hashes; delivery metadata binds the three commits, remote PR diff and available
-CI. Commits group runtime implementation, benchmark/regressions, and evidence/
-ADRs/navigation. ADR0025/0026 remain candidates for Human Implementation Review,
+`review/verification.json` binds the initially reviewed18-file allowlist and
+gate/resource hashes. `review/publication-verification.json` additionally binds
+the final19-file allowlist, unchanged measured bytes and Git round-trip proof;
+delivery metadata binds four commits, remote PR diff and available CI. Initial
+commits group runtime, benchmark/regressions and evidence/ADRs/navigation; the
+follow-up fixes only checkout identity/documentation. ADR0025/0026 remain candidates for Human Implementation Review,
 not ACCEPTED. Provider/model/Judge0; spend0 CNY. Next: Human review of the M3 PR;
 PR NOT MERGED, no auto-merge/tag/release/final delivery milestone.
 

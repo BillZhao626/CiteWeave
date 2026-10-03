@@ -5,7 +5,7 @@
 [![CI](https://github.com/BillZhao626/CiteWeave/actions/workflows/ci.yml/badge.svg)](https://github.com/BillZhao626/CiteWeave/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-当前源码候选版本为 **0.2.0**，准备未来 `v0.2.0`；已发布历史标签为 `v0.1.0`。`v0.2.0` 尚未创建或发布。
+当前源码版本为 **0.2.0**；稳定版本与发布状态以 GitHub Tags / Releases 为准。历史 `v0.1.0` 标签继续保留。
 
 ## 项目来源与公开边界
 

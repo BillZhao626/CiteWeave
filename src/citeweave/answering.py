@@ -225,13 +225,13 @@ def begin_query(workspace, body, key, captured_bindings=None, captured_snapshot=
         return run
 
 
-def citation_for(chunk, label):
+def citation_for(chunk, label, *, session=None):
     span = EvidenceSpan.model_validate(chunk.evidence)
     block = Block.model_validate(chunk.block)
     resolve_span(span, block, block.scope)
     if span.scope.revision_id != chunk.version_id:
         raise ValueError("citation_version_mismatch")
-    with transaction() as db:
+    with nullcontext(session) if session is not None else transaction() as db:
         version = db.get(VersionRow, chunk.version_id)
         if span.source_sha256 != version.source_sha256:
             raise ValueError("citation_source_mismatch")

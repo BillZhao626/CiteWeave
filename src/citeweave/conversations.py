@@ -75,14 +75,15 @@ def _conversation(db, workspace, identity):
 
 def _scope(db, workspace, scope: Scope, *, current=False):
     # KB -> documents -> versions matches the existing catalog lock direction.
-    # Hold authorization/source rows through commit, not across external work.
-    authorized_kb(db, scope.kb_id, workspace, lock=True)
+    # Shared readers still block non-key UPDATE/DELETE through commit. Conversation
+    # ownership stays exclusive; scope checks never mutate these source rows.
+    authorized_kb(db, scope.kb_id, workspace, lock=True, shared=True)
     query = (
         select(VersionRow, DocumentRow)
         .join(DocumentRow, DocumentRow.id == VersionRow.document_id)
         .where(VersionRow.id.in_(scope.version_ids), VersionRow.kb_id == scope.kb_id)
         .order_by(DocumentRow.id, VersionRow.id)
-        .with_for_update()
+        .with_for_update(read=True)
     )
     rows = db.execute(query).all()
     if len(rows) != len(scope.version_ids) or any(doc.kb_id != scope.kb_id for _, doc in rows):

@@ -1,0 +1,27 @@
+{
+  "revision": "conversation-m3-v2",
+  "baseline_commit": "8da4d1778a7f88e4d21b43ce5f9ff51426c386e6",
+  "baseline_tree": "6cf4ef113dfa0bb94578b4006de689b45d7d614f",
+  "seed": 20261003,
+  "concurrency": [1, 5, 10, 20],
+  "requests_per_repeat": 40,
+  "repeats": 3,
+  "warmup_per_repeat": 20,
+  "timeout_seconds": 60,
+  "profiles": {
+    "A": "Loopback HTTP + real PG + ProductionRuntime; original one-span evidence; synthetic model/token accounting, branch hits and streamed provider response, no injected sleep",
+    "B": "Same as A, with real local Qdrant dense/BM25 HTTP branches and three original points (one valid, two out of scope); synthetic 2D embedding/reranker/tokenization; NOT real E5/BGE or corpus performance",
+    "C": "Inclusive monotonic timing of unchanged M2 _record calls (lock, SQL, flush, commit); event INSERT cursor time separately. Atomic publication event excluded from _record timing. No event suppression or M1/M2 A/B"
+  },
+  "workload": "Each independent conversation has one untimed accepted documentary seed Turn with exact current-question entity provenance, then one measured documentary Turn with bounded nonempty history and a structurally guarded completion-only rewrite inheriting the receiver. Same shared KB/version; stable logical identities and unique keys. Measured workflow POST + authorized result GET + Trace GET. POST latency also reported separately. Untimed seeding uses five workers.",
+  "seed_question": "What does the receiver do?",
+  "measured_question": "What does the receiver do with a damaged message?",
+  "scheduler": "Finite closed-loop workers, all operations recorded; enqueue-to-finish also retained. Not an open-loop capacity/SLO test; offered arrival rate is response-dependent.",
+  "percentile": "Nearest rank ceil(p*n), all attempted workflow termination latencies including failure/timeout; success-only separately. No p99 below 1000 samples.",
+  "pool": {"size": 4, "overflow": 2, "timeout_seconds": 5, "pre_ping": true, "statement_timeout_ms": 10000},
+  "runtime": {"workers": 1, "anyio_thread_tokens": 40, "history_scan_limit": 512, "history_statement_ms": 1000, "context_max_bytes": 131072, "provider_attempt_limit": 1},
+  "provider_model_judge_calls": 0,
+  "resource_sampling_seconds": 0.2,
+  "resource_process_identity": "Actual Python API worker; follow the Windows venv launcher's module-matching child. v1 sampled only that launcher; its API CPU/RSS facts are invalid. v1 diagnostic receipts preserved, v2 frozen again before any product change and used for all final comparisons.",
+  "extension_policy": "Do not extend beyond 20 in this contract. Every comparison uses identical contract and harness hashes. Correctness failure invalidates that run."
+}

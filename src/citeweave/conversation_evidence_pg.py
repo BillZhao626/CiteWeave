@@ -65,13 +65,15 @@ def validate_durable_result(db, workspace, run_id, context, decision, result):
         version = versions.get(binding.version_id)
         if not version or str(version.document_id) != binding.document_id:
             raise CoreConflict("documentary_document_identity_conflict")
-    repository = StructuralRepository(snapshot)
+    repository = StructuralRepository(snapshot, session=db)
     repository.builds()
     atoms = repository.atoms({s.evidence_id for s in result.evidence_pack.spans})
     material = CurrentEvidence(
         snapshot=snapshot,
         pack=result.evidence_pack,
-        citations=tuple(citation_for(atoms[s.evidence_id], s.label) for s in result.evidence_pack.spans),
+        citations=tuple(
+            citation_for(atoms[s.evidence_id], s.label, session=db) for s in result.evidence_pack.spans
+        ),
     )
     # Verify lineage against the same immutable artifact, without selecting or
     # reranking again. Pack contents cannot point to an unrelated frozen span.

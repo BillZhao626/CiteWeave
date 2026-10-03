@@ -22,11 +22,11 @@ def fingerprint(value) -> str:
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
-def authorized_kb(db, identity: UUID, workspace: UUID, lock=False):
+def authorized_kb(db, identity: UUID, workspace: UUID, lock=False, *, shared=False):
     query = select(KnowledgeBaseRow).where(
         KnowledgeBaseRow.id == identity, KnowledgeBaseRow.workspace_id == workspace
     )
-    row = db.scalar(query.with_for_update() if lock else query)
+    row = db.scalar(query.with_for_update(read=shared) if lock else query)
     if row is None:
         raise HTTPException(404, "knowledge_base_not_found")
     return row

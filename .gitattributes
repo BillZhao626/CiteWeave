@@ -11,3 +11,8 @@ evals/citeweave-v02a-development-v2.json -text
 evals/citeweave-v02a-development-v3.json -text
 evals/approvals/citeweave-v02a-development-v3-human-gold-20261001.json -text
 corpus/public_telecom_manifest.json -text
+# M3 freezes raw contract/harness bytes before the comparison. Windows checkout
+# must not replace their LF endings and invalidate the published identities.
+benchmarks/conversation_contract.json -text
+benchmarks/conversation.py text eol=lf
+benchmarks/conversation_server.py text eol=lf

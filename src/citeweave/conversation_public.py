@@ -18,6 +18,7 @@ from citeweave.conversation_contract import (
     Scope,
     SourceRef,
 )
+from citeweave.runtime_reliability import ReliabilitySignal
 from citeweave.schemas import Citation
 
 
@@ -124,6 +125,9 @@ class ConversationTrace(DurableDTO):
     citations: tuple[CitationIdentity, ...] | None = None
     validation: Literal["CURRENT_PACK_PHYSICAL_ONLY"] | None = None
     semantic_support: Literal["NOT_ASSESSED"] = "NOT_ASSESSED"
+    request_fingerprint: str | None = None
+    reliability_events: tuple[ReliabilitySignal, ...] = ()
+    reliability_truncated: bool = False
 
 
 class LifecycleEvent(DurableDTO):
@@ -243,5 +247,8 @@ def trace_view(read: Readback) -> ConversationTrace:
         metadata_availability=(
             "documentary_bundle" if fields else "control_bundle" if accepted else "no_accepted_bundle"
         ),
+        request_fingerprint=read.run.fingerprint,
+        reliability_events=read.reliability_events,
+        reliability_truncated=read.reliability_truncated,
         **fields,
     )

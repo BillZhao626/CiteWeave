@@ -672,6 +672,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/conversations/{conversation_id}/runs/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_v1_conversations__conversation_id__runs__run_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/conversations/{conversation_id}/runs/{run_id}/result": {
         parameters: {
             query?: never;
@@ -1086,6 +1103,18 @@ export interface components {
              * @constant
              */
             semantic_support: "NOT_ASSESSED";
+            /** Request Fingerprint */
+            request_fingerprint?: string | null;
+            /**
+             * Reliability Events
+             * @default []
+             */
+            reliability_events: components["schemas"]["ReliabilitySignal"][];
+            /**
+             * Reliability Truncated
+             * @default false
+             */
+            reliability_truncated: boolean;
         };
         /** DatasetSource */
         DatasetSource: {
@@ -1805,6 +1834,44 @@ export interface components {
             evidence_mode: "auto" | "single" | "compare";
             /** Document Ids */
             document_ids?: string[] | null;
+        };
+        /** ReliabilitySignal */
+        ReliabilitySignal: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "admitted" | "execution_started" | "provider_prepared" | "provider_attempt" | "provider_dispatched" | "provider_completed" | "provider_failure" | "provider_retry" | "accepted" | "finished" | "cancelled" | "recovered";
+            /** Fence */
+            fence: number;
+            /** Provider Phase Id */
+            provider_phase_id?: string | null;
+            /** Attempt */
+            attempt?: number | null;
+            /** From State */
+            from_state?: string | null;
+            /** To State */
+            to_state?: string | null;
+            /** Retry Classification */
+            retry_classification?: ("BEFORE_DISPATCH" | "RETRYABLE_KNOWN" | "PERMANENT" | "UNKNOWN") | null;
+            /** Error Class */
+            error_class?: string | null;
+            /** Latency Ms */
+            latency_ms?: number | null;
+            /** Usage */
+            usage?: {
+                [key: string]: number;
+            } | null;
         };
         /** RerankerRanking */
         RerankerRanking: {
@@ -3620,6 +3687,38 @@ export interface operations {
         };
     };
     run_v1_conversations__conversation_id__runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicRun"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_v1_conversations__conversation_id__runs__run_id__cancel_post: {
         parameters: {
             query?: never;
             header?: never;

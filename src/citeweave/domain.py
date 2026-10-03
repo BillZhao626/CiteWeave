@@ -310,6 +310,14 @@ class EvalOutboxRow(Stamp, Base):
 class ProviderPhaseRow(Stamp, Base):
     __tablename__ = "cw4_provider_phases"
     __table_args__ = (
+        CheckConstraint(
+            "transport_limit BETWEEN 1 AND 3 AND transport_attempt BETWEEN 0 AND transport_limit",
+            name="ck_provider_transport_attempt",
+        ),
+        CheckConstraint(
+            "retry_classification IS NULL OR retry_classification IN ('BEFORE_DISPATCH','RETRYABLE_KNOWN','PERMANENT','UNKNOWN')",
+            name="ck_provider_retry_classification",
+        ),
         UniqueConstraint("logical_key", "phase_attempt"),
         # Existing 0008 constraints, now also represented in ORM metadata.
         ForeignKeyConstraint(
@@ -374,6 +382,10 @@ class ProviderPhaseRow(Stamp, Base):
     result: Mapped[list | None] = mapped_column(JSONB)
     error_code: Mapped[str | None] = mapped_column(String(80))
     outcome: Mapped[str] = mapped_column(String(24), default="not_dispatched")
+    transport_limit: Mapped[int] = mapped_column(Integer, server_default="1", default=1)
+    transport_attempt: Mapped[int] = mapped_column(Integer, server_default="0", default=0)
+    retry_classification: Mapped[str | None] = mapped_column(String(24))
+    retry_after: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class ProviderEventRow(Base):

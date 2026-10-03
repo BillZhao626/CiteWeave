@@ -5,6 +5,7 @@ an absent grant authorizes zero calls/spending. Synthetic test grants are not
 production spending grants.
 """
 
+from datetime import timedelta
 from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
@@ -18,6 +19,7 @@ from citeweave.costs import RATE_CARD, estimated_cost
 from citeweave.db import transaction
 from citeweave.domain import ProviderPhaseRow
 from citeweave.provider_phases import KNOWN_NOT_EXECUTED
+from citeweave.runtime_reliability import classify, event
 
 Hash = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 TokenCount = Annotated[StrictInt, Field(ge=0)]
@@ -71,11 +73,15 @@ def _aggregate(db, run, now, candidate=None):
     if run.authorization_deadline <= now:
         raise CoreConflict("run_authorization_expired")
     rows = list(db.scalars(select(ProviderPhaseRow).where(ProviderPhaseRow.conversation_run_id == run.id)))
-    calls = len(rows) + (candidate is not None)
-    inputs = sum(p.input_tokens for p in rows) + (candidate.input_tokens if candidate else 0)
-    outputs = sum(p.output_tokens for p in rows) + (candidate.output_tokens if candidate else 0)
-    amount = sum((p.reserved_yuan for p in rows), Decimal(0)) + (
-        candidate.max_yuan if candidate else Decimal(0)
+    calls = sum(p.transport_limit for p in rows) + (candidate.max_attempts if candidate else 0)
+    inputs = sum(p.input_tokens * p.transport_limit for p in rows) + (
+        candidate.input_tokens * candidate.max_attempts if candidate else 0
+    )
+    outputs = sum(p.output_tokens * p.transport_limit for p in rows) + (
+        candidate.output_tokens * candidate.max_attempts if candidate else 0
+    )
+    amount = sum((p.reserved_yuan * p.transport_limit for p in rows), Decimal(0)) + (
+        candidate.max_yuan * candidate.max_attempts if candidate else Decimal(0)
     )
     if (
         calls > run.authorization_max_calls
@@ -112,6 +118,7 @@ class CallAuthorization(DurableDTO):
     output_tokens: int = Field(gt=0, le=2147483647, strict=True)
     max_yuan: Decimal = Field(gt=0, max_digits=12, decimal_places=8, allow_inf_nan=False)
     expires_at: AwareDatetime
+    max_attempts: int = Field(default=1, ge=1, le=3, strict=True)
 
 
 class Usage(DurableDTO):
@@ -192,6 +199,7 @@ def prepare(workspace, supplied, authorization: CallAuthorization):
             owner=run.owner,
             fence=run.fence,
             logical_key=f"conversation:{run.id}:{grant.purpose}",
+            transport_limit=grant.max_attempts,
         )
         row = db.scalar(
             select(ProviderPhaseRow).where(
@@ -209,35 +217,61 @@ def prepare(workspace, supplied, authorization: CallAuthorization):
         row = ProviderPhaseRow(**values, reserved_at=now)
         db.add(row)
         _flush_owned(db, workspace, supplied, row)
+        event(db, run, "provider_prepared", provider_phase_id=row.id, attempt=0, to_state="PREPARED")
         return row
 
 
-def dispatch(workspace, supplied, identity):
+def dispatch(workspace, supplied, identity, *, attempt=None):
     """Commit permission BEFORE future transport. Repeated dispatch fails closed."""
     with transaction() as db:
         run, now = _owned(db, workspace, supplied)
         row = _phase(db, run, identity, now)
-        if row.state != "PREPARED" or row.dispatched_at is not None:
+        _attempt(row, attempt)
+        if row.state != "PREPARED" or row.retry_after is not None:
             raise CoreConflict("provider_phase_not_dispatchable")
         if unresolved(db, run.id):
             raise CoreConflict("provider_outcome_unknown")
-        row.state, row.outcome, row.dispatched_at = "DISPATCHED", "unknown", now
+        row.state, row.outcome = "DISPATCHED", "unknown"
+        row.dispatched_at = now  # Current attempt prices at its actual dispatch; events retain earlier sends.
+        row.error_code, row.retry_classification = None, None
+        row.estimated_yuan = None
+        event(
+            db,
+            run,
+            "provider_dispatched",
+            provider_phase_id=row.id,
+            attempt=row.transport_attempt or 1,
+            from_state="PREPARED",
+            to_state="DISPATCHED",
+        )
         _aggregate(db, run, now)
         _flush_owned(db, workspace, supplied, row)
         _aggregate(db, run, core._clock(db))
 
 
-def complete(workspace, supplied, identity, observation: Observation):
+def complete(workspace, supplied, identity, observation: Observation, *, attempt=None, latency_ms=None):
     receipt = Observation.model_validate(observation.model_dump())
     if receipt.result_hash is None:
         raise CoreConflict("provider_result_identity_required")
     with transaction() as db:
         run, now = _owned(db, workspace, supplied)
         row = _phase(db, run, identity, now)
+        _attempt(row, attempt)
         if row.state != "DISPATCHED" or row.dispatched_at is None:
             raise CoreConflict("provider_phase_not_dispatched")
         row.state, row.outcome = "COMPLETED", "known"
         _observation(row, receipt)
+        event(
+            db,
+            run,
+            "provider_completed",
+            provider_phase_id=row.id,
+            attempt=row.transport_attempt or 1,
+            from_state="DISPATCHED",
+            to_state="COMPLETED",
+            latency_ms=latency_ms,
+            usage=row.usage,
+        )
         _flush_owned(db, workspace, supplied, row)
 
 
@@ -257,6 +291,7 @@ def reject_prepared(workspace, supplied, identity, code: Literal["local_validati
     with transaction() as db:
         run, now = _owned(db, workspace, supplied)
         row = _phase(db, run, identity, now)
+        _attempt(row, None)
         if row.state != "PREPARED" or row.dispatched_at is not None:
             raise CoreConflict("provider_phase_not_prepared")
         row.state, row.outcome, row.error_code = "REJECTED", "known_not_executed", code
@@ -270,6 +305,8 @@ def record_unknown(
     identity,
     code: Literal["response_lost", "request_timeout"],
     observation: Observation | None = None,
+    *,
+    attempt=None,
 ):
     if code not in {"response_lost", "request_timeout"}:
         raise CoreConflict("provider_unknown_code_invalid")
@@ -277,12 +314,25 @@ def record_unknown(
     with transaction() as db:
         run, now = _owned(db, workspace, supplied)
         row = _phase(db, run, identity, now)
+        _attempt(row, attempt)
         if row.state != "DISPATCHED":
             raise CoreConflict("provider_phase_not_dispatched")
         row.state, row.outcome, row.error_code = "UNKNOWN", "unknown", code
+        row.retry_classification = "UNKNOWN"
         if receipt is not None:
             _observation(row, receipt)
         _flush_owned(db, workspace, supplied, row)
+        event(
+            db,
+            run,
+            "provider_failure",
+            provider_phase_id=row.id,
+            attempt=row.transport_attempt or 1,
+            from_state="DISPATCHED",
+            to_state="UNKNOWN",
+            retry_classification="UNKNOWN",
+            error_class=code,
+        )
 
 
 def reject_dispatched(workspace, supplied, identity, code):
@@ -292,6 +342,7 @@ def reject_dispatched(workspace, supplied, identity, code):
     with transaction() as db:
         run, now = _owned(db, workspace, supplied)
         row = _phase(db, run, identity, now)
+        _attempt(row, None)
         if row.state != "DISPATCHED" or row.dispatched_at is None:
             raise CoreConflict("provider_phase_not_dispatched")
         row.state, row.outcome, row.error_code = "REJECTED", "known_not_executed", code
@@ -308,7 +359,7 @@ def blocks_retry(db, run_id):
                 ProviderPhaseRow.conversation_run_id == run_id,
                 ProviderPhaseRow.dispatched_at.is_not(None),
                 ~(
-                    (ProviderPhaseRow.state == "REJECTED")
+                    (ProviderPhaseRow.state.in_(["REJECTED", "PREPARED"]))
                     & (ProviderPhaseRow.outcome == "known_not_executed")
                 ),
             )
@@ -332,7 +383,22 @@ def unresolved(db, run_id):
     )
 
 
-def reconcile(db, run_id):
+def permanent_failure(db, run_id):
+    return (
+        db.scalar(
+            select(ProviderPhaseRow.id)
+            .where(
+                ProviderPhaseRow.conversation_run_id == run_id,
+                ProviderPhaseRow.state == "REJECTED",
+                ProviderPhaseRow.retry_classification == "PERMANENT",
+            )
+            .limit(1)
+        )
+        is not None
+    )
+
+
+def reconcile(db, run_id, *, code="execution_expired"):
     """Caller holds Conversation lock. Preserve completed receipts and reservations."""
     blocked = blocks_retry(db, run_id)
     for row in db.scalars(
@@ -340,5 +406,121 @@ def reconcile(db, run_id):
             ProviderPhaseRow.conversation_run_id == run_id, ProviderPhaseRow.state == "DISPATCHED"
         )
     ):
-        row.state, row.outcome, row.error_code = "UNKNOWN", "unknown", "execution_expired"
+        row.state, row.outcome, row.error_code = "UNKNOWN", "unknown", code
+        row.retry_classification = "UNKNOWN"
+        run = db.get(core.Run, run_id)
+        event(
+            db,
+            run,
+            "provider_failure",
+            provider_phase_id=row.id,
+            attempt=row.transport_attempt or 1,
+            from_state="DISPATCHED",
+            to_state="UNKNOWN",
+            retry_classification="UNKNOWN",
+            error_class=code,
+        )
     return blocked
+
+
+def _attempt(row, attempt):
+    # Old one-send callers cannot mutate the receipt of a newer transport attempt.
+    if attempt is None:
+        if row.transport_limit > 1 or row.transport_attempt > 1:
+            raise CoreConflict("provider_attempt_required")
+    elif row.transport_attempt != attempt:
+        raise CoreConflict("stale_provider_attempt")
+
+
+def begin_attempt(workspace, supplied, identity):
+    with transaction() as db:
+        run, now = _owned(db, workspace, supplied)
+        row = _phase(db, run, identity, now)
+        if row.state != "PREPARED" or row.transport_attempt >= row.transport_limit:
+            raise CoreConflict("provider_attempt_not_allowed")
+        # Only initial transport or a durably scheduled known-safe retry.
+        if row.transport_attempt and (row.retry_after is None or row.retry_after > now):
+            raise CoreConflict("provider_retry_not_due")
+        row.transport_attempt += 1
+        row.retry_after = None
+        event(
+            db,
+            run,
+            "provider_attempt",
+            provider_phase_id=row.id,
+            attempt=row.transport_attempt,
+            to_state="PREPARED",
+        )
+        _flush_owned(db, workspace, supplied, row)
+        return row.transport_attempt
+
+
+def fail_attempt(workspace, supplied, identity, attempt, code, *, dispatched, latency_ms, observation=None):
+    classification = classify(code, dispatched)
+    with transaction() as db:
+        run, now = _owned(db, workspace, supplied)
+        row = _phase(db, run, identity, now)
+        _attempt(row, attempt)
+        expected = "DISPATCHED" if dispatched else "PREPARED"
+        if row.state != expected:
+            raise CoreConflict("provider_failure_receipt_conflict")
+        # A committed dispatch whose acknowledgement was lost is still uncertain.
+        if dispatched and classification != "UNKNOWN" and code not in KNOWN_NOT_EXECUTED:
+            raise CoreConflict("provider_rejection_not_proven")
+        row.state = "UNKNOWN" if classification == "UNKNOWN" else "REJECTED"
+        row.outcome = "unknown" if classification == "UNKNOWN" else "known_not_executed"
+        row.error_code, row.retry_classification = code, classification
+        if classification != "UNKNOWN":
+            row.estimated_yuan = Decimal(0)
+        elif observation is not None:
+            _observation(row, Observation.model_validate(observation.model_dump()))
+        event(
+            db,
+            run,
+            "provider_failure",
+            provider_phase_id=row.id,
+            attempt=attempt,
+            from_state=expected,
+            to_state=row.state,
+            retry_classification=classification,
+            error_class=code,
+            latency_ms=latency_ms,
+        )
+        _flush_owned(db, workspace, supplied, row)
+        return classification
+
+
+def schedule_retry(workspace, supplied, identity, attempt, delay):
+    if not 0 <= delay <= 4:
+        raise CoreConflict("provider_retry_delay_invalid")
+    with transaction() as db:
+        run, now = _owned(db, workspace, supplied)
+        row = _phase(db, run, identity, now)
+        _attempt(row, attempt)
+        if (
+            row.state != "REJECTED"
+            or row.outcome != "known_not_executed"
+            or row.retry_classification != "RETRYABLE_KNOWN"
+            or row.transport_attempt >= row.transport_limit
+        ):
+            raise CoreConflict("provider_retry_not_allowed")
+        # Earlier phases may have consumed a side effect; this retry only applies
+        # to this phase's proved non-execution, never to the completed phase.
+        if unresolved(db, run.id):
+            raise CoreConflict("provider_outcome_unknown")
+        row.retry_after = now + timedelta(seconds=delay)
+        if row.retry_after >= min(run.deadline, row.authorization_deadline):
+            raise CoreConflict("provider_retry_deadline_elapsed")
+        row.state, row.outcome = "PREPARED", "known_not_executed"
+        event(
+            db,
+            run,
+            "provider_retry",
+            provider_phase_id=row.id,
+            attempt=attempt,
+            from_state="REJECTED",
+            to_state="PREPARED",
+            retry_classification="RETRYABLE_KNOWN",
+        )
+        _aggregate(db, run, now)
+        _flush_owned(db, workspace, supplied, row)

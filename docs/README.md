@@ -1,6 +1,8 @@
 # 工程文档
 
-Current authorized milestone: [Residual root-cause closure](V02_RESIDUAL_ROOT_CAUSE_CLOSURE.md) / [ADR0018](adr/0018-residual-runtime-normal-form.md). RC Human truth is22 PASS/two residuals after explicit correction. Provider-free repair/regression only; fresh paid authorization pending. Exact candidate, tests and zero-grant execution proposal remain local.
+Current Owner-authorized milestone: [v0.2b Runtime Reliability & Recovery M1](V02B_RUNTIME_RELIABILITY_M1.md), [ADR0023](adr/0023-runtime-reliability-and-recovery.md), [evidence / claim matrix](V02B_RUNTIME_RELIABILITY_EVIDENCE.md). Champion8184 retained; rejected challengers not promoted. PostgreSQL authority, bounded known-safe retries, cancellation, attempt fencing and callable recovery are tested provider-free. Default availability and semantic baseline are unchanged. Latest state is [HANDOFF](../HANDOFF.md).
+
+Previous milestone: [Residual root-cause closure](V02_RESIDUAL_ROOT_CAUSE_CLOSURE.md) / [ADR0018](adr/0018-residual-runtime-normal-form.md). Its historical22-PASS status is superseded by the Human v6 record described above.
 
 Previous milestone: [RC Narrow Closure](V02_RC_NARROW_CLOSURE.md) / [ADR0017](adr/0017-rc-narrow-closure.md).
 

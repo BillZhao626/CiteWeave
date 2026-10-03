@@ -14,6 +14,8 @@
 
 ## Task navigation
 
+- Current milestone: [v0.2b Runtime Reliability & Recovery M1](docs/V02B_RUNTIME_RELIABILITY_M1.md), [ADR0023](docs/adr/0023-runtime-reliability-and-recovery.md). Owner-authorized provider-free implementation starts at Champion `8184d40936dd853bfaba0bb3ffcd9ab906daf11c`; rejected challengers are not implementation parents. No further v0.2a semantic tuning, live provider/model/Judge, historical paid grant reuse, performance benchmarking. Owner separately authorizes review fixes, commits, push and PR against verified main; stop before merge and do not begin M2. Default runtime remains unavailable; evidence is in `.runtime/reliability/m1/`. Preserve Human v6 21 PASS and historical UNKNOWN <=0.016110 CNY; final ec9 export labels remain PENDING. Latest gates and review state are in HANDOFF.
+
 - [Comparison Protocol Freeze](docs/V02_COMPARISON_PROTOCOL.md) is **ACCEPTED — Human Comparison Protocol Review incorporated** (Product Owner APPROVED, 2026-09-29). N=2/C=8/K=2 are conservative first-slice defaults, not measured optima or a winner. Accepted DEFERRED/fail-closed handling permits separately authorized structural implementation and fake-provider/local L1; it does not authorize them now. Real provider/candidate execution requires complete identities/accounting/deadlines/finite budgets and independent authorization. Future stage bounds are not execution authority. Do not resume preimplementation Calibration.
 - Start with [current milestone](HANDOFF.md) and the [documentation map](docs/README.md); read only the current task's relevant Spec / ADR, not complete historical archives.
 - Current implementation / operations: [architecture](docs/ARCHITECTURE.md) and [quickstart](docs/QUICKSTART.md).

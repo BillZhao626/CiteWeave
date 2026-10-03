@@ -2387,6 +2387,61 @@
         }
       }
     },
+    "/v1/conversations/{conversation_id}/runs/{run_id}/cancel": {
+      "post": {
+        "summary": "Cancel",
+        "operationId": "cancel_v1_conversations__conversation_id__runs__run_id__cancel_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicRun"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/conversations/{conversation_id}/runs/{run_id}/result": {
       "get": {
         "summary": "Result",
@@ -3392,6 +3447,30 @@
             "const": "NOT_ASSESSED",
             "title": "Semantic Support",
             "default": "NOT_ASSESSED"
+          },
+          "request_fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Fingerprint"
+          },
+          "reliability_events": {
+            "items": {
+              "$ref": "#/components/schemas/ReliabilitySignal"
+            },
+            "type": "array",
+            "title": "Reliability Events",
+            "default": []
+          },
+          "reliability_truncated": {
+            "type": "boolean",
+            "title": "Reliability Truncated",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -5240,6 +5319,151 @@
           "question"
         ],
         "title": "QueryCreate"
+      },
+      "ReliabilitySignal": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "admitted",
+              "execution_started",
+              "provider_prepared",
+              "provider_attempt",
+              "provider_dispatched",
+              "provider_completed",
+              "provider_failure",
+              "provider_retry",
+              "accepted",
+              "finished",
+              "cancelled",
+              "recovered"
+            ],
+            "title": "Kind"
+          },
+          "fence": {
+            "type": "integer",
+            "title": "Fence"
+          },
+          "provider_phase_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Phase Id"
+          },
+          "attempt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attempt"
+          },
+          "from_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From State"
+          },
+          "to_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To State"
+          },
+          "retry_classification": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "BEFORE_DISPATCH",
+                  "RETRYABLE_KNOWN",
+                  "PERMANENT",
+                  "UNKNOWN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry Classification"
+          },
+          "error_class": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Class"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usage"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "kind",
+          "fence"
+        ],
+        "title": "ReliabilitySignal"
       },
       "RerankerRanking": {
         "properties": {

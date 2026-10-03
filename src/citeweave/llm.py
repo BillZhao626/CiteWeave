@@ -91,6 +91,7 @@ class DeepSeekProvider:
                         actual_charge="unavailable",
                     )
                     started = False
+                    response_received = False
                     try:
                         if before_send is not None:
                             await asyncio.to_thread(before_send)
@@ -104,6 +105,7 @@ class DeepSeekProvider:
                             ),
                             headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"},
                         ) as response:
+                            response_received = True
                             item["http_status"] = response.status_code
                             if response.status_code != 200:
                                 code = "llm_http_" + str(response.status_code)
@@ -175,6 +177,9 @@ class DeepSeekProvider:
                                         yield {"text": content}
                             raise ProviderError("llm_stream_incomplete")
                     except (httpx.ConnectError, httpx.ConnectTimeout):
+                        if response_received:
+                            item.update(error_code="llm_protocol_error", error_category="unknown_outcome")
+                            raise ProviderError("llm_protocol_error") from None
                         item.update(
                             status="FAILED",
                             error_code="llm_connection_failed",

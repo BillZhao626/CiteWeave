@@ -1,5 +1,7 @@
 # 本地运行与复现
 
+Provider-free v0.2b reliability review and isolated-PG reproduction: [M1 evidence](V02B_RUNTIME_RELIABILITY_M1.md#reproduction-and-limits). Operator recovery uses `python scripts/reconcile_conversations.py --workspace <workspace-uuid> --limit 32`; it changes only expired durable bookkeeping and never dispatches a provider. Use isolated test databases for verification; default runtime policy remains unavailable and historical grants cannot be reused.
+
 ## 无模型离线检查
 
 安装 Python 3.12、Node 22.20+、pnpm 11.19.0；在仓库根目录运行：

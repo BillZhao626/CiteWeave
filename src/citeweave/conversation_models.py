@@ -119,6 +119,25 @@ class ConversationRunRow(Base):
     status: Mapped[str] = mapped_column(String(24))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    execution_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ConversationRunEventRow(Base):
+    __tablename__ = "cw5_run_events"
+    __table_args__ = (Index("ix_conversation_run_events", "run_id", "created_at"),)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    run_id: Mapped[UUID] = mapped_column(ForeignKey("cw5_runs.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    kind: Mapped[str] = mapped_column(String(40))
+    fence: Mapped[int] = mapped_column(Integer)
+    provider_phase_id: Mapped[UUID | None] = mapped_column(ForeignKey("cw4_provider_phases.id"))
+    attempt: Mapped[int | None] = mapped_column(Integer)
+    from_state: Mapped[str | None] = mapped_column(String(24))
+    to_state: Mapped[str | None] = mapped_column(String(24))
+    retry_classification: Mapped[str | None] = mapped_column(String(24))
+    error_class: Mapped[str | None] = mapped_column(String(80))
+    latency_ms: Mapped[Decimal | None] = mapped_column(Numeric(16, 3))
+    usage: Mapped[dict | None] = mapped_column(JSONB)
 
 
 class ConversationAcceptanceRow(Base):

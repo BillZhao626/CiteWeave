@@ -8,6 +8,8 @@ import asyncio
 import hashlib
 import json
 import logging
+import random
+import time
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -29,7 +31,7 @@ from citeweave.costs import RATE_CARD, maximum_cost
 from citeweave.llm import DeepSeekProvider, ProviderError, completion_payload
 from citeweave.model_client import ModelGateway
 from citeweave.provider_accounting import DeepSeekAccounting, request_hash, serialize_request
-from citeweave.provider_phases import KNOWN_NOT_EXECUTED
+from citeweave.runtime_reliability import retry_delay
 from citeweave.schemas import Answer
 from citeweave.settings import ROOT, settings
 from citeweave.trace import bounded_stage
@@ -40,6 +42,7 @@ class PhasePlan(DurableDTO):
     input_tokens: int = Field(gt=0, strict=True)
     output_tokens: int = Field(gt=0, strict=True)
     request_hash: str | None = Field(default=None, pattern="^[0-9a-f]{64}$")
+    max_attempts: int = Field(default=1, ge=1, le=3, strict=True)
 
 
 class RuntimePolicy(DurableDTO):
@@ -138,6 +141,7 @@ class RuntimeCalls:
 
     def call(self, purpose, messages):
         body, measured = self.request(purpose, messages)
+        plan = next(p for p in self.policy.phases if p.purpose == purpose)
         grant = ledger.CallAuthorization(
             id=uuid5(self.policy.authorization_id, purpose),
             run_id=self.run.id,
@@ -154,6 +158,7 @@ class RuntimeCalls:
             output_tokens=body["max_tokens"],
             max_yuan=maximum_cost(measured["input_tokens"], body["max_tokens"]),
             expires_at=self.policy.authorization_deadline,
+            max_attempts=plan.max_attempts,
         )
         phase = ledger.prepare(self.workspace, self.run, grant)
         if phase.state != "PREPARED":
@@ -161,60 +166,83 @@ class RuntimeCalls:
         return asyncio.run(self._send(phase, body))
 
     async def _send(self, phase, body):
-        provider = self.provider_factory()
-        provider.max_attempts = 1
-        observed, text, dispatched = {}, "", False
+        from contextlib import aclosing
 
-        def before_send():
-            nonlocal dispatched
-            ledger.dispatch(self.workspace, self.run, phase.id)
-            dispatched = True
+        while True:
+            attempt = ledger.begin_attempt(self.workspace, self.run, phase.id)
+            observed, text, dispatched = {}, "", False
+            started = time.perf_counter()
 
-        try:
-            from contextlib import aclosing
+            def before_send():
+                nonlocal dispatched
+                ledger.dispatch(self.workspace, self.run, phase.id, attempt=attempt)
+                dispatched = True
 
-            remaining = (self.run.deadline - datetime.now(timezone.utc)).total_seconds()
-            async with asyncio.timeout(min(35, remaining)):
-                async with aclosing(provider.stream_request(body, before_send=before_send)) as stream:
-                    async for part in stream:
-                        text += part.get("text", "")
-                        if len(text.encode("utf-8")) > self.policy.context_max_bytes:
-                            raise CoreConflict("provider_response_overflow")
-                        if part.get("usage") is not None:
-                            observed["usage"] = part["usage"]
-                        if part.get("provider_id"):
-                            observed["request_id"] = part["provider_id"]
-            observed["result_hash"] = hashlib.sha256(text.encode()).hexdigest()
-            receipt = ledger.Observation.model_validate(observed)
-            ledger.complete(self.workspace, self.run, phase.id, receipt)
-            if receipt.usage and (
-                receipt.usage.prompt_tokens is not None
-                and receipt.usage.prompt_tokens > phase.input_tokens
-                or receipt.usage.completion_tokens is not None
-                and receipt.usage.completion_tokens > phase.output_tokens
-            ):
-                raise CoreConflict("provider_usage_exceeded_authorization")
-            return text, receipt
-        except Exception as exc:
-            # Failed receipt writes stay DISPATCHED and reconcile conservatively.
-            # Never let stale owner/head/deadline overwrite provider truth.
             try:
-                if isinstance(exc, ProviderError) and exc.code in KNOWN_NOT_EXECUTED:
-                    if dispatched:
-                        ledger.reject_dispatched(self.workspace, self.run, phase.id, exc.code)
-                    else:
-                        ledger.reject_prepared(self.workspace, self.run, phase.id, "local_validation_failed")
-                elif dispatched:
-                    ledger.record_unknown(
+                provider = self.provider_factory()
+                provider.max_attempts = 1  # All retries belong to the durable ledger.
+                remaining = (self.run.deadline - datetime.now(timezone.utc)).total_seconds()
+                async with asyncio.timeout(min(35, remaining)):
+                    async with aclosing(provider.stream_request(body, before_send=before_send)) as stream:
+                        async for part in stream:
+                            text += part.get("text", "")
+                            if len(text.encode("utf-8")) > self.policy.context_max_bytes:
+                                raise CoreConflict("provider_response_overflow")
+                            if part.get("usage") is not None:
+                                observed["usage"] = part["usage"]
+                            if part.get("provider_id"):
+                                observed["request_id"] = part["provider_id"]
+                observed["result_hash"] = hashlib.sha256(text.encode()).hexdigest()
+                receipt = ledger.Observation.model_validate(observed)
+                ledger.complete(
+                    self.workspace,
+                    self.run,
+                    phase.id,
+                    receipt,
+                    attempt=attempt,
+                    latency_ms=round((time.perf_counter() - started) * 1000, 3),
+                )
+                if receipt.usage and (
+                    receipt.usage.prompt_tokens is not None
+                    and receipt.usage.prompt_tokens > phase.input_tokens
+                    or receipt.usage.completion_tokens is not None
+                    and receipt.usage.completion_tokens > phase.output_tokens
+                ):
+                    raise CoreConflict("provider_usage_exceeded_authorization")
+                return text, receipt
+            except Exception as exc:
+                code = (
+                    exc.code
+                    if isinstance(exc, ProviderError)
+                    else "request_timeout"
+                    if isinstance(exc, TimeoutError)
+                    else "response_lost"
+                    if dispatched
+                    else "local_validation_failed"
+                )
+                if dispatched and (text or observed):
+                    code = "response_lost"  # Partial success outweighs a retryable error name.
+                try:
+                    classification = ledger.fail_attempt(
                         self.workspace,
                         self.run,
                         phase.id,
-                        "response_lost",
-                        ledger.Observation.model_validate(observed),
+                        attempt,
+                        code,
+                        dispatched=dispatched,
+                        latency_ms=round((time.perf_counter() - started) * 1000, 3),
+                        observation=ledger.Observation.model_validate(observed),
                     )
-            except CoreConflict:
-                logging.info("conversation_provider_receipt_deferred run=%s", self.run.id)
-            raise
+                except CoreConflict:
+                    logging.info(
+                        "conversation_provider_receipt_deferred run=%s attempt=%s", self.run.id, attempt
+                    )
+                    raise exc
+                if classification != "RETRYABLE_KNOWN" or attempt >= phase.transport_limit:
+                    raise
+                delay = retry_delay(attempt, random.random())
+                ledger.schedule_retry(self.workspace, self.run, phase.id, attempt, delay)
+                await asyncio.sleep(delay)
 
 
 class ProductionRuntime:
@@ -229,6 +257,32 @@ class ProductionRuntime:
         return Execution(owner=uuid4(), deadline=self.policy.execution_deadline)
 
     def execute(self, workspace, run):
+        # A duplicated worker entry must not finish/fence the current executor.
+        core.start_execution(workspace, run)
+        try:
+            return self._execute(workspace, run)
+        except Exception as exc:
+            try:
+                from citeweave.db import transaction
+
+                with transaction() as db:
+                    blocked = ledger.blocks_retry(db, run.id)
+                core.finish(
+                    workspace,
+                    run.conversation_id,
+                    run.turn_id,
+                    run.id,
+                    run.owner,
+                    run.fence,
+                    "UNKNOWN" if blocked else "FAILED",
+                    error_class=type(exc).__name__,
+                )
+            except CoreConflict:
+                # Cancellation/completion/recovery already won the durable race.
+                logging.info("conversation_runtime_finish_fenced run=%s", run.id)
+            raise
+
+    def _execute(self, workspace, run):
         policy = self.policy
         request, previous = core.execution_input(workspace, run)
         if (

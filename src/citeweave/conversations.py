@@ -177,6 +177,9 @@ def _new_run(db, conversation, turn, key, digest, execution, retry_of=None):
     )
     db.add(run)
     db.flush()
+    from citeweave.runtime_reliability import event
+
+    event(db, run, "admitted", to_state="ADMITTED")
     return _run_view(run, turn)
 
 
@@ -389,7 +392,12 @@ def accept(
         run.status = transition(run.status, RunStatus.ACCEPTED)
         run.completed_at = _clock(db)
         conversation.fence += 1
+        from citeweave.runtime_reliability import event
+
+        event(db, run, "accepted", from_state="ADMITTED", to_state="ACCEPTED")
         db.flush()
+        if _clock(db) >= run.deadline:
+            raise CoreConflict("deadline_elapsed")
         return Acceptance.model_validate(accepted)
 
 
@@ -418,7 +426,9 @@ def execution_input(workspace, supplied: RunView):
         return request, Acceptance.model_validate(previous) if previous else None
 
 
-def finish(workspace, conversation_id, turn_id, run_id, owner, fence, target: RunStatus) -> RunView:
+def finish(
+    workspace, conversation_id, turn_id, run_id, owner, fence, target: RunStatus, *, error_class=None
+) -> RunView:
     """Owner reports a non-accepted outcome; no stale cleanup may release a new slot."""
     target = RunStatus(target)
     if target not in {RunStatus.FAILED, RunStatus.CANCELLED, RunStatus.UNKNOWN, RunStatus.STALE}:
@@ -438,6 +448,9 @@ def finish(workspace, conversation_id, turn_id, run_id, owner, fence, target: Ru
         run.status = transition(run.status, target)
         run.completed_at = _clock(db)
         conversation.fence += 1
+        from citeweave.runtime_reliability import event
+
+        event(db, run, "finished", from_state="ADMITTED", to_state=target, error_class=error_class)
         db.flush()
         return _run_view(run, turn)
 
@@ -452,12 +465,21 @@ def reconcile_expired(workspace, conversation_id) -> ConversationView:
         conversation = _conversation(db, workspace, conversation_id)
         active = _active(db, conversation_id)
         if active and active.deadline <= _clock(db):
-            from citeweave.conversation_provider import reconcile
+            from citeweave.conversation_provider import permanent_failure, reconcile
 
-            target = RunStatus.UNKNOWN if reconcile(db, active.id) else RunStatus.INTERRUPTED
+            target = (
+                RunStatus.UNKNOWN
+                if reconcile(db, active.id)
+                else RunStatus.FAILED
+                if permanent_failure(db, active.id)
+                else RunStatus.INTERRUPTED
+            )
             active.status = transition(active.status, target)
             active.completed_at = _clock(db)
             conversation.fence += 1
+            from citeweave.runtime_reliability import event
+
+            event(db, active, "recovered", from_state="ADMITTED", to_state=target)
             db.flush()
         return _view(db, workspace, conversation)
 
@@ -487,6 +509,9 @@ def _read_run(workspace, conversation_id, identity) -> Readback:
         turn = _turn(db, conversation_id, run.turn_id)
         _scope(db, workspace, Admission.model_validate(turn.request).scope)
         accepted = _accepted(db, turn.id)
+        from citeweave.runtime_reliability import read_events
+
+        events, truncated = read_events(db, run.id)
         return Readback(
             conversation=_view(db, workspace, conversation),
             turn=TurnView.model_validate(turn),
@@ -494,4 +519,63 @@ def _read_run(workspace, conversation_id, identity) -> Readback:
             accepted=Acceptance.model_validate(accepted) if accepted else None,
             unfinished=run.status == RunStatus.ADMITTED,
             deadline_elapsed=run.status == RunStatus.ADMITTED and run.deadline <= _clock(db),
+            reliability_events=tuple(e.model_dump(mode="json") for e in events),
+            reliability_truncated=truncated,
         )
+
+
+def start_execution(workspace, supplied: RunView):
+    """Claim once under the same durable guards as dispatch; restart never reclaims."""
+    from citeweave.conversation_provider import _owned
+    from citeweave.runtime_reliability import event
+
+    with transaction() as db:
+        run, now = _owned(db, workspace, supplied)
+        if run.execution_started_at is not None:
+            raise CoreConflict("execution_already_started")
+        run.execution_started_at = now
+        event(db, run, "execution_started", from_state="ADMITTED", to_state="ADMITTED")
+        db.flush()
+
+
+def cancel(workspace, conversation_id, run_id):
+    """Client intent wins only while active; never conceals an unresolved dispatch."""
+    from citeweave.conversation_provider import reconcile
+    from citeweave.runtime_reliability import event
+
+    with transaction() as db:
+        conversation = _conversation(db, workspace, conversation_id)
+        run = db.get(Run, run_id)
+        if run is None or run.conversation_id != conversation_id:
+            raise HTTPException(404, "conversation_run_not_found")
+        turn = _turn(db, conversation_id, run.turn_id)
+        _scope(db, workspace, Admission.model_validate(turn.request).scope)
+        if run.status == RunStatus.ADMITTED:
+            reconcile(db, run.id, code="cancel_requested")
+            run.status = transition(run.status, RunStatus.CANCELLED)
+            run.completed_at = _clock(db)
+            conversation.fence += 1
+            event(db, run, "cancelled", from_state="ADMITTED", to_state="CANCELLED")
+            db.flush()
+        return _run_view(run, turn)
+
+
+def reconcile_batch(workspace, *, limit=32):
+    """Bounded operator entry; durable readback, no transport or automatic retry."""
+    if type(limit) is not int or not 1 <= limit <= 128:
+        raise ValueError("recovery_batch_limit_invalid")
+    with transaction() as db:
+        identities = list(
+            db.scalars(
+                select(Conversation.id)
+                .join(Run, Run.conversation_id == Conversation.id)
+                .where(
+                    Conversation.workspace_id == workspace,
+                    Run.status == RunStatus.ADMITTED,
+                    Run.deadline <= _clock(db),
+                )
+                .order_by(Run.deadline, Run.id)
+                .limit(limit)
+            )
+        )
+    return tuple(reconcile_expired(workspace, identity) for identity in identities)

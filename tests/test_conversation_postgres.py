@@ -194,7 +194,7 @@ def test_upgrade_preserves_legacy_reader_and_schema(isolated_pg):
 
     legacy, before = isolated_pg
     with transaction() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0012"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
         after = schemas.Run.model_validate(read_query(db.get(QueryRunRow, legacy))).model_dump(mode="json")
         assert after == before
         assert db.scalar(select(func.count()).select_from(Conversation)) == 0
@@ -1022,19 +1022,22 @@ def test_interpretation_rechecks_actual_accepted_sources(sample, fault):
         )
         result = interpret(context, draft=draft)
     else:
-        # Corrupt an accepted source's terminal status to test the trust boundary.
-        # Normal core commands cannot create this combination.
-        with transaction() as db:
-            if fault == "pending":
-                # Keep the database single-active invariant while simulating loss.
-                current = db.get(Run, run.id)
-                current.status = "CANCELLED"
-                current.completed_at = datetime.now(timezone.utc)
-                db.flush()
-            old = db.get(Run, context.previous.run_id)
-            old.status = {"pending": "ADMITTED", "failed": "FAILED"}.get(fault, fault)
-            if fault == "pending":
-                old.completed_at = None
+        from sqlalchemy.exc import IntegrityError
+
+        # 0013 now rejects this contradictory bundle at the durable boundary.
+        with pytest.raises(IntegrityError, match="conversation_result_status_conflict"):
+            with transaction() as db:
+                if fault == "pending":
+                    current = db.get(Run, run.id)
+                    current.status = "CANCELLED"
+                    current.completed_at = datetime.now(timezone.utc)
+                    db.flush()
+                old = db.get(Run, context.previous.run_id)
+                old.status = {"pending": "ADMITTED", "failed": "FAILED"}.get(fault, fault)
+                if fault == "pending":
+                    old.completed_at = None
+        assert core.read_run_id(*sample[:2], context.previous.run_id).run.status == "ACCEPTED"
+        return
     with pytest.raises(CoreConflict, match="run_not_active|interpretation_durable_provenance_conflict"):
         interpretation_accept(sample, run, context, draft, result)
     with transaction() as db:

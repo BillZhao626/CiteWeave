@@ -92,6 +92,11 @@ def mount(app, principal, runtime: ConversationalRuntime | None = None):
     def run(conversation_id: UUID, run_id: UUID, workspace=Depends(principal)):
         return run_view(core.read_run_id(workspace, conversation_id, run_id))
 
+    @app.post("/v1/conversations/{conversation_id}/runs/{run_id}/cancel", response_model=PublicRun)
+    def cancel(conversation_id: UUID, run_id: UUID, workspace=Depends(principal)):
+        core.cancel(workspace, conversation_id, run_id)
+        return run_view(core.read_run_id(workspace, conversation_id, run_id))
+
     @app.get("/v1/conversations/{conversation_id}/runs/{run_id}/result", response_model=AcceptedResult)
     def result(conversation_id: UUID, run_id: UUID, workspace=Depends(principal)):
         value = accepted_result(core.read_run_id(workspace, conversation_id, run_id))

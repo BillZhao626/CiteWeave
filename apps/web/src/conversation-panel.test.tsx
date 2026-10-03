@@ -94,6 +94,8 @@ const trace: ConversationTrace = {
   completed_at: "2026-09-30",
   metadata_availability: "control_bundle",
   semantic_support: "NOT_ASSESSED",
+  reliability_events: [],
+  reliability_truncated: false,
 };
 const doc: Doc = {
   id: "d",

@@ -76,14 +76,19 @@ def fresh_0011():
             db.flush()
             db.add(EvalCaseRow(eval_run_id=run, case_id="legacy", max_attempts=3))
             db.flush()
-            db.add(
-                ProviderPhaseRow(
+            from sqlalchemy import MetaData, Table
+
+            legacy_phase = Table("cw4_provider_phases", MetaData(), autoload_with=db.connection())
+            db.execute(
+                legacy_phase.insert().values(
                     id=phase,
                     eval_run_id=run,
                     case_id="legacy",
                     logical_key=str(phase),
                     phase="generation",
                     phase_attempt=2,
+                    state="PREPARED",
+                    outcome="not_dispatched",
                     owner=uuid4(),
                     fence=1,
                     reserved_at=db.scalar(select(func.clock_timestamp())),
@@ -97,10 +102,14 @@ def fresh_0011():
         )
         migrate()
         migrate()
-        assert before == (
+        after = (
             snapshot("cw2_eval_runs", "id=:id", id=run),
             snapshot("cw2_eval_cases", "eval_run_id=:id", id=run),
             snapshot("cw4_provider_phases", "id=:id", id=phase),
+        )
+        assert all(
+            all(current[key] == value for key, value in old.items())
+            for old, current in zip(before, after, strict=True)
         )
         yield cfg, run, phase
     finally:
@@ -152,11 +161,11 @@ def terminal(state):
 def test_fresh_head_repeat_and_unsupported_downgrade(fresh_0011):
     cfg, _, _ = fresh_0011
     with transaction() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0012"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
     with pytest.raises(RuntimeError, match="use_fix_forward"):
         command.downgrade(cfg, "0011")
     with transaction() as db:
-        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0012"
+        assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
         assert db.scalar(text("SELECT count(*) FROM cw2_eval_cases")) >= 1
 
 

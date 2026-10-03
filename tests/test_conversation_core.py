@@ -198,7 +198,8 @@ def test_acceptance_service_rejects_before_any_write(accept_service, failure):
 def test_acceptance_service_one_transaction(accept_service):
     service, args, conversation, run, writes, outcomes, _ = accept_service
     accepted = service.accept(**args)
-    assert len(writes) == 1 and outcomes == ["commit"]
+    assert len(writes) == 2 and outcomes == ["commit"]
+    assert writes[1].kind == "accepted" and writes[1].run_id == run.id
     assert conversation.head_id == accepted.id and run.status == RunStatus.ACCEPTED
     assert accepted.state.source_turn_id == args["turn_id"]
     assert accepted.state.previous_snapshot_id is None
@@ -283,7 +284,7 @@ def test_late_unknown_can_be_recorded_without_acceptance(accept_service, monkeyp
         == "unknown_receipt"
     )
     assert run.status == RunStatus.UNKNOWN and conversation.head_id is None
-    assert writes == [] and outcomes == ["commit"]
+    assert len(writes) == 1 and writes[0].kind == "finished" and outcomes == ["commit"]
 
 
 def test_deadline_expiring_during_acceptance_rolls_back(accept_service):

@@ -384,13 +384,16 @@ def test_public_projection_does_not_export_internal_answer_metadata(evidence_cas
             "private-payload-sentinel",
             "hidden-sentinel",
             "private-prompt-sentinel",
-            '"usage"',
             '"prompt_version"',
             '"raw_provider"',
             '"owner"',
-            '"fence"',
         ):
             assert forbidden not in text
+        if suffix == "/trace":
+            # Reliability signals expose only non-sensitive integer usage and
+            # fencing metadata; raw Answer.usage remains private.
+            events = api.get(root + suffix).json()["reliability_events"]
+            assert all(value["usage"] is None for value in events)
 
 
 def test_control_insufficiency_has_no_fabricated_documentary_trace(evidence_case):

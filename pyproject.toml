@@ -1,6 +1,6 @@
 [project]
 name = "citeweave-rag"
-version = "0.3.0a1"
+version = "0.2.0"
 license = "MIT"
 description = "Evidence-bound retrieval engine - independent implementation"
 requires-python = ">=3.12,<3.13"

@@ -4,6 +4,7 @@ import hashlib
 import importlib.metadata
 import json
 import re
+import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote
@@ -17,6 +18,9 @@ def digest(path):
 
 
 def main():
+    release_version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "version"
+    ]
     records = {}
 
     def add(ecosystem, name, version, license_name, scope, source, notices):
@@ -117,6 +121,7 @@ def main():
         components=list(records.values()),
     )
     output = ROOT / "docs/reports"
+    output.mkdir(parents=True, exist_ok=True)
     (output / "m3-dependencies.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
@@ -126,7 +131,7 @@ def main():
         serialNumber="urn:uuid:" + str(uuid4()),
         version=1,
         metadata=dict(
-            timestamp=now, component=dict(type="application", name="CiteWeave", version="M3-candidate")
+            timestamp=now, component=dict(type="application", name="CiteWeave", version=release_version)
         ),
         components=components,
     )

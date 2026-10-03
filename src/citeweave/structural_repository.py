@@ -1,6 +1,7 @@
 """Bounded PostgreSQL reads for captured structural builds and original atoms."""
 
 import re
+from contextlib import contextmanager
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -104,13 +105,24 @@ def capture(db, workspace, body, versions, query_tokens):
 
 
 class StructuralRepository:
-    def __init__(self, snapshot):
+    def __init__(self, snapshot, *, session=None):
         self.snapshot = snapshot
         self.bindings = {b.version_id: b for b in snapshot.bindings}
+        self.session = session
+
+    @contextmanager
+    def _read(self):
+        # Acceptance already owns a connection and source locks. Borrow its
+        # Session without changing the caller's transaction lifecycle.
+        if self.session is not None:
+            yield self.session
+        else:
+            with transaction() as db:
+                yield db
 
     def builds(self):
         result = {}
-        with transaction() as db:
+        with self._read() as db:
             for b in self.bindings.values():
                 index = db.get(IndexRow, b.index_name)
                 artifact = db.get(StructureArtifactRow, UUID(b.artifact_id))
@@ -141,7 +153,7 @@ class StructuralRepository:
     def children(self, identities):
         if len(identities) > 800:
             raise ValueError("candidate_read_limit")
-        with transaction() as db:
+        with self._read() as db:
             rows = list(
                 db.scalars(
                     select(RetrievalChildRow).where(RetrievalChildRow.id.in_([UUID(i) for i in identities]))
@@ -231,7 +243,7 @@ class StructuralRepository:
     def atoms(self, identities):
         if len(identities) > 2000:
             raise ValueError("evidence_read_limit")
-        with transaction() as db:
+        with self._read() as db:
             rows = list(db.scalars(select(ChunkRow).where(ChunkRow.id.in_([UUID(i) for i in identities]))))
         result = {}
         for row in rows:
@@ -255,7 +267,7 @@ class StructuralRepository:
 
     def neighbors(self, seeds):
         identities = []
-        with transaction() as db:
+        with self._read() as db:
             for seed in seeds:
                 c = seed["row"]
                 identities.extend(

@@ -1,5 +1,7 @@
 # v0.2b M2 — Operational Observability & Recovery Drill
 
+Current source status: **MERGED** in [PR #18](https://github.com/BillZhao626/CiteWeave/pull/18), main commit `8da4d177`; included in release-readiness base `80796e56d98631071ce87333339a13e3cbf40067`. Historical implementation/review status, gates and stop boundaries below remain records of their original tasks. Current release scope: [v0.2.0 readiness](V02_RELEASE_READINESS.md).
+
 Status: independent M2 implementation review complete; authorized commit/push/PR delivery, Human review pending. Owner implementation and separate review/delivery missions, 2026-10-03. Stop before merge/auto-merge, tag/release, M3 and performance execution. Original V02B_OPERATIONAL_OBSERVABILITY_M2_COMPLETE receipts are preserved.
 
 ## Identity and scope
@@ -148,7 +150,7 @@ Review confirms a single retained event authority; Trace/UI are projections. Ins
 
 New regressions first failed (unit3; PG2), then affected22 passed. The first review release attempt also found mixed-line-ending formatting in the already-modified deadline fixture; formatter repair is confined to that fixture and its failed log is retained. This is not a new runtime behavior. Drill15 reaches the final dirty ACCEPTED Run flush, injects an expired deadline only after earlier guards, and proves final-guard rollback/no bundle/head plus conservative UNKNOWN. It is a deterministic fault seam, not a timed slow database experiment. Drills07/08 share one race;10–12 alone are OS kills; fake sends/markers are not physical exactly-once proof.
 
-Final reviewed-diff gate results and receipt bindings are recorded in the review evidence below. Offline units, PG tests, drill cases and browser wrapper are reported separately without summing overlaps. The five claims remain limited to their active synthetic test paths; no resume claim or production achievement is added.
+Final reviewed-diff gate results and receipt bindings are recorded in the review evidence below. Offline units, PG tests, drill cases and browser wrapper are reported separately without summing overlaps. The five claims remain limited to their active synthetic test paths; no production achievement is inferred.
 
 ### Final reviewed-diff evidence
 
@@ -186,9 +188,9 @@ Exact publication classification (34 files; no ACCIDENTAL or LOCAL_EVIDENCE_ONLY
 
 Ignored local receipts, XML/logs, resource inventories and helper scripts are LOCAL_EVIDENCE_ONLY. Publication uses an explicit source allowlist. No temporary DB, cache, credential, private audit material, screenshot or local machine path is published.
 
-## Claim traceability and portfolio candidates
+## Claim traceability and verification scope
 
-Each factual row below is VERIFIED_PROVIDER_FREE only within its stated active-path test/evidence scope; it does not mean production monitoring/billing/quality or public GitHub CI. No polished PDF or resume prose is produced. Public implementation/tests/docs are the candidate GitHub evidence; local receipts and demonstration states are separate artifacts.
+Each factual row below is VERIFIED_PROVIDER_FREE only within its stated active-path test/evidence scope; it does not mean production monitoring/billing/quality or public GitHub CI. Only product engineering evidence is recorded. Public implementation/tests/docs are the candidate GitHub evidence; local receipts and demonstration states are separate artifacts.
 
 | Candidate factual claim | Implementation → active path | Exact test → measured evidence | Demonstration candidate |
 | --- | --- | --- | --- |

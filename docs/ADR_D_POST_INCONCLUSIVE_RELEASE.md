@@ -8,8 +8,8 @@ and missing/failed results remain immutable.
 
 ## Governing product objective
 
-CiteWeave finishes an external-facing product portfolio evolving General
-Assistant V2 and supporting the resume. Priorities are polished React +
+CiteWeave develops a public evidence-question-answering workbench, deepening
+prior RAG engineering experience. Priorities are polished React +
 TypeScript, Answer → Citation → Evidence → PDF highlight, Documents/Structure,
 Runs/Retrieval/Evidence Trace, traceable FastAPI/Qdrant/PostgreSQL/Redis/Celery,
 and asynchronous jobs with durable state/recovery. Experiments validate these
@@ -75,7 +75,7 @@ fix. No schema/data migration, prompt change, retrieval change or UI redesign.
 Commit this protocol before code hardening. This task authorizes deterministic
 offline tests and optional saved-output compatibility replay only: zero provider
 calls, no retrieval rerun, no Holdout contents, no D2/D3, no quality matrix,
-no Resume/Portfolio edits. Replay does not alter historical completion/quality.
+no external presentation-artifact edits. Replay does not alter historical completion/quality.
 Stop at `STAGE_D_CITATION_HARDENING_READY` after validation.
 The next authorized step is a full B1/T1/T2 visible quality rerun using the
 existing frozen EvidencePacks, in a subsequent execution task with new run

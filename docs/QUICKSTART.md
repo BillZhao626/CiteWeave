@@ -1,6 +1,6 @@
 # 本地运行与复现
 
-Provider-free v0.2b reliability review and isolated-PG reproduction: [M1 evidence](V02B_RUNTIME_RELIABILITY_M1.md#reproduction-and-limits). Operator recovery uses `python scripts/reconcile_conversations.py --workspace <workspace-uuid> --limit 32`; it changes only expired durable bookkeeping and never dispatches a provider. Use isolated test databases for verification; default runtime policy remains unavailable and historical grants cannot be reused.
+Merged runtime reliability and isolated-PG reproduction: [M1 evidence](V02B_RUNTIME_RELIABILITY_M1.md#reproduction-and-limits). Operator recovery uses `python scripts/reconcile_conversations.py --workspace <workspace-uuid> --limit 32`; it changes only expired durable bookkeeping and never dispatches a provider. Use isolated test databases for verification; default runtime policy remains unavailable and historical grants cannot be reused.
 
 ## 无模型离线检查
 
@@ -41,7 +41,7 @@ docker compose --env-file .env.example -f deploy/compose.m0.yml -f deploy/compos
 .\scripts\m1.ps1 -Action Up
 ```
 
-该操作把配置传入本地服务；Key 不需要写入源码。真实 Ask 和模型评测可能计费，公开 CI 不执行它们。没有 Key 时没有真实生成服务；已有文档和 Run 的读取仍可用。
+该操作把配置传入本地服务；Key 不需要写入源码。真实 Ask 和模型评测可能计费，公开 CI 不执行它们。没有 Key 时没有真实生成服务；已有文档和 Run 的读取仍可用。此命令不创建会话运行授权，完整会话另见下文可用性边界。
 
 停止与查看状态：
 
@@ -65,7 +65,7 @@ uv run --frozen python scripts/fetch_public_telecom.py
 ```text
 POST /v1/knowledge-bases/{kb_id}/documents
   ?filename=rfc9114.pdf
-  &license=IETF-Trust
+  &license=permission-held
   &ingestion_profile=telecom-protocol-pdf-v1
 Content-Type: application/pdf
 Authorization: Bearer <your-local-admin-token>
@@ -73,7 +73,7 @@ Idempotency-Key: <a-new-unique-key-for-this-upload>
 Body: official PDF bytes
 ```
 
-示例中的 `IETF-Trust` 是来源许可说明，不是通用重新授权；MQTT 请使用其 OASIS 来源说明。结构化路径接受上限 32 MiB / 600 页；普通 UI 的兼容上传上限为 10 MiB。上传完成后等待 durable READY，在 Documents / Structure 检查章节、Parent / Child 和原文 span，再在 Ask 选择 `telecom-structural-v1` 查询路径。
+`license=permission-held` 是调用者对持有适用使用许可的声明，须先核对 RFC 的 IETF Trust 条款或 MQTT 的 OASIS 条款；不是仓库对标准的通用再授权。结构化路径接受上限 32 MiB / 600 页；普通 UI 的兼容上传上限为 10 MiB。上传完成后等待 durable READY，在 Documents / Structure 检查章节、Parent / Child 和原文 span，再在 Ask 选择 `telecom-structural-v1` 查询路径。
 
 截图所用结构化回答选择了 `answer-telecom-consistency-v1`。要显式选择同一 prompt，在本地 `.env` 增加下面的非秘密配置，再运行 Up：
 
@@ -87,4 +87,22 @@ CW_TELECOM_ANSWER_PROMPT=answer-telecom-consistency-v1
 
 公开离线检查验证源码可安装、测试和构建，不代表本轮重新验证了 GPU 模型、真实生成、worker 故障、跨库比较或生产容量。真实集成测试须使用隔离数据库和本地服务；不要对已有演示数据库直接运行故障测试。
 
-`v0.1.0` 是首次公开源码发布标签。API / 包内保留已有 `0.3.0-alpha.1` / `0.3.0a1` 工程版本，以避免改变冻结接口契约；二者不是质量评级。历史脚本与 ADR 的阶段名称仅作技术兼容。
+`v0.1.0` 是历史公开源码发布标签。当前 Python 包、frontend package 与 FastAPI/OpenAPI 均为 `0.2.0`，未来标签为 `v0.2.0`，尚未创建；版本元数据更新不改变 schema 字段或运行语义。历史证据文件名保持不变。
+
+## 三层发布验证
+
+- **Tier A**：Windows / Linux 离线源码门禁，锁定依赖安装需网络；不得借用 `.env`、旧 `.venv` / `node_modules`、`.runtime`、模型、数据库、私有语料或未跟踪文件。具体干净候选身份与执行结果见 [发布准备](V02_RELEASE_READINESS.md)。
+- **Tier B**：Docker Compose 2.24.4+（使用 `!override` / `!reset`）和 Docker Linux containers，运行下方服务烟测。镜像构建/首次拉取可能需网络。脚本用唯一 project、全新卷、无 host port、内部 network 及随机临时凭据，不读取本地 `.env`；验证真实 PG/Redis/Qdrant、API 迁移和 readiness、静态应用/PDF.js/原创手册、空队列 worker ping 与关停。不会提交任务或访问模型/提供商。
+- **Tier C**：上文完整 Windows / NVIDIA 工作台；公开 CI 不执行。没有验证 CPU-only/Linux 完整模型部署。本次不重跑模型或真实生成。
+
+```powershell
+uv run --frozen python scripts/smoke_release.py
+```
+
+烟测使用现有 Compose 与 app Dockerfile；前置须完成 Tier A 的前端 build。独立临时资源仅由该脚本清理，已有数据卷及停机的旧 RAGFlow 资源不动。
+
+## 会话可用性与升级边界
+
+`/health/ready` 表示数据库可访问且 API startup migration 已执行，不表示模型/Conversation runtime 已开放。v0.2 Ask 的真实会话执行需要服务器端准确的 `CW_CONVERSATION_RUNTIME_POLICY`、经 hash 校验的 tokenizer、有限调用/计量/CNY/绝对期限授权及本地 E5/BGE gateway；仅设置 DeepSeek Key 不开放默认会话。无 Key/授权可检查持久数据与 Trace，不能产生新真实回答。旧单轮 API 真实生成同样需要用户 Key 并计费。
+
+API 启动执行 `alembic upgrade head`，当前唯一 head `0014`。首次初始化与重复迁移由 Tier B 新空库验证；已有应用数据升级/备份恢复仍未验证。历史迁移不可重写，升级前备份 PostgreSQL 和 blobs；不可用删卷模拟迁移成功。

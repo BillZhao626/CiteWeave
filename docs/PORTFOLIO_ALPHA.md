@@ -1,4 +1,4 @@
-# Portfolio alpha E0
+# Historical local development profile E0
 
 `citeweave-portfolio-alpha-e0` is an explicit **post-Holdout development**
 runtime identity. It selects `answer-telecom-consistency-v1` for the existing
@@ -25,7 +25,7 @@ defaults to loopback port 18080 and serves the existing React production build.
 The release identity, prompt hash, retrieval parameters and provider/model are
 persisted with each new Run. Prompt selection does not reinterpret old runs.
 
-The portfolio worker reuses the existing PostgreSQL outbox/recovery supervisor
+The ingestion-only development worker reuses the existing PostgreSQL outbox/recovery supervisor
 and Redis/Celery ingestion task. It consumes only `cw-ingestion` and does not
 dispatch evaluation jobs. On Windows this profile uses the Celery solo pool.
 PostgreSQL remains the job-state authority; this local success-path verification

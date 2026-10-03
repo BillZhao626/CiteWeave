@@ -1,26 +1,25 @@
 # 工程文档
 
-Current Owner-authorized milestone: [v0.2b Concurrency & Performance M3](V02B_CONCURRENCY_PERFORMANCE_M3.md), [ADR0025](adr/0025-acceptance-evidence-session.md) / [ADR0026](adr/0026-shared-conversation-scope-readers.md), on clean `codex/v02b-concurrency-performance-m3` / main `8da4d1778a7f88e4d21b43ce5f9ff51426c386e6`. Freeze a provider-free real HTTP/PG benchmark, measure concurrency1/5/10/20, inspect observability cost and keep only measured safe optimization. M1/M2 invariants remain authoritative: [reliability](V02B_RUNTIME_RELIABILITY_M1.md) / [ADR0023](adr/0023-runtime-reliability-and-recovery.md), [observability](V02B_OPERATIONAL_OBSERVABILITY_M2.md) / [ADR0024](adr/0024-operational-trace-and-recovery-inspection.md). No provider/model/Judge calls or new infrastructure; default public runtime unavailable. Owner separately authorizes M3 review, provider-free gates, commits/push/PR against verified main; stop before merge/auto-merge, tag/release and final delivery milestone. Latest gates in [HANDOFF](../HANDOFF.md).
+当前：**v0.2.0 Release Readiness**，基线为已合并 PR #19 `80796e56d98631071ce87333339a13e3cbf40067`。M1/M2/M3 均已进入该基线；本次仅准备本地发布候选，未发布 `v0.2.0`。准确验证状态见[发布准备](V02_RELEASE_READINESS.md)与 [HANDOFF](../HANDOFF.md)。
 
-Previous milestone: [Residual root-cause closure](V02_RESIDUAL_ROOT_CAUSE_CLOSURE.md) / [ADR0018](adr/0018-residual-runtime-normal-form.md). Its historical22-PASS status is superseded by the Human v6 record described above.
+## 当前产品与发布路径
 
-Previous milestone: [RC Narrow Closure](V02_RC_NARROW_CLOSURE.md) / [ADR0017](adr/0017-rc-narrow-closure.md).
+| 阅读顺序 | 内容与边界 |
+| --- | --- |
+| 1. [架构与产品行为](ARCHITECTURE.md) | Conversation / Turn / Run、原子 Acceptance、证据与持久状态；[会话架构](V02_CONVERSATIONAL_RAG_ARCHITECTURE.md)记录设计基线 |
+| 2. [运行可靠性](V02B_RUNTIME_RELIABILITY_M1.md) | 幂等、retry / UNKNOWN、取消、fencing、人工恢复；[ADR0023](adr/0023-runtime-reliability-and-recovery.md) |
+| 3. [可观察性与恢复检查](V02B_OPERATIONAL_OBSERVABILITY_M2.md) | durable Trace、阶段诊断、provider-free drills；[ADR0024](adr/0024-operational-trace-and-recovery-inspection.md) |
+| 4. [并发与性能](V02B_CONCURRENCY_PERFORMANCE_M3.md) | 冻结本地 HTTP/PG benchmark、真实 Qdrant/合成模型边界与失败分母；[ADR0025](adr/0025-acceptance-evidence-session.md)、[ADR0026](adr/0026-shared-conversation-scope-readers.md) |
+| 5. [发布准备](V02_RELEASE_READINESS.md) | 0.2.0 身份、干净候选 Tier A、服务 Tier B、完整工作台 Tier C、剩余步骤 |
+| 6. [快速开始](QUICKSTART.md) | 锁定依赖、无模型检查、隔离烟测、Windows 完整本地工作台 |
+| 7. [语料](CORPUS.md) / [数据声明](DATA_NOTICES.md) / [第三方声明](../THIRD_PARTY_NOTICES.md) | 官方获取、归属、原创 fixtures 与再分发边界 |
+| 8. [贡献](../CONTRIBUTING.md) | 实现与验证规则 |
 
-Previous milestone: [Selective runtime reconciliation](V02_RUNTIME_RECONCILIATION.md) / [ADR0016](adr/0016-selective-runtime-reconciliation.md).
+## 历史规划、设计接受与实现记录
 
-Previous milestone: [Runtime stabilization](V02_RUNTIME_STABILIZATION.md) / [ADR0015](adr/0015-interpretation-runtime-stabilization.md); exact execution receipts and Human review remain local.
+以下内容保留各阶段当时的状态与名称。其中的“当前”、待审阅、授权、未开始和历史计数属于当时记录，不定义今日运行权限或发布状态；当前入口以上表和 HANDOFF 为准。历史付费预算不是新授权。
 
-上一里程碑：[P0 interpretation 契约修复与完整 DEV 重跑](V02_P0_INTERPRETATION_REPAIR.md)，[ADR0014](adr/0014-interpretation-wire-format.md)。实际结果与人工审阅包见 HANDOFF 指向的本地持久化 receipts。
-
-首次阅读请从以下页面开始：
-
-- [快速开始](QUICKSTART.md)：离线检查、完整本地运行、公开语料摄取。
-- [架构](ARCHITECTURE.md)：查询流程与数据职责。
-- [语料](CORPUS.md)：来源、获取、许可与 fixture 边界。
-- [数据声明](DATA_NOTICES.md)：保留的第三方摘录归属。
-- [开发贡献](../CONTRIBUTING.md)：修改与验证要求。
-
-## v0.2 规划与工程治理
+### v0.2 规划与工程治理
 
 以下 Blueprint / Foundation / Governance 基线、Playbook 与 v0.2 Conversational RAG Architecture 均为 **ACCEPTED — Human Review incorporated**，不代表已发布功能或实现授权。首个 Feature 与 ADR 0006–0009 原文本已获 APPROVED；Evaluation 方法论已接受，执行协议仍 **NOT EXECUTABLE**。Human Review 日期为 2026-09-28，审阅提交 `aa5755cbf70e552827f03211d2770a4dcff3626f`，记录见 [PR #3](https://github.com/BillZhao626/CiteWeave/pull/3)。Implementation #1 已进入 accepted main 基线 `3b10229`；Implementation #2 已进入 accepted main `2a0c406`；Implementation #3 已进入 accepted main `bebdb72`；Implementation #4 已进入 accepted main `0b45237`；Implementation #5a 已进入 accepted main 基线 `43d057b`（PR #12）；另行授权的 Implementation #5b 已在现有 Ask 中实现 React 会话、同键恢复、Citation/PDF 与 Trace Inspector，前端/离线/真实隔离 PG API 及 deterministic Chromium E2E 通过，等待 Human Implementation Review；生产 runtime 未开放，v0.2a 未完成。当前状态及下一阶段见 [HANDOFF](../HANDOFF.md)。
 

@@ -47,7 +47,7 @@ def main():
             "citeweave.api:create_app", factory=True, host="127.0.0.1", port=args.port, access_log=False
         )
     else:
-        # Reuse durable outbox dispatch/recovery; portfolio smoke never dispatches evaluation.
+        # Reuse durable outbox dispatch/recovery; development smoke never dispatches evaluation.
         from citeweave.worker_runtime import main as worker_main
 
         worker_main(ingestion_only=True)

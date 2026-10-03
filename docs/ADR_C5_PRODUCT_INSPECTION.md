@@ -22,8 +22,8 @@ Historical API/read paths remain available.
 Acceptance uses a real browser against real APIs, accepted source artifacts and
 original PDF bytes. Engineering generation is explicitly mocked and labeled;
 fault-state screenshots use recorded fault fixtures with a visible fixture label.
-Private screenshots are raw source assets for later portfolio work, not a final
-portfolio PDF. Model quality, sealed Holdout, capacity promotion and Stage D are
+Private screenshots are raw source assets for later annotated engineering
+demonstrations. Model quality, sealed Holdout, capacity promotion and Stage D are
 outside this gate.
 
 The candidate uses explicit document paths rather than recursively publishing

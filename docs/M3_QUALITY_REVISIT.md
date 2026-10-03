@@ -1,6 +1,6 @@
 # M3 — quality re-evaluation (owner requested)
 
-Status: IN PROGRESS. This continues M3; it is not M3.1/M4. No remote publication is authorized. Historical 0.3.0-alpha.1 reports/artifacts/manifest/archive remain unchanged; new reports go in `docs/reports/m3-revisit/`. The old M3 Test is now a regression set, not a pristine holdout.
+Historical status: IN PROGRESS at the time of this record. This continues the historical M3 quality study; it is not a new release milestone. No remote publication was authorized by this study. Historical reports/artifacts/manifest/archive remain unchanged; reports used `docs/reports/m3-revisit/`. The old M3 Test became a regression set, not a pristine holdout. Current release identity is defined by [QUICKSTART](QUICKSTART.md).
 
 ## Verified starting point
 
@@ -23,4 +23,4 @@ Preserve the normal API contracts, PostgreSQL authority, immutable evidence, fen
 
 M0 selected E5-small as the first resource-controlled local baseline; it did not compare against BGE-M3. BGE-M3 is an embedding model; the existing BGE reranker is a different component. Official model-card reference: https://huggingface.co/BAAI/bge-m3 (SentenceTransformers supports Dense-only use; no query instruction prefix). Technical-history assertions about old employer/lab projects remain unverified unless supported by already-authorized non-private records; do not reread their source for this implementation.
 
-Final output: funnel/root causes, experiment decisions, E5/BGE and C2/parent comparisons, Dev/regression/holdout results, resource costs, architecture/resume fact table, limitations and release recommendation. Stop at completion.
+Final output: funnel/root causes, experiment decisions, E5/BGE and C2/parent comparisons, Dev/regression/holdout results, resource costs, architecture/evidence fact table, limitations and release recommendation. Stop at completion.

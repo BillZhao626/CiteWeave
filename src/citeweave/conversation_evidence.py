@@ -209,21 +209,29 @@ def produce(
     max_input_bytes: int,
 ):
     """Pure orchestration seam. Supplied DTO fixtures do not prove PG authority."""
-    decision = interpret(context, draft=draft)
+    from citeweave.operational_trace import operational_stage
+
+    with operational_stage("interpretation"):
+        decision = interpret(context, draft=draft)
     if decision.mode == "CLARIFY":
         if max_input_bytes <= 0 or len(decision.model_dump_json().encode("utf-8")) > max_input_bytes:
             raise CoreConflict("conversation_context_overflow")
         return decision.control_result, decision
-    evidence = retriever.retrieve(workspace, context.request.scope, decision.selected_query)
-    # Detach mutable adapter objects before exposing a copy to generation.
-    evidence = CurrentEvidence.model_validate(evidence.model_dump(mode="json"))
-    assembled = assemble(workspace, run_id, context, decision, evidence, max_input_bytes=max_input_bytes)
-    answer = (
-        generator.generate(assembled.model_copy(deep=True))
-        if evidence.citations
-        else Answer(run_id=run_id, text=REFUSAL, citations=[], prompt_version="not_invoked", estimated_yuan=0)
-    )
-    return make_result(assembled, answer), decision
+    with operational_stage("retrieval"):
+        evidence = retriever.retrieve(workspace, context.request.scope, decision.selected_query)
+    with operational_stage("validation"):
+        # Detach mutable adapter objects before exposing a copy to generation.
+        evidence = CurrentEvidence.model_validate(evidence.model_dump(mode="json"))
+        assembled = assemble(workspace, run_id, context, decision, evidence, max_input_bytes=max_input_bytes)
+    if evidence.citations:
+        with operational_stage("generation"):
+            answer = generator.generate(assembled.model_copy(deep=True))
+    else:
+        answer = Answer(
+            run_id=run_id, text=REFUSAL, citations=[], prompt_version="not_invoked", estimated_yuan=0
+        )
+    with operational_stage("validation"):
+        return make_result(assembled, answer), decision
 
 
 def execute(

@@ -30,6 +30,7 @@ from citeweave.conversation_interpretation import InterpretationDraft, Interpret
 from citeweave.costs import RATE_CARD, maximum_cost
 from citeweave.llm import DeepSeekProvider, ProviderError, completion_payload
 from citeweave.model_client import ModelGateway
+from citeweave.operational_trace import observe, operational_stage, record_fenced, safe_error_code
 from citeweave.provider_accounting import DeepSeekAccounting, request_hash, serialize_request
 from citeweave.runtime_reliability import retry_delay
 from citeweave.schemas import Answer
@@ -260,7 +261,8 @@ class ProductionRuntime:
         # A duplicated worker entry must not finish/fence the current executor.
         core.start_execution(workspace, run)
         try:
-            return self._execute(workspace, run)
+            with observe(workspace, run):
+                return self._execute(workspace, run)
         except Exception as exc:
             try:
                 from citeweave.db import transaction
@@ -275,11 +277,12 @@ class ProductionRuntime:
                     run.owner,
                     run.fence,
                     "UNKNOWN" if blocked else "FAILED",
-                    error_class=type(exc).__name__,
+                    error_class=safe_error_code(exc),
                 )
-            except CoreConflict:
+            except CoreConflict as conflict:
                 # Cancellation/completion/recovery already won the durable race.
                 logging.info("conversation_runtime_finish_fenced run=%s", run.id)
+                record_fenced(workspace, run, safe_error_code(conflict))
             raise
 
     def _execute(self, workspace, run):
@@ -307,14 +310,15 @@ class ProductionRuntime:
         query = policy.history_query or HistoryQuery(scope=request.scope, expected_head=request.expected_head)
         if query.scope != request.scope or query.expected_head != request.expected_head:
             raise CoreConflict("runtime_history_query_conflict")
-        history = read_history(
-            workspace,
-            run.conversation_id,
-            query,
-            permit=RuntimeHistoryRead(
-                run=run, scan_limit=policy.history_scan_limit, statement_ms=policy.history_statement_ms
-            ),
-        )
+        with operational_stage("history"):
+            history = read_history(
+                workspace,
+                run.conversation_id,
+                query,
+                permit=RuntimeHistoryRead(
+                    run=run, scan_limit=policy.history_scan_limit, statement_ms=policy.history_statement_ms
+                ),
+            )
         context = InterpretationInput(
             conversation_id=run.conversation_id,
             turn_id=run.turn_id,
@@ -332,7 +336,8 @@ class ProductionRuntime:
             if draft is None:
                 raw, _ = calls.call("interpretation", interpretation_messages(context))
                 draft = InterpretationDraft.model_validate_json(raw)
-            interpret(context, draft=draft)  # Guard provider drafts before documentary retrieval.
+            with operational_stage("interpretation"):
+                interpret(context, draft=draft)  # Guard provider drafts before documentary retrieval.
             core.execution_input(workspace, run)
             result, decision = produce(
                 workspace,
@@ -343,18 +348,19 @@ class ProductionRuntime:
                 generator=ProductionGenerator(calls),
                 max_input_bytes=policy.context_max_bytes,
             )
-        return core.accept(
-            workspace,
-            run.conversation_id,
-            run.turn_id,
-            run.id,
-            run.owner,
-            run.fence,
-            result,
-            StateSnapshot(source_turn_id=run.turn_id, previous_snapshot_id=run.expected_head),
-            delta=decision.delta,
-            interpretation=(context, draft),
-        )
+        with operational_stage("publication"):
+            return core.accept(
+                workspace,
+                run.conversation_id,
+                run.turn_id,
+                run.id,
+                run.owner,
+                run.fence,
+                result,
+                StateSnapshot(source_turn_id=run.turn_id, previous_snapshot_id=run.expected_head),
+                delta=decision.delta,
+                interpretation=(context, draft),
+            )
 
 
 class ProductionGenerator:

@@ -45,8 +45,16 @@ class ReliabilitySignal(DurableDTO):
         "finished",
         "cancelled",
         "recovered",
+        "stage_started",
+        "stage_completed",
+        "stage_failed",
+        "stale_result_rejected",
     ]
     fence: int
+    phase: (
+        Literal["history", "interpretation", "retrieval", "generation", "validation", "publication"] | None
+    ) = None
+    current_fence: int | None = None
     provider_phase_id: UUID | None = None
     attempt: int | None = None
     from_state: str | None = None
@@ -63,6 +71,10 @@ def event(db, run, kind, **detail):
     from citeweave.conversation_models import ConversationRunEventRow
     from citeweave.conversations import _clock
 
+    if detail.get("provider_phase_id") and "phase" not in detail:
+        from citeweave.domain import ProviderPhaseRow
+
+        detail["phase"] = db.get(ProviderPhaseRow, detail["provider_phase_id"]).phase
     value = ReliabilitySignal(id=uuid4(), created_at=_clock(db), kind=kind, fence=run.fence, **detail)
     db.add(
         ConversationRunEventRow(

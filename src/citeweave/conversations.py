@@ -265,6 +265,9 @@ def accept(
     delta: ResolvedConversationDelta | None = None,
     interpretation: tuple["InterpretationInput", "InterpretationDraft"] | None = None,
 ) -> Acceptance:
+    import time
+
+    started = time.perf_counter()
     # Revalidate nested JSON even when a caller used unchecked model_copy.
     result = type(result).model_validate(result.model_dump(mode="json"))
     if isinstance(result, DocumentaryResult) and interpretation is None:
@@ -394,7 +397,12 @@ def accept(
         conversation.fence += 1
         from citeweave.runtime_reliability import event
 
-        event(db, run, "accepted", from_state="ADMITTED", to_state="ACCEPTED")
+        event(
+            db, run, "accepted", current_fence=conversation.fence, from_state="ADMITTED", to_state="ACCEPTED"
+        )
+        from citeweave.operational_trace import publication_fact
+
+        publication_fact(db, run, started)
         db.flush()
         if _clock(db) >= run.deadline:
             raise CoreConflict("deadline_elapsed")
@@ -450,7 +458,15 @@ def finish(
         conversation.fence += 1
         from citeweave.runtime_reliability import event
 
-        event(db, run, "finished", from_state="ADMITTED", to_state=target, error_class=error_class)
+        event(
+            db,
+            run,
+            "finished",
+            current_fence=conversation.fence,
+            from_state="ADMITTED",
+            to_state=target,
+            error_class=error_class,
+        )
         db.flush()
         return _run_view(run, turn)
 
@@ -479,7 +495,14 @@ def reconcile_expired(workspace, conversation_id) -> ConversationView:
             conversation.fence += 1
             from citeweave.runtime_reliability import event
 
-            event(db, active, "recovered", from_state="ADMITTED", to_state=target)
+            event(
+                db,
+                active,
+                "recovered",
+                current_fence=conversation.fence,
+                from_state="ADMITTED",
+                to_state=target,
+            )
             db.flush()
         return _view(db, workspace, conversation)
 
@@ -512,6 +535,11 @@ def _read_run(workspace, conversation_id, identity) -> Readback:
         from citeweave.runtime_reliability import read_events
 
         events, truncated = read_events(db, run.id)
+        from citeweave.operational_trace import diagnose, provider_diagnostics
+
+        operational = diagnose(
+            run.status, run.created_at, run.completed_at, events, truncated, provider_diagnostics(db, run.id)
+        )
         return Readback(
             conversation=_view(db, workspace, conversation),
             turn=TurnView.model_validate(turn),
@@ -521,6 +549,7 @@ def _read_run(workspace, conversation_id, identity) -> Readback:
             deadline_elapsed=run.status == RunStatus.ADMITTED and run.deadline <= _clock(db),
             reliability_events=tuple(e.model_dump(mode="json") for e in events),
             reliability_truncated=truncated,
+            operational=operational.model_dump(mode="json"),
         )
 
 
@@ -555,7 +584,14 @@ def cancel(workspace, conversation_id, run_id):
             run.status = transition(run.status, RunStatus.CANCELLED)
             run.completed_at = _clock(db)
             conversation.fence += 1
-            event(db, run, "cancelled", from_state="ADMITTED", to_state="CANCELLED")
+            event(
+                db,
+                run,
+                "cancelled",
+                current_fence=conversation.fence,
+                from_state="ADMITTED",
+                to_state="CANCELLED",
+            )
             db.flush()
         return _run_view(run, turn)
 

@@ -1115,6 +1115,7 @@ export interface components {
              * @default false
              */
             reliability_truncated: boolean;
+            operational?: components["schemas"]["OperationalTrace"] | null;
         };
         /** DatasetSource */
         DatasetSource: {
@@ -1212,6 +1213,27 @@ export interface components {
             citations: components["schemas"]["Citation"][];
             /** Documents */
             documents: components["schemas"]["DocumentIdentity"][];
+        };
+        /** Duration */
+        Duration: {
+            /**
+             * Phase
+             * @enum {string}
+             */
+            phase: "admission_queue" | "history" | "interpretation" | "retrieval" | "generation" | "validation" | "publication" | "provider" | "total";
+            /**
+             * Availability
+             * @enum {string}
+             */
+            availability: "AVAILABLE" | "UNAVAILABLE" | "INCOMPLETE" | "UNKNOWN" | "CANCELLED";
+            /** Latency Ms */
+            latency_ms?: number | null;
+            /**
+             * Measurement
+             * @default not_recorded
+             * @enum {string}
+             */
+            measurement: "db_timestamp_difference" | "local_monotonic" | "not_recorded";
         };
         /** EvalCase */
         EvalCase: {
@@ -1696,6 +1718,48 @@ export interface components {
              */
             created_at: string;
         };
+        /** OperationalTrace */
+        OperationalTrace: {
+            /**
+             * Revision
+             * @default operational-trace-v1
+             * @constant
+             */
+            revision: "operational-trace-v1";
+            /**
+             * Timeline
+             * @default []
+             */
+            timeline: components["schemas"]["TimelineItem"][];
+            /**
+             * Truncated
+             * @default false
+             */
+            truncated: boolean;
+            /**
+             * Durations
+             * @default []
+             */
+            durations: components["schemas"]["Duration"][];
+            total: components["schemas"]["Duration"];
+            /**
+             * Provider Phases
+             * @default []
+             */
+            provider_phases: components["schemas"]["ProviderDiagnostic"][];
+            /**
+             * Retry Decision
+             * @enum {string}
+             */
+            retry_decision: "BLOCKED_UNKNOWN" | "TERMINAL_NO_DISPATCH" | "EXPLICIT_NEW_AUTHORIZATION_REQUIRED" | "POLICY_AND_KNOWN_PROOF_REQUIRED";
+            /**
+             * Publication
+             * @enum {string}
+             */
+            publication: "ACCEPTED" | "NOT_ACCEPTED";
+            /** Unknown Reason */
+            unknown_reason?: ("PROVIDER_UNCERTAIN" | "KNOWN_RESULT_NOT_ACCEPTED" | "CANCELLED_WITH_UNRESOLVED_PROVIDER" | "LEGACY_REASON_UNAVAILABLE") | null;
+        };
         /** PackSpan */
         PackSpan: {
             /** Label */
@@ -1751,6 +1815,44 @@ export interface components {
             result_hash: string | null;
             /** Error Code */
             error_code: string | null;
+        };
+        /** ProviderDiagnostic */
+        ProviderDiagnostic: {
+            /**
+             * Provider Phase Id
+             * Format: uuid
+             */
+            provider_phase_id: string;
+            /**
+             * Phase
+             * @enum {string}
+             */
+            phase: "interpretation" | "generation";
+            /** State */
+            state: string;
+            /** Attempt */
+            attempt: number | null;
+            /** Attempt Limit */
+            attempt_limit: number;
+            /**
+             * Dispatch
+             * @enum {string}
+             */
+            dispatch: "NOT_RECORDED" | "MARKER_COMMITTED_SEND_UNCONFIRMED" | "RESPONSE_OBSERVED" | "KNOWN_NOT_EXECUTED";
+            /** Retry Classification */
+            retry_classification: string | null;
+            /** Error Code */
+            error_code: string | null;
+            /** Error Category */
+            error_category: ("admission" | "validation" | "database_transaction" | "retrieval" | "provider_known_safe" | "provider_unknown" | "provider_permanent" | "cancellation" | "deadline" | "reconciliation" | "stale_fenced" | "internal_invariant") | null;
+            /** Usage */
+            usage: {
+                [key: string]: number;
+            } | null;
+            /** Estimated Yuan */
+            estimated_yuan: string | null;
+            /** Price Revision */
+            price_revision: string | null;
         };
         /** PublicConversation */
         PublicConversation: {
@@ -1851,9 +1953,13 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "admitted" | "execution_started" | "provider_prepared" | "provider_attempt" | "provider_dispatched" | "provider_completed" | "provider_failure" | "provider_retry" | "accepted" | "finished" | "cancelled" | "recovered";
+            kind: "admitted" | "execution_started" | "provider_prepared" | "provider_attempt" | "provider_dispatched" | "provider_completed" | "provider_failure" | "provider_retry" | "accepted" | "finished" | "cancelled" | "recovered" | "stage_started" | "stage_completed" | "stage_failed" | "stale_result_rejected";
             /** Fence */
             fence: number;
+            /** Phase */
+            phase?: ("history" | "interpretation" | "retrieval" | "generation" | "validation" | "publication") | null;
+            /** Current Fence */
+            current_fence?: number | null;
             /** Provider Phase Id */
             provider_phase_id?: string | null;
             /** Attempt */
@@ -2241,6 +2347,52 @@ export interface components {
             row_header: string;
             /** Column Header */
             column_header: string;
+        };
+        /** TimelineItem */
+        TimelineItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "admitted" | "execution_started" | "provider_prepared" | "provider_attempt" | "provider_dispatched" | "provider_completed" | "provider_failure" | "provider_retry" | "accepted" | "finished" | "cancelled" | "recovered" | "stage_started" | "stage_completed" | "stage_failed" | "stale_result_rejected";
+            /** Fence */
+            fence: number;
+            /** Phase */
+            phase?: ("history" | "interpretation" | "retrieval" | "generation" | "validation" | "publication") | null;
+            /** Current Fence */
+            current_fence?: number | null;
+            /** Provider Phase Id */
+            provider_phase_id?: string | null;
+            /** Attempt */
+            attempt?: number | null;
+            /** From State */
+            from_state?: string | null;
+            /** To State */
+            to_state?: string | null;
+            /** Retry Classification */
+            retry_classification?: ("BEFORE_DISPATCH" | "RETRYABLE_KNOWN" | "PERMANENT" | "UNKNOWN") | null;
+            /** Error Class */
+            error_class?: string | null;
+            /** Latency Ms */
+            latency_ms?: number | null;
+            /** Usage */
+            usage?: {
+                [key: string]: number;
+            } | null;
+            /** Error Code */
+            error_code?: string | null;
+            /** Error Category */
+            error_category?: ("admission" | "validation" | "database_transaction" | "retrieval" | "provider_known_safe" | "provider_unknown" | "provider_permanent" | "cancellation" | "deadline" | "reconciliation" | "stale_fenced" | "internal_invariant") | null;
         };
         /** TurnSubmit */
         TurnSubmit: {

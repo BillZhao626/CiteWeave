@@ -19,6 +19,7 @@ import {
   type PublicRun,
 } from "./conversation-session";
 import type { Citation, Doc } from "./api";
+import { ApiError } from "./api";
 
 vi.mock("./pdf-evidence", () => ({
   PdfEvidence: ({ citation }: { citation: Citation }) => (
@@ -139,6 +140,163 @@ const doc: Doc = {
 };
 
 describe("accepted product surfaces", () => {
+  function restoredTransport() {
+    const storage = {
+      getItem: vi.fn(() =>
+        JSON.stringify({
+          revision: 1,
+          createKey: "create-key",
+          conversationId: "c",
+          runIds: ["r"],
+          versions: ["v1"],
+        }),
+      ),
+      setItem: vi.fn(),
+    };
+    const transport = {
+      create: vi.fn(async () => ({
+        revision: "conversation-api-v1" as const,
+        id: "new-conversation",
+        head_id: null,
+        active_run_id: null,
+        active_turn_id: null,
+      })),
+      conversation: vi.fn(async () => ({
+        revision: "conversation-api-v1" as const,
+        id: "c",
+        head_id: "a",
+        active_run_id: null,
+        active_turn_id: null,
+      })),
+      submit: vi.fn(async () => run),
+      run: vi.fn<(conversationId: string, runId: string) => Promise<PublicRun>>(
+        async () => run,
+      ),
+      trace: vi.fn<
+        (conversationId: string, runId: string) => Promise<ConversationTrace>
+      >(async () => trace),
+    };
+    return { storage, transport };
+  }
+  it("counts retried Runs with the same Turn as one conversation round", async () => {
+    const { storage, transport } = restoredTransport();
+    storage.getItem.mockReturnValue(
+      JSON.stringify({
+        revision: 1,
+        conversationId: "c",
+        runIds: ["failed-run", "r"],
+        versions: ["v1"],
+      }),
+    );
+    const failedRun: PublicRun = {
+      ...run,
+      id: "failed-run",
+      status: "FAILED",
+      accepted: null,
+    };
+    transport.run.mockImplementation(async (_conversation, id) =>
+      id === failedRun.id ? failedRun : { ...run, retry_of: failedRun.id },
+    );
+    transport.trace.mockImplementation(async (_conversation, id) => ({
+      ...trace,
+      run_id: id,
+      status: id === failedRun.id ? "FAILED" : "ACCEPTED",
+      acceptance_id: id === failedRun.id ? null : trace.acceptance_id,
+    }));
+    const { container } = render(
+      <ConversationPanel
+        kbId="kb"
+        docs={[doc]}
+        selected={null}
+        onSelect={vi.fn()}
+        session={new ConversationSession("kb", storage, transport)}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("文档答案")).toBeTruthy());
+    expect(screen.getByText("1 轮")).toBeTruthy();
+    expect(screen.getByText("/ 第 1 轮")).toBeTruthy();
+    expect(
+      [...container.querySelectorAll(".turn-number")].map(
+        (node) => node.textContent,
+      ),
+    ).toEqual(["01", "01"]);
+    expect(screen.queryByText("/ 第 2 轮")).toBeNull();
+    expect(transport.create).not.toHaveBeenCalled();
+    expect(transport.submit).not.toHaveBeenCalled();
+  });
+  it("returns to the composer when starting a new conversation from the Trace view", async () => {
+    const { storage, transport } = restoredTransport();
+    const session = new ConversationSession("kb", storage, transport);
+    render(
+      <ConversationPanel
+        kbId="kb"
+        docs={[doc]}
+        selected={null}
+        onSelect={vi.fn()}
+        session={session}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("文档答案")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: /运行过程/ }));
+    expect(screen.queryByLabelText("下一条问题或澄清回复")).toBeNull();
+    fireEvent.click(screen.getByText("新会话"));
+    await waitFor(() =>
+      expect(session.getSnapshot().conversation?.id).toBe("new-conversation"),
+    );
+    expect(screen.getByLabelText("下一条问题或澄清回复")).toBeTruthy();
+    expect(transport.create).toHaveBeenCalledTimes(1);
+    expect(transport.submit).not.toHaveBeenCalled();
+  });
+  it("keeps submission errors visible outside collapsed scope settings", async () => {
+    const { storage, transport } = restoredTransport();
+    transport.submit.mockRejectedValue(new ApiError(422, "invalid_scope"));
+    const session = new ConversationSession("kb", storage, transport);
+    const { container } = render(
+      <ConversationPanel
+        kbId="kb"
+        docs={[doc]}
+        selected={null}
+        onSelect={vi.fn()}
+        session={session}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("文档答案")).toBeTruthy());
+    const settings = container.querySelector<HTMLDetailsElement>(
+      ".conversation-settings",
+    )!;
+    expect(settings.open).toBe(false);
+    fireEvent.change(screen.getByLabelText("下一条问题或澄清回复"), {
+      target: { value: "New question" },
+    });
+    fireEvent.click(screen.getByText("发送会话问题"));
+    await waitFor(() =>
+      expect(session.getSnapshot().notice).toContain("请求未被接受"),
+    );
+    const notice = screen.getByText(/请求未被接受，请检查问题与文档版本范围/);
+    expect(notice.closest(".conversation-settings")).toBeNull();
+    expect(settings.open).toBe(false);
+    expect(transport.submit).toHaveBeenCalledTimes(1);
+  });
+  it("keeps missing-version admission failures visible outside collapsed settings", async () => {
+    const { storage, transport } = restoredTransport();
+    const session = new ConversationSession("kb", storage, transport);
+    render(
+      <ConversationPanel
+        kbId="kb"
+        docs={[]}
+        selected={null}
+        onSelect={vi.fn()}
+        session={session}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("文档答案")).toBeTruthy());
+    const missing = screen.getByText(/已选版本不在当前可用列表中/);
+    expect(missing.closest(".conversation-settings")).toBeNull();
+    expect(
+      (screen.getByText("发送会话问题") as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(transport.submit).not.toHaveBeenCalled();
+  });
   it("shows durable UNKNOWN, retry, cancellation and fencing with absent usage distinct from zero", () => {
     render(
       <TraceInspector

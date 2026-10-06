@@ -2165,6 +2165,29 @@
         ]
       }
     },
+    "/v1/runtime/operations": {
+      "get": {
+        "summary": "Operations",
+        "operationId": "operations_v1_runtime_operations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationsObservation"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/v1/conversations": {
       "post": {
         "summary": "Create",
@@ -2590,6 +2613,178 @@
               "text/event-stream": {
                 "schema": {
                   "$ref": "#/components/schemas/ConversationEvent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/conversation-runs": {
+      "get": {
+        "summary": "Runs",
+        "operationId": "runs_v1_runtime_conversation_runs_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 25,
+              "minimum": 1,
+              "default": 25,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationRunSummary"
+                  },
+                  "title": "Response Runs V1 Runtime Conversation Runs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/conversations/{conversation_id}/runs/{run_id}/inspection": {
+      "get": {
+        "summary": "Inspection",
+        "operationId": "inspection_v1_conversations__conversation_id__runs__run_id__inspection_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationRunInspection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/conversations/{conversation_id}/runs/{run_id}/context": {
+      "get": {
+        "summary": "Context",
+        "operationId": "context_v1_conversations__conversation_id__runs__run_id__context_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContextObservation"
                 }
               }
             }
@@ -3125,6 +3320,399 @@
         ],
         "title": "ClarificationResult"
       },
+      "CollectionObservation": {
+        "properties": {
+          "collection": {
+            "type": "string",
+            "title": "Collection"
+          },
+          "document_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Document Id"
+          },
+          "document_version_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Document Version Id"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "version_sequence": {
+            "type": "integer",
+            "title": "Version Sequence"
+          },
+          "durable_status": {
+            "type": "string",
+            "title": "Durable Status"
+          },
+          "current_version": {
+            "type": "boolean",
+            "title": "Current Version"
+          },
+          "index_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Index Status"
+          },
+          "points_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Count"
+          },
+          "indexed_vectors_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Indexed Vectors Count"
+          },
+          "observed": {
+            "type": "boolean",
+            "title": "Observed",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "collection",
+          "document_id",
+          "document_version_id",
+          "filename",
+          "version_sequence",
+          "durable_status",
+          "current_version"
+        ],
+        "title": "CollectionObservation"
+      },
+      "ContextInputScope": {
+        "properties": {
+          "kb_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Kb Id"
+          },
+          "version_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Version Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kb_id",
+          "version_ids"
+        ],
+        "title": "ContextInputScope",
+        "description": "Keep the existing public documentary Scope schema name stable."
+      },
+      "ContextObservation": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "const": "context-observation-v1",
+            "title": "Revision",
+            "default": "context-observation-v1"
+          },
+          "run_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Run Id"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "VERIFIED_LOCAL_RECEIPT",
+              "NOT_RECORDED",
+              "UNVERIFIABLE"
+            ],
+            "title": "Availability"
+          },
+          "candidates": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ContextSource"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates"
+          },
+          "relevant_sources": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SourceRef"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relevant Sources"
+          },
+          "recent_sources": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SourceRef"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recent Sources"
+          },
+          "working_state": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ContextStateEntry"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working State"
+          },
+          "used_state_item_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Used State Item Ids"
+          },
+          "references": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ReferenceObservation"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "References"
+          },
+          "inherited_facts": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/IntentFact"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inherited Facts"
+          },
+          "topic_relation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "continue",
+                  "shift",
+                  "return"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Relation"
+          },
+          "dependency": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "required",
+                  "unresolved"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dependency"
+          },
+          "candidate_input_identity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Input Identity"
+          },
+          "interpretation_identity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interpretation Identity"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "run_id",
+          "availability"
+        ],
+        "title": "ContextObservation"
+      },
+      "ContextSource": {
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "run_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Run Id"
+          },
+          "origins": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Origins"
+          },
+          "relevant": {
+            "type": "boolean",
+            "title": "Relevant"
+          },
+          "selected_group": {
+            "type": "boolean",
+            "title": "Selected Group"
+          },
+          "recent_candidate": {
+            "type": "boolean",
+            "title": "Recent Candidate"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "question",
+          "run_id",
+          "origins",
+          "relevant",
+          "selected_group",
+          "recent_candidate"
+        ],
+        "title": "ContextSource"
+      },
+      "ContextStateEntry": {
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/StateValue"
+          },
+          "introduced_by": {
+            "$ref": "#/components/schemas/SourceRef"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ContextInputScope"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active",
+            "default": true
+          },
+          "changed_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "superseded",
+                  "deactivated",
+                  "scope_narrowed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "item",
+          "introduced_by",
+          "scope"
+        ],
+        "title": "ContextStateEntry"
+      },
       "ConversationEvent": {
         "properties": {
           "revision": {
@@ -3158,6 +3746,151 @@
           "event"
         ],
         "title": "ConversationEvent"
+      },
+      "ConversationRunInspection": {
+        "properties": {
+          "revision": {
+            "type": "string",
+            "const": "conversation-inspection-v1",
+            "title": "Revision",
+            "default": "conversation-inspection-v1"
+          },
+          "run": {
+            "$ref": "#/components/schemas/PublicRun"
+          },
+          "publication": {
+            "$ref": "#/components/schemas/PublicationObservation"
+          },
+          "trace": {
+            "$ref": "#/components/schemas/ConversationTrace"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "run",
+          "publication",
+          "trace"
+        ],
+        "title": "ConversationRunInspection"
+      },
+      "ConversationRunSummary": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Run Id"
+          },
+          "conversation_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Conversation Id"
+          },
+          "turn_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Turn Id"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "acceptance_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acceptance Id"
+          },
+          "publication": {
+            "type": "string",
+            "enum": [
+              "PUBLISHED",
+              "NOT_PUBLISHED"
+            ],
+            "title": "Publication"
+          },
+          "retry_decision": {
+            "type": "string",
+            "enum": [
+              "BLOCKED_UNKNOWN",
+              "TERMINAL_NO_DISPATCH",
+              "EXPLICIT_NEW_AUTHORIZATION_REQUIRED",
+              "POLICY_AND_KNOWN_PROOF_REQUIRED"
+            ],
+            "title": "Retry Decision"
+          },
+          "unknown_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PROVIDER_UNCERTAIN",
+                  "KNOWN_RESULT_NOT_ACCEPTED",
+                  "CANCELLED_WITH_UNRESOLVED_PROVIDER",
+                  "LEGACY_REASON_UNAVAILABLE"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unknown Reason"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "run_id",
+          "conversation_id",
+          "turn_id",
+          "question",
+          "status",
+          "created_at",
+          "completed_at",
+          "acceptance_id",
+          "publication",
+          "retry_decision",
+          "unknown_reason",
+          "reason_code"
+        ],
+        "title": "ConversationRunSummary"
       },
       "ConversationScope": {
         "properties": {
@@ -4578,6 +5311,68 @@
         ],
         "title": "InsufficientResult"
       },
+      "IntentFact": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "topic",
+              "task",
+              "entity",
+              "constraint",
+              "document",
+              "version",
+              "time",
+              "negation"
+            ],
+            "title": "Kind"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Value"
+          },
+          "span": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TextSpan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state_item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Item Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "value"
+        ],
+        "title": "IntentFact"
+      },
       "Job": {
         "properties": {
           "id": {
@@ -4770,6 +5565,107 @@
           "name"
         ],
         "title": "KnowledgeBaseCreate"
+      },
+      "LatestJobObservation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "document_version_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Document Version Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "attempt": {
+            "type": "integer",
+            "title": "Attempt"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "document_version_id",
+          "status",
+          "attempt",
+          "created_at",
+          "finished_at"
+        ],
+        "title": "LatestJobObservation"
+      },
+      "LatestRunObservation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "conversation_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Conversation Id"
+          },
+          "turn_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Turn Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "conversation_id",
+          "turn_id",
+          "status",
+          "created_at",
+          "completed_at"
+        ],
+        "title": "LatestRunObservation"
       },
       "LifecycleEvent": {
         "properties": {
@@ -5078,6 +5974,69 @@
           "publication"
         ],
         "title": "OperationalTrace"
+      },
+      "OperationsObservation": {
+        "properties": {
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Observed At"
+          },
+          "authority": {
+            "type": "string",
+            "const": "PostgreSQL",
+            "title": "Authority",
+            "default": "PostgreSQL"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceObservation"
+            },
+            "type": "array",
+            "title": "Services"
+          },
+          "workers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Workers"
+          },
+          "collections": {
+            "items": {
+              "$ref": "#/components/schemas/CollectionObservation"
+            },
+            "type": "array",
+            "title": "Collections"
+          },
+          "latest_job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LatestJobObservation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latest_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LatestRunObservation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "observed_at",
+          "services"
+        ],
+        "title": "OperationsObservation"
       },
       "PackSpan": {
         "properties": {
@@ -5557,6 +6516,163 @@
         ],
         "title": "PublicRun"
       },
+      "PublicationObservation": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "PUBLISHED",
+              "NOT_PUBLISHED"
+            ],
+            "title": "Decision"
+          },
+          "acceptance_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acceptance Id"
+          },
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded At"
+          },
+          "working_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublishedStateSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "conversation_head_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Head Id"
+          },
+          "head_relation": {
+            "type": "string",
+            "enum": [
+              "CURRENT",
+              "ADVANCED",
+              "NO_ACCEPTANCE"
+            ],
+            "title": "Head Relation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "decision",
+          "acceptance_id",
+          "recorded_at",
+          "working_state",
+          "conversation_head_id",
+          "head_relation"
+        ],
+        "title": "PublicationObservation"
+      },
+      "PublishedStateSummary": {
+        "properties": {
+          "snapshot_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Snapshot Id"
+          },
+          "revision": {
+            "type": "string",
+            "enum": [
+              "conversation-core-v1",
+              "conversation-state-v2"
+            ],
+            "title": "Revision"
+          },
+          "source_turn_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Source Turn Id"
+          },
+          "previous_snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Snapshot Id"
+          },
+          "topic_signal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Signal"
+          },
+          "active_entries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Entries"
+          },
+          "retired_entries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retired Entries"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "snapshot_id",
+          "revision",
+          "source_turn_id",
+          "previous_snapshot_id",
+          "topic_signal",
+          "active_entries",
+          "retired_entries"
+        ],
+        "title": "PublishedStateSummary"
+      },
       "QueryCreate": {
         "properties": {
           "kb_id": {
@@ -5620,6 +6736,46 @@
           "question"
         ],
         "title": "QueryCreate"
+      },
+      "ReferenceObservation": {
+        "properties": {
+          "mention": {
+            "type": "string",
+            "title": "Mention"
+          },
+          "start": {
+            "type": "integer",
+            "title": "Start"
+          },
+          "end": {
+            "type": "integer",
+            "title": "End"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Values"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "type": "array",
+            "title": "Sources"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mention",
+          "start",
+          "end",
+          "values",
+          "sources"
+        ],
+        "title": "ReferenceObservation"
       },
       "ReliabilitySignal": {
         "properties": {
@@ -6254,6 +7410,55 @@
         ],
         "title": "Scope"
       },
+      "ServiceObservation": {
+        "properties": {
+          "component": {
+            "type": "string",
+            "enum": [
+              "FastAPI",
+              "PostgreSQL",
+              "Redis",
+              "Celery",
+              "Qdrant",
+              "Model gateway",
+              "LLM provider"
+            ],
+            "title": "Component"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "unavailable",
+              "not_checked"
+            ],
+            "title": "Status"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "component",
+          "status",
+          "detail"
+        ],
+        "title": "ServiceObservation"
+      },
       "SourceCoverage": {
         "properties": {
           "requested": {
@@ -6320,6 +7525,53 @@
           "turn_id"
         ],
         "title": "SourceRef"
+      },
+      "StateValue": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "topic",
+              "entity",
+              "constraint",
+              "ambiguity"
+            ],
+            "title": "Kind"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Key"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Value"
+          },
+          "replaces": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Replaces",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "key",
+          "value"
+        ],
+        "title": "StateValue"
       },
       "StreamEvent": {
         "properties": {
@@ -6733,6 +7985,27 @@
           "column_header"
         ],
         "title": "TableCell"
+      },
+      "TextSpan": {
+        "properties": {
+          "start": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Start"
+          },
+          "end": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "End"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "TextSpan"
       },
       "TimelineItem": {
         "properties": {

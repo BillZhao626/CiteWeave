@@ -27,6 +27,14 @@
 .conversational-panel {
   min-width: 0;
 }
+.conversational-panel:has(.conversation-trace[open]) .conversation {
+  flex: none;
+  max-height: none;
+  overflow: visible;
+}
+.work-columns:has(.conversation-trace[open]) {
+  height: auto;
+}
 .conversational-panel .conversation {
   min-height: 200px;
 }
@@ -96,4 +104,46 @@
 .operational-timeline time {
   font-size: 0.8rem;
   color: var(--muted-foreground);
+}
+
+.trace-identity {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+.trace-identity > div {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+}
+.trace-identity dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.trace-durations {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+.trace-durations th,
+.trace-durations td {
+  text-align: left;
+  padding: 7px 10px;
+  border-bottom: 1px solid #dce5df;
+}
+.job-timeline {
+  list-style: none;
+  padding: 0;
+  border-left: 2px solid #dce5df;
+}
+.job-timeline li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px 16px;
+}
+.job-timeline time {
+  color: #65766c;
+  font-size: 12px;
 }

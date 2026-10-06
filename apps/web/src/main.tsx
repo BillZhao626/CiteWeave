@@ -8,6 +8,7 @@ import {
   Route,
   Routes,
   useNavigate,
+  useLocation,
 } from "react-router";
 import {
   QueryClient,
@@ -29,8 +30,13 @@ import {
   SystemPage,
 } from "./operations";
 import { DocumentsPage, StructureView } from "./structure-view";
+import { BenchmarkPage } from "./benchmark-page";
+import { PublicationPage, ReliabilityPage } from "./publication-inspector";
+import { ContextPage } from "./context-inspector";
 import "./index.css";
 import "./product-polish.css";
+import "./product-inspectors.css";
+import "./workspace-product.css";
 
 const client = new QueryClient({
   defaultOptions: {
@@ -70,7 +76,7 @@ function Login() {
           都有迹可循。
         </h1>
         <p>把文档变成可追溯的知识。检索、回答，再回到原文，核对每一个引用。</p>
-        <div className="login-note">个人知识库 · 本地运行 · Alpha</div>
+        <div className="login-note">个人知识库 · 本地运行 · v0.2.0</div>
       </div>
       <form
         className="login-card"
@@ -113,6 +119,7 @@ function Login() {
 }
 
 function Layout() {
+  const location = useLocation();
   const kbs = useQuery({ queryKey: ["kbs"], queryFn: listKBs }),
     cache = useQueryClient();
   if (kbs.error instanceof ApiError && kbs.error.status === 401)
@@ -130,7 +137,7 @@ function Layout() {
     <div className="shell">
       <aside className="sidebar">
         <Link to="/" className="brand">
-          <Layers /> CiteWeave <sup>α</sup>
+          <Layers /> CiteWeave
         </Link>
         <p className="workspace-label">EVIDENCE WORKSPACE</p>
         <NavLink to="/" end className="nav-item">
@@ -143,6 +150,16 @@ function Layout() {
           <NavLink className="nav-item" to="/runs">
             运行 / Trace
           </NavLink>
+          <NavLink
+            className={({ isActive }) =>
+              isActive || location.pathname === "/runtime/reliability"
+                ? "nav-item active"
+                : "nav-item"
+            }
+            to="/runtime/publication"
+          >
+            发布 / 可靠性
+          </NavLink>
         </nav>
         <nav className="ops-nav secondary-nav" aria-label="开发与管理">
           <NavLink className="nav-item" to="/evaluations">
@@ -150,6 +167,9 @@ function Layout() {
           </NavLink>
           <NavLink className="nav-item" to="/system">
             系统与任务
+          </NavLink>
+          <NavLink className="nav-item" to="/benchmark">
+            性能基准
           </NavLink>
         </nav>
         <div className="side-label">
@@ -167,7 +187,7 @@ function Layout() {
           <p>
             <span className="online-dot" /> 本地工作空间
           </p>
-          <small>Portfolio alpha · Local runtime</small>
+          <small>v0.2.0 · Local runtime</small>
           <button
             className="text-button"
             onClick={async () => {
@@ -189,7 +209,7 @@ function Layout() {
             知识与证据 <span className="topbar-divider">/</span> Ask. Trace.
             Verify.
           </span>
-          <span className="chip">PORTFOLIO ALPHA</span>
+          <span className="chip">LOCAL WORKSPACE · v0.2.0</span>
         </header>
         <Outlet />
       </div>
@@ -319,10 +339,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="versions/:id/structure" element={<StructureView />} />
             <Route path="runs" element={<RunsPage />} />
             <Route path="runs/:id" element={<RunInspector />} />
+            <Route path="runtime/publication" element={<PublicationPage />} />
+            <Route path="runtime/reliability" element={<ReliabilityPage />} />
+            <Route path="runtime/context" element={<ContextPage />} />
             <Route path="evaluations" element={<EvaluationsPage />} />
             <Route path="evaluations/:id" element={<EvaluationDetail />} />
             <Route path="documents/:id/versions" element={<VersionsPage />} />
             <Route path="system" element={<SystemPage />} />
+            <Route path="benchmark" element={<BenchmarkPage />} />
             <Route path="*" element={<Library />} />
           </Route>
         </Routes>

@@ -1,9 +1,9 @@
+import { CitationStatus } from "./citation-status";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowUp,
-  Check,
   FileText,
   LoaderCircle,
   Upload,
@@ -284,7 +284,7 @@ function Workspace({ id }: { id: string }) {
           }}
         >
           <option value="conversation">会话 · 多轮证据问答</option>
-          <option value="single">单轮 · 现有 Ask</option>
+          <option value="single">单轮 · 文档问答</option>
         </select>
       </label>
       {(kb.error || docs.error) && (
@@ -292,7 +292,9 @@ function Workspace({ id }: { id: string }) {
           {message(kb.error || docs.error)}
         </p>
       )}
-      <div className={`work-columns ${selected ? "has-evidence" : ""}`}>
+      <div
+        className={`work-columns ${surface === "conversation" ? "is-conversational" : ""} ${selected ? "has-evidence" : ""}`}
+      >
         <aside className="documents">
           <div className="section-heading">
             <h3>资料</h3>
@@ -390,7 +392,7 @@ function Workspace({ id }: { id: string }) {
             <details className="query-settings">
               <summary>
                 下一次提问设置 ·{" "}
-                {profile === "telecom-structural-v1" ? "结构感知" : "兼容路径"}
+                {profile === "telecom-structural-v1" ? "结构感知" : "标准检索"}
               </summary>
               <div className="query-options">
                 <label>
@@ -404,7 +406,7 @@ function Workspace({ id }: { id: string }) {
                       setScope([]);
                     }}
                   >
-                    <option value="m3-context">兼容路径 · Legacy</option>
+                    <option value="m3-context">标准检索</option>
                     <option value="telecom-structural-v1">
                       结构感知 · Telecom
                     </option>
@@ -526,13 +528,9 @@ function Workspace({ id }: { id: string }) {
                     )}
                     {answer && (
                       <>
-                        <div className="verified-label">
-                          <Check size={13} />{" "}
-                          {answer.citations.length
-                            ? "引用与原文片段一致"
-                            : "未提供可引用答案"}{" "}
-                          <span>· 不代表语义支持已自动验证</span>
-                        </div>
+                        <CitationStatus
+                          hasCitations={answer.citations.length > 0}
+                        />
                         <div className="citation-cards">
                           {answer.citations.map((c) => (
                             <button

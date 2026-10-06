@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, listKBs, message, unwrap, type Citation } from "./api";
 import { Button } from "./components/ui/button";
@@ -8,6 +8,7 @@ import { CaseRuntimeView } from "./runtime-view";
 import { statusTone, judgmentLabel } from "./product-facts";
 import { PdfEvidence } from "./pdf-evidence";
 import type { components } from "./generated/api";
+import { ConversationRunsPage } from "./conversation-runs";
 
 type ObjectValue = Record<string, unknown>;
 const object = (value: unknown): ObjectValue =>
@@ -111,6 +112,27 @@ function Metric({
 }
 
 export function RunsPage() {
+  const [params] = useSearchParams();
+  const conversation = params.get("view") === "conversation";
+  return (
+    <>
+      <nav className="run-mode-tabs" aria-label="运行记录类型">
+        <Link to="/runs" aria-current={!conversation ? "page" : undefined}>
+          单轮回答
+        </Link>
+        <Link
+          to="/runs?view=conversation"
+          aria-current={conversation ? "page" : undefined}
+        >
+          会话运行
+        </Link>
+      </nav>
+      {conversation ? <ConversationRunsPage /> : <SingleRunsPage />}
+    </>
+  );
+}
+
+function SingleRunsPage() {
   const [offset, setOffset] = useState(0);
   const runs = useQuery({
     queryKey: ["runs", offset],
@@ -214,8 +236,8 @@ export function RunInspector() {
     .sort((a, b) => Number(a.rank) - Number(b.rank));
   return (
     <Page
-      title="Run Inspector"
-      subtitle="检索、重排、生成与引用校验使用同一个运行标识。"
+      title="检索与运行记录"
+      subtitle="检索、重排、生成与引用校验，沿同一次运行逐步回看。"
     >
       <Link className="ops-link" to="/runs">
         ← 回答记录
@@ -229,7 +251,10 @@ export function RunInspector() {
               <h2>{row.question}</h2>
               <Status value={row.status} />
             </div>
-            <p className="ops-id">{row.id}</p>
+            <details className="source-details" style={{ margin: "8px 0" }}>
+              <summary>Run {short(row.id)} · 完整运行身份</summary>
+              <p className="ops-id">{row.id}</p>
+            </details>
             <Link className="ops-link" to={`/kb/${row.kb_id}?run=${row.id}`}>
               在 Ask 中查看答案 →
             </Link>
@@ -288,7 +313,8 @@ export function RunInspector() {
               }}
             />
           </div>
-          <div className="ops-panel">
+          <details className="ops-panel">
+            <summary>执行时间线与阶段耗时</summary>
             <h2>执行链路 / 阶段耗时</h2>
             <p className="muted">
               记录顺序 · 阶段可能嵌套，耗时不累加为总延迟。
@@ -296,36 +322,29 @@ export function RunInspector() {
             {!row.stages.length && (
               <p className="muted">这条历史记录未采集阶段耗时。</p>
             )}
-            <div className="ops-table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>阶段</th>
-                    <th>状态</th>
-                    <th>输入 → 输出</th>
-                    <th>耗时 ms</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {row.stages.map((s, i) => (
-                    <tr key={i}>
-                      <td>
-                        <strong>{text(s.name)}</strong>
-                        <small>{s.version_id ? short(s.version_id) : ""}</small>
-                      </td>
-                      <td>{text(s.status)}</td>
-                      <td>
-                        {text(s.input_count)} →{" "}
-                        {text(s.output_count ?? s.output_chars)}
-                      </td>
-                      <td>{number(s.latency_ms)?.toFixed(1) ?? "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ol className="ops-stage-timeline" aria-label="执行时间线">
+              {row.stages.map((s, i) => (
+                <li key={i}>
+                  <span>{String(i + 1).padStart(2, "0")}</span>
+                  <div>
+                    <strong>{text(s.name)}</strong>
+                    {s.version_id != null && (
+                      <small>{short(s.version_id)}</small>
+                    )}
+                  </div>
+                  <span>{text(s.status)}</span>
+                  <span className="stage-count">
+                    {text(s.input_count)} →{" "}
+                    {text(s.output_count ?? s.output_chars)}
+                  </span>
+                  <span className="stage-duration">
+                    {number(s.latency_ms)?.toFixed(1) ?? "—"} ms
+                  </span>
+                </li>
+              ))}
+            </ol>
             <Json label="阶段时间戳和配置" value={row.stages} />
-          </div>
+          </details>
           <div className="ops-panel">
             {row.trace_schema_revision === "structural-trace-v1" ? (
               <StructuralTrace run={row} />
@@ -1081,7 +1100,24 @@ export function VersionsPage() {
       title="文档版本"
       subtitle="切换当前发布版本。历史答案继续引用它当时使用的原始 PDF。"
     >
+      <Link className="ops-link" to="/documents">
+        ← 来源文档
+      </Link>
       <Failure error={versions.error || action.error} />
+      {versions.data && (
+        <div className="version-hero">
+          <div>
+            <p className="eyebrow">DURABLE PUBLICATION</p>
+            <strong>文档持续演进，来源版本保持不变</strong>
+            <p>
+              当前发布指针决定新问题的检索范围；历史引用继续绑定原件与精确片段。
+            </p>
+          </div>
+          <span className="chip">
+            {versions.data.versions.length} 个版本 · 本页
+          </span>
+        </div>
+      )}
       {action.data && (
         <p className="ops-notice">
           操作状态：{action.data.status}。
@@ -1091,49 +1127,93 @@ export function VersionsPage() {
         </p>
       )}
       {versions.data?.versions.map((v) => (
-        <div className="ops-panel" key={v.id}>
-          <div className="ops-heading">
-            <h2>
-              {v.filename} · v{v.sequence}
-            </h2>
-            <Status value={v.status} />
+        <article className="version-record" key={v.id}>
+          <div className="version-number">v{v.sequence}</div>
+          <div>
+            <div className="ops-heading">
+              <h2>{v.filename}</h2>
+              <div>
+                <Status value={v.status} />
+                {versions.data.active_version_id === v.id && (
+                  <span className="chip">当前发布版本</span>
+                )}
+              </div>
+            </div>
+            <dl className="source-facts">
+              <div>
+                <dt>原文结构</dt>
+                <dd>
+                  {v.page_count} 页 · {v.chunk_count} 个片段
+                </dd>
+              </div>
+              <div>
+                <dt>登记时间</dt>
+                <dd>{date(v.created_at)}</dd>
+              </div>
+              <div>
+                <dt>版本身份</dt>
+                <dd>
+                  <code title={v.id}>{short(v.id)}</code>
+                </dd>
+              </div>
+              <div>
+                <dt>原件 SHA-256</dt>
+                <dd>
+                  <code title={v.source_sha256}>{short(v.source_sha256)}</code>
+                </dd>
+              </div>
+              <div>
+                <dt>来源许可</dt>
+                <dd>{v.license || "未记录"}</dd>
+              </div>
+              <div>
+                <dt>Qdrant 索引</dt>
+                <dd className="source-index">
+                  {v.index_collection ?? "尚未发布"}
+                </dd>
+              </div>
+            </dl>
+            <div className="ops-actions">
+              {v.status === "READY" && (
+                <Link className="ops-link" to={`/versions/${v.id}/structure`}>
+                  检查章节与原文 →
+                </Link>
+              )}
+              <Button
+                variant="outline"
+                disabled={v.status !== "READY" || action.isPending}
+                onClick={() =>
+                  action.mutate({ version: v.id, kind: "rebuild" })
+                }
+              >
+                重建派生索引
+              </Button>
+              <Button
+                disabled={
+                  v.status !== "READY" ||
+                  versions.data.active_version_id === v.id ||
+                  action.isPending ||
+                  !versions.data.active_version_id
+                }
+                onClick={() =>
+                  action.mutate({ version: v.id, kind: "rollback" })
+                }
+              >
+                切换为当前版本
+              </Button>
+            </div>
+            <Json
+              label="原件哈希与索引身份"
+              value={{
+                sha256: v.source_sha256,
+                index: v.index_collection,
+                profile: v.profile,
+                version_id: v.id,
+                document_id: v.document_id,
+              }}
+            />
           </div>
-          <p className="ops-id">{v.id}</p>
-          {versions.data.active_version_id === v.id && (
-            <span className="chip">当前发布版本</span>
-          )}
-          <p className="muted">
-            {v.page_count} 页 · {v.chunk_count} 个片段 · {date(v.created_at)}
-          </p>
-          <div className="ops-actions">
-            <Button
-              variant="outline"
-              disabled={v.status !== "READY" || action.isPending}
-              onClick={() => action.mutate({ version: v.id, kind: "rebuild" })}
-            >
-              重建派生索引
-            </Button>
-            <Button
-              disabled={
-                v.status !== "READY" ||
-                versions.data.active_version_id === v.id ||
-                action.isPending ||
-                !versions.data.active_version_id
-              }
-              onClick={() => action.mutate({ version: v.id, kind: "rollback" })}
-            >
-              切换为当前版本
-            </Button>
-          </div>
-          <Json
-            label="原件哈希与索引身份"
-            value={{
-              sha256: v.source_sha256,
-              index: v.index_collection,
-              profile: v.profile,
-            }}
-          />
-        </div>
+        </article>
       ))}
       <Pages
         offset={offset}
@@ -1145,6 +1225,7 @@ export function VersionsPage() {
 }
 
 export function SystemPage() {
+  const [params] = useSearchParams();
   const cache = useQueryClient(),
     [offset, setOffset] = useState(0),
     [showGC, setShowGC] = useState(false),
@@ -1158,6 +1239,11 @@ export function SystemPage() {
     queryKey: ["broker"],
     queryFn: async () => unwrap(await api.GET("/v1/runtime/broker")),
     refetchInterval: 10000,
+  });
+  const operations = useQuery({
+    queryKey: ["runtime-operations"],
+    queryFn: async () => unwrap(await api.GET("/v1/runtime/operations")),
+    refetchInterval: 15000,
   });
   const jobs = useQuery({
     queryKey: ["jobs", offset],
@@ -1192,12 +1278,96 @@ export function SystemPage() {
   const row = system.data;
   return (
     <Page
-      title="系统与任务"
-      subtitle="检查后台处理、上游健康、费用预留和索引清理记录。"
+      title="运行与入库"
+      subtitle="从实际服务观察与持久任务记录，检查文档如何成为可用来源。"
     >
-      <Failure error={system.error || jobs.error || gc.error || remove.error} />
+      <Failure
+        error={
+          operations.error ||
+          system.error ||
+          broker.error ||
+          jobs.error ||
+          gc.error ||
+          remove.error
+        }
+      />
+      {operations.data && (
+        <>
+          <div className="operations-health">
+            <div className="operations-health-heading">
+              <h2>服务观察</h2>
+              <small>{date(operations.data.observed_at)} · 本地观察</small>
+            </div>
+            {operations.data.services.map((service) => (
+              <div className="operations-service-row" key={service.component}>
+                <strong>{service.component}</strong>
+                <span
+                  className={`status ${service.status === "available" ? "ready" : service.status === "unavailable" ? "failed" : "pending"}`}
+                >
+                  {service.status === "available"
+                    ? "可访问"
+                    : service.status === "unavailable"
+                      ? "不可访问"
+                      : "未探测"}
+                </span>
+                <p>{service.detail}</p>
+                <small>{service.version ?? "—"}</small>
+              </div>
+            ))}
+          </div>
+          <div className="ops-panel">
+            <div className="job-heading">
+              <h2>已发布版本 → Qdrant 索引</h2>
+              <span>
+                {operations.data.collections?.length ?? 0} 个持久索引绑定
+              </span>
+            </div>
+            <div className="ops-table-wrap collection-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>来源版本</th>
+                    <th>发布状态</th>
+                    <th>集合观察</th>
+                    <th>Points</th>
+                    <th>Indexed vectors</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {operations.data.collections?.map((c) => (
+                    <tr key={c.collection}>
+                      <td>
+                        <Link
+                          className="ops-link"
+                          to={`/documents/${c.document_id}/versions`}
+                        >
+                          {c.filename} · v{c.version_sequence}
+                        </Link>
+                        <div className="collection-name">{c.collection}</div>
+                      </td>
+                      <td>
+                        <Status value={c.durable_status} />
+                        {c.current_version && <small>当前发布版本</small>}
+                      </td>
+                      <td>
+                        {c.observed ? (c.index_status ?? "未记录") : "未观测到"}
+                      </td>
+                      <td>{c.points_count ?? "—"}</td>
+                      <td>{c.indexed_vectors_count ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="muted" style={{ fontSize: 12, marginTop: 12 }}>
+              PostgreSQL 保存版本与发布状态；Qdrant 保存可重建的检索索引。
+            </p>
+          </div>
+        </>
+      )}
       {row && (
-        <div className="ops-panel">
+        <details className="ops-panel">
+          <summary>调用、费用与恢复诊断</summary>
           <div className="ops-metrics">
             <Metric
               label="Redis / PING"
@@ -1232,12 +1402,19 @@ export function SystemPage() {
               jobs: row.jobs,
             }}
           />
-        </div>
+        </details>
       )}
       <div className="ops-panel">
-        <h2>后台任务</h2>
+        <div className="job-heading">
+          <h2>异步文档处理</h2>
+          <span>Redis 通知 · Celery 执行 · PostgreSQL 持久状态</span>
+        </div>
         {jobs.data?.map((job) => (
-          <JobView key={job.id} job={job} />
+          <JobView
+            key={`${job.id}-${params.get("job") === job.id}`}
+            job={job}
+            initiallyOpen={params.get("job") === job.id}
+          />
         ))}
         <Pages
           offset={offset}
@@ -1245,7 +1422,8 @@ export function SystemPage() {
           setOffset={setOffset}
         />
       </div>
-      <div className="ops-panel">
+      <details className="ops-panel">
+        <summary>安全索引清理</summary>
         <h2>安全索引清理</h2>
         <p className="muted">
           预览会说明每个索引的保护原因。删除操作执行前再次检查引用，并保留审计记录。
@@ -1289,17 +1467,34 @@ export function SystemPage() {
             />
           </>
         )}
-      </div>
+      </details>
     </Page>
   );
 }
 
-function JobView({ job }: { job: components["schemas"]["Job"] }) {
+export function JobView({
+  job,
+  initiallyOpen = false,
+}: {
+  job: components["schemas"]["Job"];
+  initiallyOpen?: boolean;
+}) {
+  const stageLabel: Record<string, string> = {
+    PENDING: "任务已登记",
+    PARSING: "读取并解析原文",
+    CHUNKING: "构建原文片段",
+    EMBEDDING: "生成检索向量",
+    INDEXING: "写入派生索引",
+    READY: "版本已持久发布",
+    RETRY_WAIT: "等待有限重试",
+    FAILED_FINAL: "处理终止",
+    CANCELLED: "任务已取消",
+  };
   return (
-    <details className="ops-job">
+    <details className="ops-job" open={initiallyOpen || undefined}>
       <summary>
         <div>
-          <strong>{job.kind === "rebuild" ? "索引重建" : "文档处理"}</strong>
+          <strong>{job.kind === "rebuild" ? "索引重建" : "文档入库"}</strong>
           <small>
             {short(job.id)} · {date(job.created_at)}
           </small>
@@ -1310,7 +1505,69 @@ function JobView({ job }: { job: components["schemas"]["Job"] }) {
         </span>
       </summary>
       {job.error_code && <p className="error">{job.error_code}</p>}
-      <Json label="任务事件" value={job.events} />
+      <dl className="trace-identity">
+        <div>
+          <dt>Job</dt>
+          <dd>{job.id}</dd>
+        </div>
+        <div>
+          <dt>DocumentVersion</dt>
+          <dd>{job.document_version_id}</dd>
+        </div>
+        <div>
+          <dt>登记时间</dt>
+          <dd>{date(job.created_at)}</dd>
+        </div>
+        <div>
+          <dt>流水线</dt>
+          <dd>{job.pipeline_version}</dd>
+        </div>
+        <div>
+          <dt>开始处理</dt>
+          <dd>{job.started_at ? date(job.started_at) : "未记录"}</dd>
+        </div>
+        <div>
+          <dt>完成时间</dt>
+          <dd>{job.finished_at ? date(job.finished_at) : "未记录"}</dd>
+        </div>
+      </dl>
+      {job.events.length === 0 ? (
+        <p>未记录任务事件。</p>
+      ) : (
+        <ol className="job-timeline" aria-label="任务时间线">
+          {job.events.map((event, index) => {
+            const field = (key: string) =>
+              typeof event[key] === "string" || typeof event[key] === "number"
+                ? String(event[key])
+                : "未记录";
+            return (
+              <li key={index} data-status={field("status")}>
+                <strong>
+                  {field("status")}
+                  <small className="job-meaning">
+                    {stageLabel[field("status")] ?? "原始任务事件"}
+                  </small>
+                </strong>
+                <span>尝试 {field("attempt")}</span>
+                <time>
+                  {typeof event.at === "string" &&
+                  !Number.isNaN(Date.parse(event.at))
+                    ? date(event.at)
+                    : field("at")}
+                </time>
+                {event.code != null && <span>{field("code")}</span>}
+              </li>
+            );
+          })}
+        </ol>
+      )}
+      <a
+        className="ops-link"
+        href={`/versions/${job.document_version_id}/structure`}
+      >
+        检查对应来源版本 →
+      </a>
+      <Json label="原始任务事件" value={job.events} />
     </details>
   );
 }

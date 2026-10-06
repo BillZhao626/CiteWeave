@@ -9,6 +9,8 @@ import {
   type PublicRun,
 } from "./conversation-session";
 import "./conversation.css";
+import { CitationStatus } from "./citation-status";
+import { RunOverview } from "./run-overview";
 
 const labels: Record<PublicRun["status"], string> = {
   ADMITTED: "已准入，等待持久结果",
@@ -57,9 +59,7 @@ export function AcceptedAnswer({
           onSelect={onSelect}
         />
       </div>
-      <p className="verified-label">
-        引用与原文片段一致 · 不代表语义支持已验证
-      </p>
+      <CitationStatus hasCitations={result.citations.length > 0} />
       <div className="citation-cards">
         {result.citations.map((citation) => (
           <button
@@ -73,9 +73,6 @@ export function AcceptedAnswer({
               <p>{citation.span.quote}</p>
               <small>
                 第 {citation.span.boxes[0].page_index + 1} 页 · 查看原文 ↗
-              </small>
-              <small className="block-id">
-                版本 {citation.document_version_id}
               </small>
             </div>
           </button>
@@ -123,35 +120,91 @@ const traceFields: [keyof ConversationTrace, string][] = [
   ["validation", "引用物理校验"],
   ["semantic_support", "语义支持评估"],
 ];
+function ContextEvidenceSummary({ trace }: { trace: ConversationTrace }) {
+  if (trace.metadata_availability !== "documentary_bundle") return null;
+  return (
+    <div className="context-evidence-summary" aria-label="上下文与当前证据">
+      <div>
+        <span>上下文理解</span>
+        <strong>
+          {trace.history_sources == null
+            ? "历史来源未记录"
+            : `${trace.history_sources.length} 轮历史用于解释`}
+        </strong>
+        {!!trace.input_state_item_ids?.length && (
+          <small>{trace.input_state_item_ids.length} 个工作状态项</small>
+        )}
+      </div>
+      <div>
+        <span>当前轮检索</span>
+        <strong>
+          {trace.evidence_ids == null
+            ? "证据数量未记录"
+            : `${trace.evidence_ids.length} 个当前证据片段`}
+        </strong>
+        <small>文档原文作为回答依据</small>
+      </div>
+      {trace.selected_query && (
+        <details
+          className="selected-query"
+          open={!!trace.history_sources?.length || undefined}
+        >
+          <summary>实际检索问题</summary>
+          <p>{trace.selected_query}</p>
+        </details>
+      )}
+    </div>
+  );
+}
 export function TraceInspector({ trace }: { trace?: ConversationTrace }) {
   return (
     <details className="trace conversation-trace">
       <summary>Trace Inspector · 持久记录</summary>
-      <p>
-        CURRENT_PACK_PHYSICAL_ONLY ≠ semantic
-        support。物理引用校验不证明语义支持。
-      </p>
+      <details>
+        <summary>引用与计量说明</summary>
+        <p>
+          CURRENT_PACK_PHYSICAL_ONLY ≠ semantic
+          support。物理引用校验不证明语义支持。
+        </p>
+      </details>
       {!trace ? (
         <p>未记录 / 不可用</p>
       ) : (
         <>
-          <OperationalTimeline trace={trace} />
-          <dl>
-            {traceFields.map(([field, label]) => (
-              <div key={field}>
-                <dt>{label}</dt>
-                <dd>
-                  {trace[field] == null ? (
-                    "未记录 / 不可用"
-                  ) : typeof trace[field] === "object" ? (
-                    <pre>{JSON.stringify(trace[field], null, 2)}</pre>
-                  ) : (
-                    String(trace[field])
-                  )}
-                </dd>
-              </div>
-            ))}
+          <dl className="trace-identity" aria-label="运行身份">
+            <div>
+              <dt>Conversation</dt>
+              <dd>{trace.conversation_id}</dd>
+            </div>
+            <div>
+              <dt>Turn</dt>
+              <dd>{trace.turn_id}</dd>
+            </div>
+            <div>
+              <dt>Run</dt>
+              <dd>{trace.run_id}</dd>
+            </div>
           </dl>
+          <OperationalTimeline trace={trace} />
+          <details>
+            <summary>完整 Trace 字段</summary>
+            <dl>
+              {traceFields.map(([field, label]) => (
+                <div key={field}>
+                  <dt>{label}</dt>
+                  <dd>
+                    {trace[field] == null ? (
+                      "未记录 / 不可用"
+                    ) : typeof trace[field] === "object" ? (
+                      <pre>{JSON.stringify(trace[field], null, 2)}</pre>
+                    ) : (
+                      String(trace[field])
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </details>
         </>
       )}
     </details>
@@ -165,6 +218,7 @@ export function OperationalTimeline({ trace }: { trace: ConversationTrace }) {
     value == null ? "未记录 / 不可用" : `${value} ms`;
   return (
     <section aria-label="运行时间线">
+      <RunOverview trace={trace} />
       <h4>运行时间线 · {trace.status}</h4>
       <p>
         发布：{operational.publication} · 重试：{operational.retry_decision}
@@ -172,6 +226,14 @@ export function OperationalTimeline({ trace }: { trace: ConversationTrace }) {
       {operational.unknown_reason && (
         <p>UNKNOWN 原因：{operational.unknown_reason}</p>
       )}
+      {operational.timeline
+        .filter((event) => event.error_code)
+        .slice(-1)
+        .map((event) => (
+          <p key={event.id} className="error">
+            运行错误：{event.error_category ?? "未分类"} · {event.error_code}
+          </p>
+        ))}
       <p>
         总时长：{duration(operational.total.latency_ms)} ·{" "}
         {operational.total.availability}
@@ -179,36 +241,66 @@ export function OperationalTimeline({ trace }: { trace: ConversationTrace }) {
       {operational.truncated && (
         <p role="status">仅显示最近 64 条持久事件；阶段时长可能不完整。</p>
       )}
-      <ol className="operational-timeline">
-        {operational.timeline.map((event) => (
-          <li key={event.id}>
-            <time dateTime={event.created_at}>{event.created_at}</time>
-            <strong>
-              {event.kind} · {event.phase ?? "Run"}
-            </strong>
-            <span>
-              attempt {event.attempt ?? "未记录"} · fence {event.fence}
-              {event.current_fence != null && ` → 当前 ${event.current_fence}`}
-            </span>
-            {(event.from_state || event.to_state) && (
-              <span>
-                {event.from_state ?? "未记录"} → {event.to_state ?? "未记录"}
-              </span>
-            )}
-            {event.retry_classification && (
-              <span>重试分类：{event.retry_classification}</span>
-            )}
-            {event.error_code && (
-              <span>
-                {event.error_category ?? "未分类"} · {event.error_code}
-              </span>
-            )}
-            {event.latency_ms != null && (
-              <span>{duration(event.latency_ms)}</span>
-            )}
-          </li>
+      <table className="trace-durations">
+        <thead>
+          <tr>
+            <th>阶段</th>
+            <th>耗时</th>
+            <th>记录状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          {operational.durations.map((item) => (
+            <tr key={item.phase}>
+              <td>{item.phase}</td>
+              <td>{duration(item.latency_ms)}</td>
+              <td>{item.availability}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="muted">阶段耗时可重叠；publication 不含 commit 确认。</p>
+      {operational.provider_phases
+        .filter((p) => p.error_code)
+        .map((p) => (
+          <p key={p.provider_phase_id} className="error">
+            {p.phase} · {p.error_category ?? "未分类"} · {p.error_code}
+          </p>
         ))}
-      </ol>
+      <details>
+        <summary>持久事件 · {operational.timeline.length} 条</summary>
+        <ol className="operational-timeline">
+          {operational.timeline.map((event) => (
+            <li key={event.id}>
+              <time dateTime={event.created_at}>{event.created_at}</time>
+              <strong>
+                {event.kind} · {event.phase ?? "Run"}
+              </strong>
+              <span>
+                attempt {event.attempt ?? "未记录"} · fence {event.fence}
+                {event.current_fence != null &&
+                  ` → 当前 ${event.current_fence}`}
+              </span>
+              {(event.from_state || event.to_state) && (
+                <span>
+                  {event.from_state ?? "未记录"} → {event.to_state ?? "未记录"}
+                </span>
+              )}
+              {event.retry_classification && (
+                <span>重试分类：{event.retry_classification}</span>
+              )}
+              {event.error_code && (
+                <span>
+                  {event.error_category ?? "未分类"} · {event.error_code}
+                </span>
+              )}
+              {event.latency_ms != null && (
+                <span>{duration(event.latency_ms)}</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </details>
       <details>
         <summary>阶段时长与 Provider 回执</summary>
         <p>
@@ -275,6 +367,10 @@ export function ConversationPanel({
   );
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [question, setQuestion] = useState("");
+  const [existingConversation, setExistingConversation] = useState("");
+  const [existingRuns, setExistingRuns] = useState("");
+  const [focusedRunId, setFocusedRunId] = useState<string | null>(null);
+  const [view, setView] = useState<"answer" | "trace">("answer");
   useEffect(() => {
     void session.refresh();
   }, [session]);
@@ -282,6 +378,13 @@ export function ConversationPanel({
     if (!state.conversation && selected) onSelect(null);
   }, [state.conversation, selected, onSelect]);
   const pendingRun = state.runs.some((run) => run.status === "ADMITTED");
+  const turnIds = [...new Set(state.runs.map((run) => run.turn_id))];
+  const focusedRun =
+    state.runs.find((run) => run.id === focusedRunId) ?? state.runs.at(-1);
+  const focusedTrace = focusedRun ? state.traces[focusedRun.id] : undefined;
+  const focusedNumber = focusedRun
+    ? turnIds.indexOf(focusedRun.turn_id) + 1
+    : 0;
   // Three GET refreshes per observed pending period; explicit refresh remains
   // available afterwards. Finite /events snapshots are not a live subscription.
   useEffect(() => {
@@ -317,6 +420,8 @@ export function ConversationPanel({
     if (disabled || !question.trim()) return;
     const submitted = question;
     onSelect(null);
+    setFocusedRunId(null);
+    setView("answer");
     await session.submit(submitted, {
       kb_id: kbId,
       version_ids: state.versions,
@@ -326,125 +431,277 @@ export function ConversationPanel({
   };
   return (
     <>
+      <aside className="conversation-rail" aria-label="会话导航">
+        <div className="section-heading">
+          <h3>会话</h3>
+          <span>{turnIds.length} 轮</span>
+        </div>
+        <div className="rail-heading">
+          <span className="eyebrow">CONVERSATION</span>
+          <h3>
+            问题在延续，
+            <br />
+            证据每轮重查。
+          </h3>
+        </div>
+        <nav aria-label="选择会话轮次" className="turn-navigation">
+          {state.runs.map((run) => (
+            <button
+              key={run.id}
+              className={
+                focusedRun?.id === run.id ? "turn-link selected" : "turn-link"
+              }
+              aria-current={focusedRun?.id === run.id ? "step" : undefined}
+              onClick={() => {
+                setFocusedRunId(run.id);
+                setView("answer");
+                onSelect(null);
+              }}
+            >
+              <span className="turn-number">
+                {String(turnIds.indexOf(run.turn_id) + 1).padStart(2, "0")}
+              </span>
+              <span>
+                <strong>
+                  {state.traces[run.id]?.original_question ?? "正在读取问题…"}
+                </strong>
+                <small>
+                  {run.status === "ACCEPTED"
+                    ? "答案已发布"
+                    : labels[run.status]}
+                </small>
+              </span>
+            </button>
+          ))}
+          {!state.runs.length && (
+            <p className="muted rail-empty">
+              你的问题与每轮运行记录将保存在这里。
+            </p>
+          )}
+        </nav>
+        <div className="rail-sources">
+          <span className="eyebrow">CURRENT SOURCES</span>
+          <p>{state.versions.length} 个明确版本</p>
+          <small>当前轮使用所选文档，引用绑定原始版本。</small>
+        </div>
+      </aside>
       <div className="chat-panel conversational-panel">
         <div className="section-heading">
-          <h3>会话证据问答</h3>
-          <span>服务端持久状态</span>
+          <h3>
+            会话证据问答{" "}
+            {focusedNumber > 0 && (
+              <span className="turn-heading">/ 第 {focusedNumber} 轮</span>
+            )}
+          </h3>
+          <span>
+            {focusedRun?.status === "ACCEPTED"
+              ? "已发布 · 可核查"
+              : "服务端持久状态"}
+          </span>
         </div>
         <div className="conversation-controls">
-          <p className="muted">生产会话运行时尚未开放；已有会话结果可读回。</p>
-          <div className="conversation-actions">
-            {!state.conversation && (
-              <Button
-                disabled={state.busy}
-                onClick={() => void session.start()}
-              >
-                {state.hasIdentity ? "恢复会话身份" : "开始会话"}
-              </Button>
-            )}
-            {state.conversation && (
-              <Button
-                variant="outline"
-                disabled={
-                  state.busy ||
-                  !!state.pending ||
-                  !!state.conversation.active_run_id
-                }
-                onClick={() => {
-                  onSelect(null);
-                  setQuestion("");
-                  void session.start(true);
-                }}
-              >
-                新会话
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              disabled={state.busy || !state.hasIdentity}
-              onClick={() => void session.refresh()}
-            >
-              刷新持久状态
-            </Button>
-            {state.pending && (
-              <Button
-                disabled={state.busy}
-                onClick={() => void session.recover()}
-              >
-                使用同一提交身份恢复
-              </Button>
-            )}
-          </div>
-          {state.conversation && (
-            <details className="source-details">
-              <summary>当前会话身份</summary>
-              <p className="version-meta">
-                Conversation {state.conversation.id}
-                <br />
-                已接受 head：{state.conversation.head_id ?? "无"}
-                <br />
-                活动 Run：{state.conversation.active_run_id ?? "无"}
-              </p>
-            </details>
-          )}
-          <fieldset className="conversation-scope" disabled={state.busy}>
-            <legend>
-              下一 Turn 的明确文档范围 · {state.versions.length} 个版本
-            </legend>
-            {usable.map(({ doc, version }) => (
-              <label className="scope-option" key={version.id}>
-                <input
-                  type="checkbox"
-                  checked={state.versions.includes(version.id)}
-                  onChange={(event) =>
-                    session.setVersions(
-                      event.target.checked
-                        ? [...state.versions, version.id]
-                        : state.versions.filter((id) => id !== version.id),
-                    )
-                  }
-                />
-                <span>
-                  {doc.title} · v{version.sequence}
-                  <small className="block-id">{version.id}</small>
-                </span>
-              </label>
-            ))}
-            {!usable.length && <p>请从左侧添加文档并等待处理完成。</p>}
-            {!!missing.length && (
-              <p role="alert">
-                已选版本不在当前可用列表中，请重新选择：{missing.join(", ")}{" "}
-                <button
-                  type="button"
-                  className="text-button"
-                  onClick={() =>
-                    session.setVersions(
-                      state.versions.filter((id) => !missing.includes(id)),
-                    )
-                  }
-                >
-                  移除不可用选择
-                </button>
-              </p>
-            )}
-          </fieldset>
           {state.notice && (
             <p role="alert" className="warning-banner">
               {state.notice}
             </p>
           )}
-          <p role="status">
-            {state.busy
-              ? "正在提交 / 读取持久状态…"
-              : state.pending && !state.pending.runId
-                ? "提交结果未确认"
-                : pendingRun
-                  ? "ADMITTED · 等待结果；有限自动读回后可手动刷新"
-                  : state.conversation
-                    ? "持久状态已读回"
-                    : "尚未连接会话"}
-          </p>
+          {!!missing.length && (
+            <p role="alert" className="warning-banner">
+              已选版本不在当前可用列表中，请重新选择：{missing.join(", ")}{" "}
+              <button
+                type="button"
+                className="text-button"
+                disabled={state.busy}
+                onClick={() =>
+                  session.setVersions(
+                    state.versions.filter((id) => !missing.includes(id)),
+                  )
+                }
+              >
+                移除不可用选择
+              </button>
+            </p>
+          )}
+          <details
+            className="conversation-settings"
+            open={!state.conversation || undefined}
+          >
+            <summary>
+              下一轮来源范围 · {state.versions.length} 个固定版本{" "}
+              <span>调整文档 / 会话设置</span>
+            </summary>
+            <div className="conversation-settings-body">
+              <div className="conversation-actions">
+                {!state.conversation && (
+                  <Button
+                    disabled={state.busy}
+                    onClick={() => void session.start()}
+                  >
+                    {state.hasIdentity ? "恢复会话身份" : "开始会话"}
+                  </Button>
+                )}
+                {state.conversation && (
+                  <Button
+                    variant="outline"
+                    disabled={
+                      state.busy ||
+                      !!state.pending ||
+                      !!state.conversation.active_run_id
+                    }
+                    onClick={() => {
+                      onSelect(null);
+                      setQuestion("");
+                      setFocusedRunId(null);
+                      setView("answer");
+                      void session.start(true);
+                    }}
+                  >
+                    新会话
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  disabled={state.busy || !state.hasIdentity}
+                  onClick={() => void session.refresh()}
+                >
+                  刷新持久状态
+                </Button>
+                {state.pending && (
+                  <Button
+                    disabled={state.busy}
+                    onClick={() => void session.recover()}
+                  >
+                    使用同一提交身份恢复
+                  </Button>
+                )}
+              </div>
+              <details className="source-details">
+                <summary>打开已有会话</summary>
+                <label>
+                  Conversation ID
+                  <input
+                    value={existingConversation}
+                    onChange={(e) => setExistingConversation(e.target.value)}
+                    disabled={state.busy}
+                  />
+                </label>
+                <label>
+                  Run IDs（逗号或换行分隔）
+                  <textarea
+                    value={existingRuns}
+                    onChange={(e) => setExistingRuns(e.target.value)}
+                    disabled={state.busy}
+                    rows={2}
+                  />
+                </label>
+                <p className="version-meta">
+                  读取指定运行的持久记录；不会创建会话或重新执行。最多 25
+                  条，身份可从 Run 检查视图复制。
+                </p>
+                <Button
+                  variant="outline"
+                  disabled={
+                    state.busy ||
+                    !!state.pending ||
+                    !existingConversation.trim() ||
+                    !existingRuns.trim()
+                  }
+                  onClick={() => {
+                    onSelect(null);
+                    setFocusedRunId(null);
+                    setView("answer");
+                    void session.openExisting(
+                      existingConversation,
+                      existingRuns.split(/[,，\s]+/).filter(Boolean),
+                    );
+                  }}
+                >
+                  读取已有会话
+                </Button>
+              </details>
+              {state.conversation && (
+                <details className="source-details">
+                  <summary>当前会话身份</summary>
+                  <p className="version-meta">
+                    Conversation {state.conversation.id}
+                    <br />
+                    已接受 head：{state.conversation.head_id ?? "无"}
+                    <br />
+                    活动 Run：{state.conversation.active_run_id ?? "无"}
+                  </p>
+                </details>
+              )}
+              <fieldset className="conversation-scope" disabled={state.busy}>
+                <legend>下一轮文档范围 · {state.versions.length} 个版本</legend>
+                {usable.map(({ doc, version }) => (
+                  <label className="scope-option" key={version.id}>
+                    <input
+                      type="checkbox"
+                      checked={state.versions.includes(version.id)}
+                      onChange={(event) =>
+                        session.setVersions(
+                          event.target.checked
+                            ? [...state.versions, version.id]
+                            : state.versions.filter((id) => id !== version.id),
+                        )
+                      }
+                    />
+                    <span>
+                      {doc.title} · v{version.sequence}
+                      <small className="scope-version-id" title={version.id}>
+                        READY · 固定版本
+                      </small>
+                    </span>
+                  </label>
+                ))}
+                {!usable.length && <p>请添加文档并等待处理完成。</p>}
+              </fieldset>
+              <p role="status" className="conversation-readback">
+                {state.busy
+                  ? "正在提交 / 读取持久状态…"
+                  : state.pending && !state.pending.runId
+                    ? "提交结果未确认"
+                    : pendingRun
+                      ? "ADMITTED · 等待结果；有限自动读回后可手动刷新"
+                      : state.conversation
+                        ? "持久状态已读回"
+                        : "尚未连接会话"}
+              </p>
+              {!state.conversation && (
+                <small className="muted">
+                  执行取决于服务器授权；已有结果可读取。
+                </small>
+              )}
+            </div>
+          </details>
         </div>
+        {focusedRun && (
+          <nav className="answer-tabs" aria-label="当前轮视图">
+            <button
+              aria-pressed={view === "answer"}
+              onClick={() => setView("answer")}
+            >
+              回答与引用
+            </button>
+            <button
+              aria-pressed={view === "trace"}
+              onClick={() => setView("trace")}
+            >
+              运行过程{" "}
+              <span>
+                {focusedTrace?.operational?.total.latency_ms == null
+                  ? ""
+                  : `${(focusedTrace.operational.total.latency_ms / 1000).toFixed(2)} s`}
+              </span>
+            </button>
+            <a
+              className="context-view-link"
+              href={`/runtime/context?run=${focusedRun.id}`}
+            >
+              上下文 / 指代解析 ↗
+            </a>
+          </nav>
+        )}
         <div className="conversation" aria-label="会话记录">
           {!state.runs.length && !state.pending && (
             <p className="muted">
@@ -452,7 +709,7 @@ export function ConversationPanel({
               Run；当前 API 不提供完整历史列表。
             </p>
           )}
-          {state.runs.map((run) => (
+          {(focusedRun ? [focusedRun] : []).map((run) => (
             <article
               key={run.id}
               className="conversation-turn"
@@ -469,12 +726,26 @@ export function ConversationPanel({
                     {run.status} · {labels[run.status]}
                   </span>
                 </div>
-                <AcceptedAnswer
-                  run={run}
-                  selected={selected}
-                  onSelect={onSelect}
-                />
-                <TraceInspector trace={state.traces[run.id]} />
+                {view === "answer" ? (
+                  <>
+                    {focusedTrace && (
+                      <ContextEvidenceSummary trace={focusedTrace} />
+                    )}
+                    <AcceptedAnswer
+                      run={run}
+                      selected={selected}
+                      onSelect={onSelect}
+                    />
+                    <TraceInspector trace={state.traces[run.id]} />
+                  </>
+                ) : (
+                  <div className="focused-trace">
+                    {focusedTrace && (
+                      <OperationalTimeline trace={focusedTrace} />
+                    )}
+                    <TraceInspector trace={focusedTrace} />
+                  </div>
+                )}
               </div>
             </article>
           ))}
@@ -485,29 +756,31 @@ export function ConversationPanel({
             </div>
           )}
         </div>
-        <form
-          className="composer"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void send();
-          }}
-        >
-          <label htmlFor="conversation-question">下一条问题或澄清回复</label>
-          <textarea
-            id="conversation-question"
-            rows={2}
-            value={question}
-            onChange={(event) => setQuestion(event.target.value)}
-            disabled={disabled}
-            placeholder="输入关于所选文档的问题…"
-          />
-          <div className="composer-foot">
-            <span>仅使用上方明确选择的版本</span>
-            <Button type="submit" disabled={disabled || !question.trim()}>
-              发送会话问题
-            </Button>
-          </div>
-        </form>
+        {view === "answer" && (
+          <form
+            className="composer"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void send();
+            }}
+          >
+            <label htmlFor="conversation-question">下一条问题或澄清回复</label>
+            <textarea
+              id="conversation-question"
+              rows={2}
+              value={question}
+              onChange={(event) => setQuestion(event.target.value)}
+              disabled={disabled}
+              placeholder="输入关于所选文档的问题…"
+            />
+            <div className="composer-foot">
+              <span>仅使用上方明确选择的版本</span>
+              <Button type="submit" disabled={disabled || !question.trim()}>
+                发送会话问题
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
       {selected && (
         <aside className="evidence-panel" aria-label="会话原文证据">

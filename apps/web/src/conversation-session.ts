@@ -111,7 +111,7 @@ export class ConversationSession {
   private listeners = new Set<() => void>();
   private storageKey: string;
   constructor(
-    kb: string,
+    private kb: string,
     private storage: Storage,
     private transport = conversationApi,
   ) {
@@ -129,7 +129,7 @@ export class ConversationSession {
       traces: {},
       versions: this.journal.versions,
       pending: this.journal.pending,
-      hasIdentity: !!this.journal.createKey,
+      hasIdentity: !!(this.journal.createKey || this.journal.conversationId),
       busy: false,
       notice,
     };
@@ -148,7 +148,7 @@ export class ConversationSession {
   private save() {
     this.update({
       pending: this.journal.pending,
-      hasIdentity: !!this.journal.createKey,
+      hasIdentity: !!(this.journal.createKey || this.journal.conversationId),
       versions: this.journal.versions,
     });
     try {
@@ -178,6 +178,10 @@ export class ConversationSession {
   }
   async start(fresh = false) {
     await this.operation(async () => {
+      if (!fresh && this.journal.conversationId) {
+        await this.read();
+        return;
+      }
       if (fresh) {
         this.journal = {
           revision: 1,
@@ -243,6 +247,62 @@ export class ConversationSession {
   refresh = async () => {
     if (this.journal.conversationId) await this.operation(() => this.read());
   };
+  async openExisting(conversationId: string, runIds: string[]) {
+    if (this.journal.pending) {
+      this.update({ notice: "请先确认当前提交结果，再打开已有会话。" });
+      return;
+    }
+    await this.operation(async () => {
+      const id = z.string().uuid().parse(conversationId.trim());
+      const ids = [
+        ...new Set(z.array(z.string().uuid()).min(1).max(25).parse(runIds)),
+      ];
+      this.update({ conversation: undefined, runs: [], traces: {} });
+      const conversation = await this.transport.conversation(id);
+      const pairs = await Promise.all(
+        ids.map(
+          async (runId) =>
+            [
+              await this.transport.run(id, runId),
+              await this.transport.trace(id, runId),
+            ] as const,
+        ),
+      );
+      if (
+        conversation.id !== id ||
+        pairs.some(
+          ([run, trace], i) =>
+            run.id !== ids[i] ||
+            run.conversation_id !== id ||
+            !trace ||
+            trace.run_id !== run.id ||
+            trace.conversation_id !== id ||
+            trace.scope.kb_id !== this.kb,
+        )
+      )
+        throw new ApiError(404, "conversation_not_found");
+      pairs.sort(
+        ([a], [b]) =>
+          a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id),
+      );
+      this.journal = {
+        revision: 1,
+        conversationId: id,
+        runIds: pairs.map(([run]) => run.id),
+        versions: [
+          ...new Set(pairs.flatMap(([, trace]) => trace.scope.version_ids)),
+        ].sort(),
+      };
+      this.save();
+      this.update({
+        conversation,
+        runs: pairs.map(([run]) => run),
+        traces: Object.fromEntries(
+          pairs.map(([run, trace]) => [run.id, trace]),
+        ),
+      });
+    });
+  }
   private async sendPending() {
     const pending = this.journal.pending;
     const id = this.journal.conversationId;

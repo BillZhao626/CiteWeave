@@ -308,10 +308,21 @@ def create_app(
     from citeweave.inspection import mount as mount_inspection
 
     mount_inspection(app, principal)
+    from citeweave.runtime_operations import mount as mount_operations
+
+    mount_operations(app, principal)
 
     from citeweave.conversation_api import mount as mount_conversations
 
     mount_conversations(app, principal, conversation_runtime)
+
+    from citeweave.runtime_inspection import mount as mount_runtime_inspection
+
+    mount_runtime_inspection(app, principal)
+
+    from citeweave.context_inspection import mount as mount_context_inspection
+
+    mount_context_inspection(app, principal)
 
     if lab_root:
         from citeweave.lab import install_lab

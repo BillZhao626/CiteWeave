@@ -604,6 +604,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/runtime/operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Operations */
+        get: operations["operations_v1_runtime_operations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/conversations": {
         parameters: {
             query?: never;
@@ -732,6 +749,57 @@ export interface paths {
         };
         /** Events */
         get: operations["events_v1_conversations__conversation_id__runs__run_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/conversation-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Runs */
+        get: operations["runs_v1_runtime_conversation_runs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conversations/{conversation_id}/runs/{run_id}/inspection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inspection */
+        get: operations["inspection_v1_conversations__conversation_id__runs__run_id__inspection_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conversations/{conversation_id}/runs/{run_id}/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Context */
+        get: operations["context_v1_conversations__conversation_id__runs__run_id__context_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -998,6 +1066,127 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** CollectionObservation */
+        CollectionObservation: {
+            /** Collection */
+            collection: string;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /**
+             * Document Version Id
+             * Format: uuid
+             */
+            document_version_id: string;
+            /** Filename */
+            filename: string;
+            /** Version Sequence */
+            version_sequence: number;
+            /** Durable Status */
+            durable_status: string;
+            /** Current Version */
+            current_version: boolean;
+            /** Index Status */
+            index_status?: string | null;
+            /** Points Count */
+            points_count?: number | null;
+            /** Indexed Vectors Count */
+            indexed_vectors_count?: number | null;
+            /**
+             * Observed
+             * @default false
+             */
+            observed: boolean;
+        };
+        /**
+         * ContextInputScope
+         * @description Keep the existing public documentary Scope schema name stable.
+         */
+        ContextInputScope: {
+            /**
+             * Kb Id
+             * Format: uuid
+             */
+            kb_id: string;
+            /** Version Ids */
+            version_ids: string[];
+        };
+        /** ContextObservation */
+        ContextObservation: {
+            /**
+             * Revision
+             * @default context-observation-v1
+             * @constant
+             */
+            revision: "context-observation-v1";
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /**
+             * Availability
+             * @enum {string}
+             */
+            availability: "VERIFIED_LOCAL_RECEIPT" | "NOT_RECORDED" | "UNVERIFIABLE";
+            /** Candidates */
+            candidates?: components["schemas"]["ContextSource"][] | null;
+            /** Relevant Sources */
+            relevant_sources?: components["schemas"]["SourceRef"][] | null;
+            /** Recent Sources */
+            recent_sources?: components["schemas"]["SourceRef"][] | null;
+            /** Working State */
+            working_state?: components["schemas"]["ContextStateEntry"][] | null;
+            /** Used State Item Ids */
+            used_state_item_ids?: string[] | null;
+            /** References */
+            references?: components["schemas"]["ReferenceObservation"][] | null;
+            /** Inherited Facts */
+            inherited_facts?: components["schemas"]["IntentFact"][] | null;
+            /** Topic Relation */
+            topic_relation?: ("continue" | "shift" | "return") | null;
+            /** Dependency */
+            dependency?: ("none" | "required" | "unresolved") | null;
+            /** Candidate Input Identity */
+            candidate_input_identity?: string | null;
+            /** Interpretation Identity */
+            interpretation_identity?: string | null;
+        };
+        /** ContextSource */
+        ContextSource: {
+            source: components["schemas"]["SourceRef"];
+            /** Question */
+            question: string;
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Origins */
+            origins: string[];
+            /** Relevant */
+            relevant: boolean;
+            /** Selected Group */
+            selected_group: boolean;
+            /** Recent Candidate */
+            recent_candidate: boolean;
+        };
+        /** ContextStateEntry */
+        ContextStateEntry: {
+            item: components["schemas"]["StateValue"];
+            introduced_by: components["schemas"]["SourceRef"];
+            scope: components["schemas"]["ContextInputScope"];
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+            changed_by?: components["schemas"]["SourceRef"] | null;
+            /** Change */
+            change?: ("superseded" | "deactivated" | "scope_narrowed") | null;
+        };
         /** ConversationEvent */
         ConversationEvent: {
             /**
@@ -1008,6 +1197,62 @@ export interface components {
             revision: "conversation-event-v1";
             /** Event */
             event: components["schemas"]["LifecycleEvent"] | components["schemas"]["ResultEvent"];
+        };
+        /** ConversationRunInspection */
+        ConversationRunInspection: {
+            /**
+             * Revision
+             * @default conversation-inspection-v1
+             * @constant
+             */
+            revision: "conversation-inspection-v1";
+            run: components["schemas"]["PublicRun"];
+            publication: components["schemas"]["PublicationObservation"];
+            trace: components["schemas"]["ConversationTrace"];
+        };
+        /** ConversationRunSummary */
+        ConversationRunSummary: {
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /**
+             * Conversation Id
+             * Format: uuid
+             */
+            conversation_id: string;
+            /**
+             * Turn Id
+             * Format: uuid
+             */
+            turn_id: string;
+            /** Question */
+            question: string;
+            status: components["schemas"]["RunStatus"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed At */
+            completed_at: string | null;
+            /** Acceptance Id */
+            acceptance_id: string | null;
+            /**
+             * Publication
+             * @enum {string}
+             */
+            publication: "PUBLISHED" | "NOT_PUBLISHED";
+            /**
+             * Retry Decision
+             * @enum {string}
+             */
+            retry_decision: "BLOCKED_UNKNOWN" | "TERMINAL_NO_DISPATCH" | "EXPLICIT_NEW_AUTHORIZATION_REQUIRED" | "POLICY_AND_KNOWN_PROOF_REQUIRED";
+            /** Unknown Reason */
+            unknown_reason: ("PROVIDER_UNCERTAIN" | "KNOWN_RESULT_NOT_ACCEPTED" | "CANCELLED_WITH_UNRESOLVED_PROVIDER" | "LEGACY_REASON_UNAVAILABLE") | null;
+            /** Reason Code */
+            reason_code: string | null;
         };
         /**
          * ConversationScope
@@ -1543,6 +1788,20 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** IntentFact */
+        IntentFact: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "topic" | "task" | "entity" | "constraint" | "document" | "version" | "time" | "negation";
+            /** Value */
+            value: string;
+            span?: components["schemas"]["TextSpan"] | null;
+            source?: components["schemas"]["SourceRef"] | null;
+            /** State Item Id */
+            state_item_id?: string | null;
+        };
         /** Job */
         Job: {
             /**
@@ -1623,6 +1882,57 @@ export interface components {
              * @default
              */
             description: string;
+        };
+        /** LatestJobObservation */
+        LatestJobObservation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Document Version Id
+             * Format: uuid
+             */
+            document_version_id: string;
+            /** Status */
+            status: string;
+            /** Attempt */
+            attempt: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Finished At */
+            finished_at: string | null;
+        };
+        /** LatestRunObservation */
+        LatestRunObservation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Conversation Id
+             * Format: uuid
+             */
+            conversation_id: string;
+            /**
+             * Turn Id
+             * Format: uuid
+             */
+            turn_id: string;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed At */
+            completed_at: string | null;
         };
         /** LifecycleEvent */
         LifecycleEvent: {
@@ -1759,6 +2069,28 @@ export interface components {
             publication: "ACCEPTED" | "NOT_ACCEPTED";
             /** Unknown Reason */
             unknown_reason?: ("PROVIDER_UNCERTAIN" | "KNOWN_RESULT_NOT_ACCEPTED" | "CANCELLED_WITH_UNRESOLVED_PROVIDER" | "LEGACY_REASON_UNAVAILABLE") | null;
+        };
+        /** OperationsObservation */
+        OperationsObservation: {
+            /**
+             * Observed At
+             * Format: date-time
+             */
+            observed_at: string;
+            /**
+             * Authority
+             * @default PostgreSQL
+             * @constant
+             */
+            authority: "PostgreSQL";
+            /** Services */
+            services: components["schemas"]["ServiceObservation"][];
+            /** Workers */
+            workers?: string[];
+            /** Collections */
+            collections?: components["schemas"]["CollectionObservation"][];
+            latest_job?: components["schemas"]["LatestJobObservation"] | null;
+            latest_run?: components["schemas"]["LatestRunObservation"] | null;
         };
         /** PackSpan */
         PackSpan: {
@@ -1913,6 +2245,52 @@ export interface components {
             deadline_elapsed: boolean;
             accepted: components["schemas"]["AcceptedResult"] | null;
         };
+        /** PublicationObservation */
+        PublicationObservation: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "PUBLISHED" | "NOT_PUBLISHED";
+            /** Acceptance Id */
+            acceptance_id: string | null;
+            /** Recorded At */
+            recorded_at: string | null;
+            working_state: components["schemas"]["PublishedStateSummary"] | null;
+            /** Conversation Head Id */
+            conversation_head_id: string | null;
+            /**
+             * Head Relation
+             * @enum {string}
+             */
+            head_relation: "CURRENT" | "ADVANCED" | "NO_ACCEPTANCE";
+        };
+        /** PublishedStateSummary */
+        PublishedStateSummary: {
+            /**
+             * Snapshot Id
+             * Format: uuid
+             */
+            snapshot_id: string;
+            /**
+             * Revision
+             * @enum {string}
+             */
+            revision: "conversation-core-v1" | "conversation-state-v2";
+            /**
+             * Source Turn Id
+             * Format: uuid
+             */
+            source_turn_id: string;
+            /** Previous Snapshot Id */
+            previous_snapshot_id: string | null;
+            /** Topic Signal */
+            topic_signal: string | null;
+            /** Active Entries */
+            active_entries: number | null;
+            /** Retired Entries */
+            retired_entries: number | null;
+        };
         /** QueryCreate */
         QueryCreate: {
             /**
@@ -1936,6 +2314,19 @@ export interface components {
             evidence_mode: "auto" | "single" | "compare";
             /** Document Ids */
             document_ids?: string[] | null;
+        };
+        /** ReferenceObservation */
+        ReferenceObservation: {
+            /** Mention */
+            mention: string;
+            /** Start */
+            start: number;
+            /** End */
+            end: number;
+            /** Values */
+            values: string[];
+            /** Sources */
+            sources: components["schemas"]["SourceRef"][];
         };
         /** ReliabilitySignal */
         ReliabilitySignal: {
@@ -2152,6 +2543,23 @@ export interface components {
              */
             revision_id: string;
         };
+        /** ServiceObservation */
+        ServiceObservation: {
+            /**
+             * Component
+             * @enum {string}
+             */
+            component: "FastAPI" | "PostgreSQL" | "Redis" | "Celery" | "Qdrant" | "Model gateway" | "LLM provider";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "unavailable" | "not_checked";
+            /** Detail */
+            detail: string;
+            /** Version */
+            version?: string | null;
+        };
         /** SourceCoverage */
         SourceCoverage: {
             /** Requested */
@@ -2177,6 +2585,28 @@ export interface components {
              * Format: uuid
              */
             turn_id: string;
+        };
+        /** StateValue */
+        StateValue: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "topic" | "entity" | "constraint" | "ambiguity";
+            /** Key */
+            key: string;
+            /** Value */
+            value: string;
+            /**
+             * Replaces
+             * @default []
+             */
+            replaces: string[];
         };
         /** StreamEvent */
         StreamEvent: {
@@ -2347,6 +2777,13 @@ export interface components {
             row_header: string;
             /** Column Header */
             column_header: string;
+        };
+        /** TextSpan */
+        TextSpan: {
+            /** Start */
+            start: number;
+            /** End */
+            end: number;
         };
         /** TimelineItem */
         TimelineItem: {
@@ -3730,6 +4167,26 @@ export interface operations {
             };
         };
     };
+    operations_v1_runtime_operations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationsObservation"];
+                };
+            };
+        };
+    };
     create_v1_conversations_post: {
         parameters: {
             query?: never;
@@ -3985,6 +4442,102 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": components["schemas"]["ConversationEvent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    runs_v1_runtime_conversation_runs_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationRunSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inspection_v1_conversations__conversation_id__runs__run_id__inspection_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationRunInspection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    context_v1_conversations__conversation_id__runs__run_id__context_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContextObservation"];
                 };
             };
             /** @description Validation Error */

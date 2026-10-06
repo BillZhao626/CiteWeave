@@ -102,6 +102,16 @@ export function PdfEvidence({ citation }: { citation: Citation }) {
       <p className="version-meta">
         引用 {citation.label} · PDF 第 {initial + 1} 页 · 固定来源版本
       </p>
+      <div className="evidence-chain" aria-label="引用来源链">
+        <span className="selected-citation">{citation.label}</span>
+        <span>引用</span>
+        <span>→</span>
+        <span>原文片段</span>
+        <span>→</span>
+        <a href={citation.content_url} target="_blank" rel="noreferrer">
+          打开原始 PDF ↗
+        </a>
+      </div>
       <blockquote>{citation.span.quote}</blockquote>
       <details className="source-details">
         <summary>来源与版本详情</summary>
@@ -110,6 +120,10 @@ export function PdfEvidence({ citation }: { citation: Citation }) {
           <span className="block-id" title={citation.evidence_id}>
             EvidenceSpan {citation.evidence_id}
           </span>
+        </p>
+        <p className="version-meta">
+          字符 {citation.span.start_offset}–{citation.span.end_offset} · 第{" "}
+          {initial + 1} 页
         </p>
       </details>
       <div className="pdf-toolbar">

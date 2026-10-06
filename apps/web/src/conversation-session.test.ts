@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "./api";
 import {
   ConversationSession,
+  type ConversationTrace,
   type ConversationTransport,
   type PublicRun,
 } from "./conversation-session";
@@ -58,6 +59,69 @@ function setup() {
 }
 
 describe("durable conversation session", () => {
+  const existingId = "0cd279c0-86ba-4aa1-92fe-345fd68d2d3b";
+  const existingRun = "a3d929df-4a7c-452a-a59c-94c4a67df556";
+  function existingSetup() {
+    const fixture = setup();
+    const accepted = {
+      ...fixture.accepted,
+      id: existingRun,
+      conversation_id: existingId,
+    };
+    vi.mocked(fixture.api.conversation).mockResolvedValue({
+      ...conversation,
+      id: existingId,
+    });
+    vi.mocked(fixture.api.run).mockResolvedValue(accepted);
+    vi.mocked(fixture.api.trace).mockResolvedValue({
+      run_id: existingRun,
+      conversation_id: existingId,
+      scope,
+    } as ConversationTrace);
+    return fixture;
+  }
+  it("reopens durable identities using GET only and restores without a creation key", async () => {
+    const { session, api, storage } = existingSetup();
+    await session.openExisting(existingId, [existingRun]);
+    expect(session.getSnapshot().runs[0].status).toBe("ACCEPTED");
+    expect(session.getSnapshot().hasIdentity).toBe(true);
+    expect(session.getSnapshot().versions).toEqual(["v1"]);
+    expect(storage.getItem()).not.toContain("Which receiver?");
+    const restored = new ConversationSession("kb", storage, api);
+    await restored.start();
+    expect(restored.getSnapshot().conversation?.id).toBe(existingId);
+    expect(api.create).not.toHaveBeenCalled();
+    expect(api.submit).not.toHaveBeenCalled();
+  });
+  it("rejects inaccessible or mismatched source scopes without publishing a partial read", async () => {
+    const { session, api } = existingSetup();
+    vi.mocked(api.trace).mockRejectedValueOnce(
+      new ApiError(404, "run_not_found"),
+    );
+    await session.openExisting(existingId, [existingRun]);
+    expect(session.getSnapshot().conversation).toBeUndefined();
+    expect(session.getSnapshot().runs).toEqual([]);
+    vi.mocked(api.trace).mockResolvedValue({
+      run_id: existingRun,
+      conversation_id: existingId,
+      scope: { ...scope, kb_id: "other-kb" },
+    } as ConversationTrace);
+    await session.openExisting(existingId, [existingRun]);
+    expect(session.getSnapshot().runs).toEqual([]);
+    expect(api.create).not.toHaveBeenCalled();
+    expect(api.submit).not.toHaveBeenCalled();
+  });
+  it("does not replace an unresolved submission journal when opening another Conversation", async () => {
+    const { session, api, storage } = setup();
+    await session.start();
+    vi.mocked(api.submit).mockRejectedValueOnce(new TypeError("lost"));
+    await session.submit("question", scope);
+    const before = storage.getItem();
+    await session.openExisting(existingId, [existingRun]);
+    expect(storage.getItem()).toBe(before);
+    expect(session.getSnapshot().notice).toContain("先确认当前提交");
+    expect(api.submit).toHaveBeenCalledTimes(1);
+  });
   it("fails closed before dispatch when the recovery journal cannot be saved", async () => {
     const { api } = setup();
     const storage = {

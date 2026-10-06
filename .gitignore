@@ -25,6 +25,11 @@ coverage/
 /output/
 /tmp/
 /apps/web/public/pdfjs/
+/apps/web/public/benchmarks/
+
+# One-off local portfolio builders and evidence reports, preserved for later integration.
+/scripts/build_product_portfolio.py
+/docs/PRODUCT_PORTFOLIO_RECONSTRUCTION.md
 
 # Private local audits and historical machine-specific reports.
 /docs/scope_audit_20260917/

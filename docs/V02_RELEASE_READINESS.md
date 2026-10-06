@@ -1,5 +1,7 @@
 # CiteWeave v0.2.0 — Release Readiness
 
+This is the historical preparation and review record for the published [v0.2.0 release](https://github.com/BillZhao626/CiteWeave/releases/tag/v0.2.0), which pins `5885d6323c459e5b91f81bf5f90c5ca46197d0c8`. The candidate, pending-review and not-yet-created statements below describe their original record time; the historical verification narrative is preserved. Current `main` contains ongoing Unreleased improvements after v0.2.0. Current installation and architecture are documented in [Quickstart](QUICKSTART.md) and [Architecture](ARCHITECTURE.md).
+
 Status: **REVIEWED RELEASE CANDIDATE — Human PR review pending**. Owner separately authorized review, logical commits, feature push and PR. Merge/auto-merge, tag and release remain outside this task.
 
 ## Candidate and release identity

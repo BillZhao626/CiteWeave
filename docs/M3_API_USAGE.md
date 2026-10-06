@@ -1,5 +1,7 @@
 # M3 API
 
+This document preserves the historical single-turn query/evaluation API examples and profile identities. Current Conversation/Turn/Run and read-only inspectors are described in [Current API](API.md); installation and runtime authorization are defined in [Quickstart](QUICKSTART.md).
+
 Current API version `0.2.0`. [Generated OpenAPI](../contracts/openapi.json) defines schemas, constraints and errors; `/docs` serves the running API. Authenticate with the local workspace Bearer token or same-origin HttpOnly session cookie. Keep provider credentials server-side. [M1 upload/SSE examples](M1_API_USAGE.md) and [M2 governance endpoints](M2_API_USAGE.md) remain applicable.
 
 | Operation | Contract |

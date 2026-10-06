@@ -1,189 +1,102 @@
 # 架构与职责
 
-当前源码为 `0.2.0` 发布候选，基于合并 PR #19 `80796e56d98631071ce87333339a13e3cbf40067`。M1 / M2 / M3 是该基线已有实现；发布验证见 [Release Readiness](V02_RELEASE_READINESS.md)。
+本页描述 `main` 的当前实现。最新正式发布为 `v0.2.0`；发布后的改进尚未形成新版本。API 与包元数据保持 `0.2.0`。安装见[快速开始](QUICKSTART.md)，路由与类型见[API](API.md)。
 
-[运行可靠性](V02B_RUNTIME_RELIABILITY_M1.md) / [ADR0023](adr/0023-runtime-reliability-and-recovery.md)覆盖幂等准入、有限安全 retry、UNKNOWN no-redispatch、取消、owner/fence/head/deadline 及原子 Acceptance。默认 Conversation runtime 仍 unavailable，没有安装 live policy；恢复显式人工执行，不自动派发。
-
-[可观察性与恢复](V02B_OPERATIONAL_OBSERVABILITY_M2.md) / [ADR0024](adr/0024-operational-trace-and-recovery-inspection.md)复用持久 Run events 和认证 Trace，记录有界 timeline、阶段/fence、错误分类、可用耗时和安全 usage/estimate。Alembic `0014` 添加两个 nullable event 字段，不回填。`scripts/reconcile_conversations.py --inspect` 只读、workspace-scoped；同步会话不使用 Redis/Celery。
-
-[并发/性能](V02B_CONCURRENCY_PERFORMANCE_M3.md) / [ADR0025](adr/0025-acceptance-evidence-session.md) / [ADR0026](adr/0026-shared-conversation-scope-readers.md)中，Acceptance 将现有 Session 传给 `StructuralRepository` / `citation_for`，避免递归借连接；只读 KB/Document/Version scope guard 使用 `FOR SHARE` 到 commit，仍阻止非 key 来源修改，Conversation 与 catalog writer 保持独占锁。scope/current-version/owner/fence/deadline 与事务归属不弱化。冻结 HTTP/PG synthetic benchmark 与真实小型 Qdrant Profile B 分开；不是生产容量或真实模型吞吐。
-
-CiteWeave 使用 React + TypeScript 工作台和 FastAPI API。v0.1 单轮查询通过 SSE 返回草稿及最终结果，v0.2a 会话 UI 读取持久 Run/result（其 SSE endpoint 仅为有限快照）；文档摄取交给异步 worker。前端类型由 Pydantic / OpenAPI 生成。
+## 查询与会话
 
 ```mermaid
 flowchart LR
-    PDF[官方或原创 PDF] --> Blob[内容寻址 BlobStore]
-    Blob --> Parse[结构解析 Section / Clause]
-    Parse --> Parent[Parent / RetrievalChild / EvidenceSpan]
-    Parent --> Index[Qdrant Dense + BM25]
-    Ask[React Ask] --> API[FastAPI / SSE]
-    API --> Query[Query Runtime]
-    Index --> Query
-    Query --> RRF[RRF]
-    RRF --> BGE[BGE Reranker]
-    BGE --> Pack[有界 EvidencePack]
-    Pack --> Model[DeepSeek]
-    Model --> Validate[最终引用校验]
-    Validate --> View[Citation → Evidence → PDF]
-    Blob --> View
+    UI[React Workspace] --> API[FastAPI]
+    API --> Run[Conversation / Turn / Run]
+    Run --> History[有界历史与有效 Working State]
+    History --> Context[Context Interpretation]
+    Context --> Retrieval[Dense + BM25]
+    QD[(Qdrant)] --> Retrieval
+    Retrieval --> RRF[RRF]
+    RRF --> BGE[BGE rerank]
+    BGE --> Pack[Current EvidencePack]
+    Pack --> Model[授权的 LLM generation]
+    Model --> Validate[Citation / 原文校验]
+    Validate --> Accept[Atomic Acceptance]
+    Accept --> PG[(PostgreSQL)]
+    PG --> Trace[Durable Run / Trace]
+    Trace --> UI
+    PG --> History
 ```
 
-## 数据归属
+React 19 / TypeScript / Vite / Router / TanStack Query 工作台通过 Pydantic/OpenAPI 生成的类型访问 FastAPI。SQLAlchemy 2 管理 Session 与事务；Alembic 管理持久 schema。
 
-| 组件 | 责任 | 边界 |
-| --- | --- | --- |
-| PostgreSQL | 文档版本、Run / Job、状态与期限、执行记录、持久化元数据 | 不作为向量召回引擎 |
-| Qdrant | 带类型与版本约束的可重建 Dense / BM25 检索索引 | 不作为业务生命周期的唯一真相或 PDF 备份 |
-| Redis | Celery 任务通知传输 | 未验证为通用生产缓存 |
-| Celery | 异步解析、编码、写索引；业务状态回写 PostgreSQL | 未验证为通用生产评测 worker |
-| LocalBlobStore | 不可变原始 PDF 与 canonical artifacts | 未部署云对象存储 |
+Conversation 保存 workspace、固定文档范围及已接受 head；Turn 保存不可变原始请求；Run 表示执行尝试。客户端使用稳定 `Idempotency-Key`，重复请求恢复同一身份。Acceptance 在一笔事务中发布结果、下一轮状态、Conversation head 与 Run 终态。对外结果有 `documentary_answer`、`clarification`、`evidence_insufficient` 三种，不把草稿作为最终答案。
 
-查询以 Child 召回，使用 E5-small 编码、BM25 与 RRF（k=60）融合，再由 bge-reranker-v2-m3 精排。Parent 扩展保留来源，并受证据数量与 token 预算约束。EvidencePack 将 seed、heading、sibling 等来源关联到原始 span。最终引用指向 EvidenceSpan 身份，不是临时检索排名。
+会话 SSE 是一次有界持久快照；UI 通过 Run/result GET 读回恢复状态。旧单轮查询 API 的 SSE 仍区分 provisional delta 与校验后的 final；流已返回 HTTP 200 并不保证后续生成成功。
 
-文档、版本、解析器及来源哈希固定后才能绑定可检查的证据。PDF.js 使用保存的页码与几何位置高亮原始文件。结构页不通过临时重新解析覆盖已有证据；旧 Run 保留原 profile 与来源身份。
+### History、State 与当前 Evidence
 
-## 任务与查询
+生产历史读取仅投影已接受身份、原始请求、scope、关系与版本化 State，不把旧 answer、Citation、EvidencePack 或 PDF geometry 带入解释输入。完整持久结果仍保留，投影不截断问题或改写已接受记录。
 
-摄取任务先持久化，再经 Redis 通知 Celery；worker 的状态转换和索引发布受持久状态约束。索引只在 READY 提交后对查询开放。重试、取消、超时与不确定提供商结果有显式记录；实现中存在保护不等于每种生产故障均经过验证。
+近期分支与匹配分支提供有界待检查来源；解释模型显式声明 Relevant History，再由应用验证精确 Acceptance/Turn 身份、完整纠正关系、scope、State 来源和继承事实。Recent History 的候选资格不等于相关性；候选中的未选来源也不自动进入生成。当前没有公开的数值历史权重。
 
-当前产品验证覆盖真实检索、DeepSeek 问答、引用到 PDF 和独立样本的异步摄取成功路径。评测调度和恢复的实现可供阅读，但不能由摄取测试推出生产评测 consumer 已验证。
+指代或省略使用原始问题中的准确 mention 与已授权来源值形成查询；歧义走澄清路径。Working State 只包含实际继承、仍有效且在当前范围内的结构化状态，允许真实为空。较旧来源仍受原有匹配条件与扫描上限约束，未声明无限历史语义召回。
 
-## 历史实现增量记录
+解释之后重新执行当前文档检索。History/State 提供意图，Current Evidence 支持回答，两者使用不同类型与校验边界。无当前引用时发布证据不足结果，并跳过 generation。
 
-以下保留当时审阅、执行和计数；其中“当前”仅指该历史阶段。当前实现与运行权限以上文及 HANDOFF 为准。
+### 检索与引用
 
-Provider-free residual closure adds [wire v6](adr/0018-residual-runtime-normal-form.md): strict singleton active-State references and a unique validated older-task normal form in the evaluation path. Existing ambiguity/core/provenance checks and generation prompt remain authoritative. RC Human truth is22 PASS/two residuals; a fresh paid grant is required for new semantic outputs. Shared schema/Acceptance,0012,History N/C/K/ranking and Evidence/Citation authority remain unchanged.
+结构化检索以 RetrievalChild 召回，使用 multilingual-e5-small Dense、BM25 与 RRF 融合，再由 bge-reranker-v2-m3 精排。Parent 扩展保留来源，EvidencePack 受证据数量与 token 预算约束。引用最终绑定 EvidenceSpan 身份和不可变文档版本，不绑定临时排名。
 
-Authorized isolated RC validation uses [wire v5 narrow closure](adr/0017-rc-narrow-closure.md): explicit supported-origin metadata and inherited-subject/same-task-selection instructions, with unchanged strict v4 validation. A separately versioned generation prompt adds proposition polarity consistency. Shared schema/Acceptance, retrieval/ranking, evidence authority and provider accounting remain unchanged; real semantic quality awaits external Human review.
+生成结果先校验引用标签，再在 Acceptance 事务内核对授权版本、EvidencePack、原文区间与来源身份。PDF.js 使用已保存的页码与几何位置定位原始 PDF。旧 Run 保留其配置和证据身份，不通过重新解析覆盖旧 span。物理引用校验不独立证明自然语言答案的语义支持。
 
-Authorized isolated DEV uses [P0-anchored reconciliation v4](adr/0016-selective-runtime-reconciliation.md), with explicit entity mode and resolution into the existing validator/reducer. Shared schema/Acceptance, documentary authority and generation policy are unchanged; new semantic outputs need external Human review.
+## 摄取与索引发布
 
-Authorized isolated DEV interpretation now uses [wire v3 stabilization](adr/0015-interpretation-runtime-stabilization.md): unique bookkeeping normalization, explicit head context and existing correction mapping. Shared Acceptance/schema0012/retrieval/EvidencePack/generation policy are unchanged; semantic review remains pending. Public runtime availability is unchanged.
+```mermaid
+flowchart LR
+    Upload[PDF Upload] --> API[FastAPI]
+    API --> Blob[LocalBlobStore]
+    API --> Job[PostgreSQL Job / DocumentVersion]
+    Job --> Redis[Redis]
+    Redis --> Worker[Celery]
+    Blob --> Worker
+    Worker --> Parse[Parse / Chunk]
+    Parse --> Encode[Encode / Index]
+    Encode --> QD[(Qdrant)]
+    QD --> Ready[PostgreSQL READY commit]
+    Blob --> View[Evidence / original PDF]
+```
 
+逻辑 Document 与不可变 DocumentVersion 分开。摄取 Job 先写入 PostgreSQL，再经 Redis 通知 Celery；worker 解析、分块、编码和写索引，并以持久尝试身份隔离外部写入。只有 durable READY 提交完成后，查询才可使用该版本索引。失效尝试不能发布为当前有效版本。
 
-
-### 历史任务：#5c-2 单次授权真实 smoke 已通过，待 Human Implementation Review
-
-accepted baseline 为 `01858bf`（PR #14）。此前累计授权存储阻塞已由 Human Review 显式批准的一次 additive `0011` 迁移解决。下方 #1–#5c-1 节是历史增量记录；当前状态以本节和 [HANDOFF](../HANDOFF.md) 为准。
-
-`cw5_runs` 保存不可变的授权身份、到期时间、calls/input/output/CNY 总上限；无授权为零权限，旧数据不回填授权。ProviderPhase 继续作为唯一调用账本，不复制生命周期。prepare 与 dispatch 均在 Conversation 锁内检查累计占用及 owner/fence/head/scope/DB deadline；UNKNOWN 保留占用，usage 超额阻止继续调用。详见 [ADR 0011 扩展](adr/0011-conversation-provider-ledger.md#5c-2-approved-aggregate-authorization-extension)。
-
-默认仍为 unavailable/fail-closed。显式服务器配置 `CW_CONVERSATION_RUNTIME_POLICY` 指向 RuntimePolicy JSON，`CW_CONVERSATION_TOKENIZER` 指向 hash 校验的官方离线 tokenizer。policy 绑定 workspace/Conversation/Admission、绝对 Run/授权期限、总限额、各 phase 限额、history scan/statement 和 context bytes；没有默认正数生产预算，没有 public grant API，也未安装 live policy。需要本地模型授权与已有网关配置。所有配置缺失、身份不符或过期均不得派发。
-
-ProductionRuntime 连接 Public Turn → durable admission → 有界 PG History/State → guarded Interpretation → 原 StructuralEvidenceRetriever → Context/EvidencePack → 原 DeepSeekProvider → citation validation → atomic Acceptance。RuntimeHistoryRead 以显式 scan/statement 上限、PG 时间、scope/head/fence 检查准入，保持既有 Recent A/Relevant B、State 和 correction-chain 选择语义。semantic HistoryQuery 仍是服务器显式输入；没有新增启发式信号抽取。Interpretation 使用模型结构化结果或绑定准确请求的 reviewed draft，再走既有守卫；CLARIFY bypass 不派发生成为答案。首烟测选择 reviewed USE_ORIGINAL，并非自动识别所有自包含问题。
-
-请求只有受支持的 system/user 纯文本形态。`provider_accounting.py` 用固定官方 V4.1 tokenizer/framing 计量完整消息，拒绝特殊 token literal 和未支持 controls；对实际发送的序列化字节求 hash，峰值 cache-miss 成本由 `costs.py` 计算。E5/BGE 数不是计费数，离线计量不是 provider usage。gateway 复用原 transport，在 HTTP 前提交 DISPATCHED；此路径 max_attempts=1。超时/丢失结果保持 UNKNOWN；实际 usage/request ID/result hash 保留，Acceptance 是唯一有效答案，没有新付费自动重试。
-
-最终离线后端 359、前端 41；真实隔离 PostgreSQL/Qdrant 合并 146；Chromium 3 通过，详细命令/重叠计数见 HANDOFF。REAL_QDRANT VERIFIED 仅覆盖原创合成 fixture + 真实本地 E5/BGE，不证明生产数据或语义质量。应用数据库未升级。公开 API 及 retrieval/ranking/EvidencePack 语义不变；仅内部授权 schema/接线扩展。Owner 已确认 CNY 并授权的单次真实 generation 已完成：provider generation = 1，Interpretation/Judge = 0，retry = 0；DEV/HARD/REG NOT_RUN；#5d NOT_STARTED；v0.2a NOT_COMPLETE。该单次授权已消耗，后续调用仍须另行授权。
-
-当前发布状态：**Production Runtime real smoke VERIFIED**；real provider generation: **1 call**；usage: **306 input / 11 output / 317 total**；**finish_reason=stop**；estimated non-peak cost under pinned rate: **0.00035000 CNY**；**actual provider billing amount NOT independently verified**。Citation and atomic Acceptance succeeded；no retry / Interpretation / Judge call；**REAL_QDRANT VERIFIED；semantic quality evaluation still NOT_RUN；DEV/HARD/REG NOT_RUN；#5d NOT_STARTED；v0.2a NOT_COMPLETE**。Human Review 已接受本次接线烟测，当前仅发布一个实现 commit/PR 供代码审阅，不扩大运行授权。
-
-真实 smoke 保持原请求 hash、306-token 离线输入计量、1024 输出硬上限与 0.008804 CNY 最大预留；provider 实报输入 306、输出 11、总计 317、cache hit 0 / miss 306，finish reason stop。按固定 revision 的非高峰价格精确估计 0.00035000 CNY，未声称拿到实际扣款。既有 ProviderPhase 持久化 COMPLETED/known、request ID/usage/cost/result hash/timestamps；既有 ProviderEvent 记录烟测 finish reason。Citation 校验及原子 Acceptance 成功，head 仅前进一次，Acceptance 将 Conversation fence 从 1 增至 2；完成在绝对期限前，无 stale/late writeback。真实隔离 PG 的独立读回已通过。只证明接线，不证明语义质量。持久烟测数据库保留供审阅；请求、账本身份、时刻及局限见 [HANDOFF](../HANDOFF.md)。本次执行无需产品代码修复，也没有重跑无关广泛测试。
-
-### 历史增量：#5c-1 Durable Provider Ledger / Recovery
-
-在 accepted main `3502981`（#5b）上，Product Owner 单独批准的 #5c-1 只实现 provider 账本与恢复基础设施；Human Implementation Review pending。此前各节描述对应增量当时的边界，本节为当前计量/恢复状态。**#5c-2 runtime 接线与 #5d 均 NOT_STARTED；默认生产 runtime 不可用，production history 仍 fail-closed。**
-
-Alembic `0010` 为既有 `cw4_provider_phases` 增加 nullable Conversation Run 外键、provider/model/price revision、单次调用授权 ID/期限/input-output caps、prompt revision 和 request hash。复用原 phase/attempt、owner/fence、reservation、usage/cost/result identity；不新增账本、不伪造 QueryRun，也不在 `cw5_runs` 重复存调用计量。条件约束禁止 Conversation 与 QueryRun/Eval 混合归属，保留旧 Eval+Query 合法组合；每 Run/purpose 一个 phase，授权 ID 唯一，数据库 trigger 阻止身份/价格/授权追溯修改。
-
-`conversation_provider.py` 在短事务中先锁 Conversation，校验 workspace/scope/head/owner/fence/PG deadline，再写 phase；flush 后再验期限。PREPARED 与 DISPATCHED 分开，后者必须先 commit 才可能由未来 runtime 发出外部请求；重复 dispatch 明确失败。当前模块没有 transport/runtime 调用。成功/不确定观察保留 provider usage、request ID、result hash；缺值不补造。费用复用 `costs.py` 的固定 revision 和 dispatch 时间，只是估计，非实扣账单；单次显式授权不替代后续累计预算策略。
-
-过期 ADMITTED 无可能执行的 provider 派发时进入 INTERRUPTED；直接观测到的确定未执行拒绝同样可安全恢复。DISPATCHED/UNKNOWN 或已有 provider 响应但尚无 Acceptance 时保守进入 UNKNOWN，禁止普通 retry；已 ACCEPTED 不被 reconciliation 改写。未决 phase 不能被接受或隐藏成可重试失败，同 Run 后续 phase 也不能继续派发。既有来源/Citation/head/fence 原子接受不弱化，无自动重发、后台恢复或 provider-specific reconciliation。详见 [ADR 0011](adr/0011-conversation-provider-ledger.md)。
-
-验证使用 UUID 隔离 PG、原创 synthetic receipts 和 mocked transport，旧 Query/Eval 回归保持有效；实际计数见 [HANDOFF](../HANDOFF.md)。没有迁移配置中的应用 DB，没有启动服务/修改 Qdrant 或 RAGFlow。**provider/model/Judge calls = 0；monetary exposure = 0 CNY；REAL_QDRANT NOT_VERIFIED；DEV/HARD/REG NOT_RUN；public API/React、retrieval/ranking/EvidencePack 语义不变；v0.2a NOT_COMPLETE。**
-
-### v0.2a 内部 Conversation Core（Implementation #1）
-
-独立授权的持久核心已实现；公开 API 接线见 Implementation #5a，React 会话 UI 见 #5b，真实模型会话执行未开放。PostgreSQL `cw5_conversations / cw5_turns / cw5_runs / cw5_acceptances` 保存会话、不可变原始请求、相关执行尝试和不可变接受记录；v0.1 QueryRun、单轮问答、摄取和证据 reader 不改变。
-
-`conversations.py` 在短事务中锁定 Conversation，检查 workspace/显式 KB 与版本范围、幂等 fingerprint、expected head 和单活动执行。部分唯一索引限制活动 Run；单调 fence、owner 和显式 deadline 阻止迟到接受。同 key 同请求读回原身份，异内容冲突；独立请求 busy/head conflict，不排队或 rebase。显式 retry 保留原 Turn、产生新 Run；UNKNOWN 不重发。
-
-接受记录将已产出的控制结果与仅含来源 Turn/前驱的最小状态快照存为一个 bundle；其 ID 同时是 result/state/head 身份。插入 bundle、推进 head、关闭 Run、释放活动槽在一个事务内完成。最初仅接受 clarification/evidence-insufficient 控制结果；Working State 扩展见 Implementation #2，内部澄清策略见 Implementation #3，documentary answer/Citation 接入见 Implementation #4。读回只判断 PG 真相，显式过期 reconciliation 最多处理一个活动 Run，没有自动续算。
-
-Alembic `0009` 仅增加表/约束，不改写历史迁移或 v0.1 数据；不提供破坏性 downgrade。理由、替代方案和恢复边界见 [ADR 0010 implementation record](adr/0010-conversation-core-storage.md)。离线验证已通过；既有 PostgreSQL 18.1 的独立 UUID 测试库完成 12 项真实 PG 测试，覆盖迁移/旧 reader、并发/幂等/fencing、原子可见性、回滚和回执丢失读回。应用数据库未迁移，实际应用数据兼容性和 backup restore **未验证**，当前计数见 [HANDOFF](../HANDOFF.md)。这不代表 v0.2a 完成或可启动 provider。
-
-### v0.2a Relevant History / Working State（Implementation #2）
-
-`conversation_contract.py` 定义内部 resolved signals / delta / non-Evidence Working State；`conversation_history.py` 实现纯确定性 reducer、完整来源组与选择；`conversation_history_pg.py` 负责 PostgreSQL 读取及有界准入。没有 NLP、关键词/向量检索或模型执行。A 为最近 N=2 个 committed accepted Turns；B 按显式来源、同 task 的 entity+适用约束、task、topic 精确匹配全会话元数据。A 不凭近期性自动入选；任何来源仍须通过当前授权与 scope。
-
-关系按完整连通组展开，精确 Acceptance/Turn 身份去重，保留 correction/dependency 边、原始 request 与 UTF-8 hash；同文异版不合并。优先 mandatory/explicit、correction、entity+constraints、task、topic，同层按稳定来源 ID。每分支最多8组，union C=8、最终 K=2；N/C/K 均为保守实现默认，非测量最优。mandatory 超限、缺失来源或纠正链不完整均显式失败，不裁组；内部结果保留 origins/reasons、union、rejections、cutoff/search_incomplete，可供后续 Trace 使用。
-
-`conversation-state-v2` 在原 acceptance JSONB 中保存 topic/entity/constraint/ambiguity 条目、当前 scope、输入 delta 与前驱身份。每条语义值带 accepted Turn/Acceptance 来源、原 scope、active 状态与后续变更来源。纠正可明确指定整来源或 state item IDs；未纠正项继续继承，已停用项不会因 scope 扩大复活。历史 Turn 的元数据遇到任一纠正后不自动作为活跃 B 匹配；仍可由显式引用/已验证 state 来源恢复完整组。scope 收窄使不适用条目失效，旧快照不修改。持久快照不截断，读取投影最多16项；每组最多8原文成员。Memory 类型不能作为 documentary Evidence。
-
-`accept(..., delta=...)` 在现有锁定事务中验证 delta 的前驱、来源与当前 scope，再由 reducer 产生带本次 Acceptance 身份的快照；result/state/head/Run 保持原子发布。v1 原有记录可读，后续可接受 v2；v2 后禁止 legacy finalize 静默清空状态。未增加迁移、表或新 ADR，沿用 ADR 0007/0008/0010 的职责与 JSON 演进空间。
-
-真实 history query 默认 disabled：协议中的生产扫描/期限绑定仍 DEFERRED。显式 `LocalHistoryRead` 仅开放隔离 UUID 测试库，整库最多512个 acceptance/Turn、1024个 Run，statement timeout 1000ms；这是 L1 资源界，不是产品容量。SQL 候选阶段只物化元数据，按完整组限制四个 B 分支，展开全部依赖后先检查64个来源行上限，再在 PG 物化完整原文；128 KiB UTF-8 history body 门禁在返回客户端前检查；加上授权/锁/准入实测6次往返，低于8次上限。任何搜索、成员、投影或期限超限均 fail closed；不通过分页/refetch 绕过。真实测试覆盖跨窗恢复、scope、原子可见性/回滚、重启及边界；计数和未验证范围见 [HANDOFF](../HANDOFF.md)。无公开 API、前端或现有 Evidence RAG 路径变更；Implementation #3 见下节；v0.2a 未完成。
-
-### v0.2a Interpretation / Rewrite / Clarification（Implementation #3）
-
-`conversation_interpretation.py` 消费现有 `HistorySelection` / Working State，以 typed draft 表示 topic continue/shift/return、当前原文 span 或 accepted 来源的 intent facts、指代候选、歧义、rewrite 和纠正。provider-neutral `Interpreter` 只有显式注入 seam 与确定性 fake；无生产 provider runtime、凭据加载、公开 API 或 prompt。
-
-无结构化草稿且无注入 interpreter 时返回 `interpretation_required`，不以代词正则/关键词判定自足性。草稿明确无依赖且无继承项时 USE_ORIGINAL；多个有效候选（同一 mention 的重复条目先合并）或 unresolved 意图时 CLARIFY；有依赖且全部来源/结构校验通过才 USE_REWRITE。来源必须在选中的完整组内，同会话、当前 scope、精确 Acceptance/Turn；state 来源须匹配当前 active 投影。部分纠正只能绑定明确仍活跃的 item，不能复活已纠正假设。
-
-改写保守限定为完整原问加有来源的补全值，分别保留 original/proposed/selected query；scope 完全一致，显式 critical entity/document/version/time/negation/constraint 项保持。任意自由增删、缺源、范围扩大均失败，不静默改用不安全原文。typed result 返回事实来源、绑定、topic、歧义、结构 guard 结果与 delta hash，供后续 Trace 使用；不保存思维链。**结构校验不能证明自然语言语义保真，Memory 不能证明文档事实**。语义 skip、候选完整性、改写质量仍需后续评测/人审。
-
-复用 `ResolvedConversationDelta` 与现有 reducer。shift 停用旧上下文，return 重验旧来源并停用无关活跃条目；v2 delta 的可选 `topic_relation` 标记区分上下文停用与用户纠正，旧记录缺省为 None。混合 correction + shift/return 草稿明确拒绝，避免将纠正标为可恢复停用。未增加迁移/表/依赖或改变 A/B 选择；旧 v1/v2 可读。澄清仅生成 unresolved ambiguity state，丢弃猜测的 resolved mutations；后续结构化回复可清除歧义。
-
-`accept(..., interpretation=(input, draft))` 在现有事务内再次匹配 durable Turn/head/来源内容/ACCEPTED Run 状态，并重算结果/delta；复用 scope、owner、fence、deadline 和 reducer，原子提交控制结果、状态、head、终态 Run。来源校验是有界精确 ID 读取，不另建 history 搜索。允许已有 externally-produced evidence-insufficient control 承载确认后的 state；解释层自身不执行 Evidence RAG；其后接线及 documentary answer 接受见 Implementation #4。37 个解释离线用例和 8 个新增真实 PG 用例通过；全量及局限见 HANDOFF。生产 history query 仍 fail-closed；完整 durable interpretation Trace 与模型计量未实现；Context Assembler 见 Implementation #4，公开 API 的有限持久字段投影见 #5a，React 会话 UI 见 #5b。
-
-### v0.2a Context Assembler / Evidence RAG（Implementation #4）
-
-`conversation_evidence.py` 提供内部 `GenerationContext` 和 `execute`：admitted Run preflight → 既有 HistorySelection/Working State → Implementation #3 interpretation → 原文/已验证 rewrite → 当前范围的 Evidence RAG → typed assembly → Answer/Citation validation → atomic acceptance。CLARIFY 不检索、不生成文档答案。生产 history read 继续 fail-closed；隔离 L1 显式 permit 是唯一已验证的执行入口。
-
-原问、检索 query、解释元数据、必要完整历史组、活跃且相关的 state 投影、documentary pack 分类型保存。历史只携带原始用户文本和 correction/dependency 来源；不携带历史 assistant answer 或旧 Citation。USE_ORIGINAL 不注入无关历史，已纠正条目不进入活跃投影；Memory 始终只解释意图。完整 pack 不因历史占用而裁剪。显式本地 UTF-8 字节门禁只限制 synthetic 工作量，不替代真实 provider tokenizer/framing/output reserve；超限失败而非伪装证据不足。
-
-`conversation_evidence_pg.py` 复用现有 `capture`、`StructuralRetriever`、Dense/BM25/RRF/BGE、EvidencePack selection 和 `citation_for`，使用当前授权 KB/不可变版本，未改排名、索引、prompt 或选择语义。生成只有显式注入的 provider-neutral seam，测试使用 deterministic fake；空 pack 沿用现有 REFUSAL，不调用生成。原始 v0.1 Ask 和 QueryRun 不变，不为会话伪造提前完成的单轮结果。
-
-`DocumentaryResult` 在现有 acceptance JSON 内保留 Answer/Citation、结构 snapshot、完整 pack 和最小 Trace 身份；无迁移、新表或旧记录改写。提交事务重验来源内容/ACCEPTED Run、scope/版本/document、不可变 build/atom/lineage、pack 文本/标签、当前 Run 和引用身份，再用既有 reducer、head/owner/fence/deadline 检查原子发布 result/state/head/终态 Run/slot。返回 receipt 丢失通过既有 readback 恢复，不自动执行或重试。失败不发布，显式 finish/reconciliation 负责终态处理。
-
-验证标签 `CURRENT_PACK_PHYSICAL_ONLY` 明确只证明引用身份和物理解析，不证明自然语言语义支持。离线、真实隔离 PG + fake retrieval adapters 的实际结果见 HANDOFF；真实 Qdrant、模型答案质量和生产会话能力未验证。另行授权的公开 API 与持久 Trace 投影见 #5a；UI 见另行授权的 #5b；完整 Trace 重建、provider accounting/admission 仍待后续授权，v0.2a NOT_COMPLETE。
-
-### v0.2a Public Conversational API / Durable Trace（Implementation #5a）
-
-`conversation_api.py` 复用现有 `/v1`、Bearer/session workspace 授权、错误 envelope 和 no-store 响应；`conversation_public.py` 只定义版本化 allowlist 投影，不另建会话真相。Pydantic/OpenAPI 是类型来源，`contracts/openapi.json`、`apps/web/openapi.json` 和生成的 TypeScript 同步更新。旧路径与 schema 保持不变。#5a 无新表/迁移或测试专用 HTTP endpoint，React 会话组件见 #5b。
-
-| 方法 / 路径 | 契约 |
+| 组件 | 责任 |
 | --- | --- |
-| POST `/v1/conversations` | `Idempotency-Key` 创建或返回同 workspace 会话，200；无请求体 |
-| GET `/v1/conversations/{conversation_id}` | 当前 head、active Turn/Run 身份；不包含历史内容 |
-| POST `/v1/conversations/{conversation_id}/turns` | `Idempotency-Key` + `{question, scope: {kb_id, version_ids}, expected_head}`；expected_head 必填，初始为 null；返回稳定 Conversation/Turn/Run 身份与状态 |
-| GET `/v1/conversations/{conversation_id}/runs/{run_id}` | 该 Run 的持久状态及其 accepted bundle（如有）；不触发执行 |
-| GET `…/runs/{run_id}/result` | 该 Run 已原子接受的结果；尚无结果返回 409 `conversation_result_unavailable` |
-| GET `…/runs/{run_id}/trace` | `conversation-trace-v1`，已持久化的结构化身份/结果描述 |
-| GET `…/runs/{run_id}/events` | `text/event-stream`，有限 durable snapshot，不订阅未来阶段 |
+| PostgreSQL | 文档版本、Job、Conversation/Turn/Run、Acceptance、期限、授权计量与持久 Trace；业务权威 |
+| Qdrant | 带类型、版本及尝试约束的可重建 Dense/BM25 索引 |
+| Redis | 可恢复的 Celery 任务通知传输 |
+| Celery | 异步解析、编码、写索引；状态回写 PostgreSQL |
+| LocalBlobStore | 内容寻址原始 PDF 与 canonical artifacts |
+| 本地 E5/BGE gateway | 编码与精排；独立于计费生成提供商 |
 
-Turn DTO 直接转换为 Core Admission，复用原 scope 规范化与 fingerprint；不清理/截断原问。Core `admit_once` 在既有事务内区分首次准入/幂等重放，相同 key+请求返回原身份，改变请求、过期 head 或第二活动 Turn 为 409；授权/scope/跨会话访问按既有 404 边界处理。新的 `read_run_id` 复用原授权读回事务；不新增 route 层并发规则。服务器执行 owner/deadline 不接受客户端输入。
+同步 Conversation 查询不使用 Redis/Celery。当前实现使用 LocalBlobStore；没有部署云对象存储。
 
-默认 `UnavailableRuntime` 对新授权提交返回 503 `conversation_runtime_unavailable`，事务不创建 Turn/Run；生产 history query 仍 DEFERRED/fail-closed。显式注入的 provider-neutral runtime 只有 `prepare`（锁内本地、无副作用的执行身份/期限供应）与 `execute`（准入 commit 后调用现有执行/接受边界），没有默认模型、token/time/cost 假设或后台工作架构。测试使用隔离 L1 的确定性 runtime。运行时只有新准入调用一次；重放即使默认 runtime 不可用也可恢复原身份，不重执行。Pending 为 202，终态读回为 200。执行异常返回去敏 503 `conversation_runtime_outcome_unavailable`，不推断 FAILED/UNKNOWN、不自动重发：重放 key/Run readback 恢复 durable truth；现有显式 finish/reconciliation 负责失联后的 lifecycle。
+## 可靠性与并发
 
-结果为 `conversation-result-v1` discriminated union：clarification、evidence_insufficient、documentary_answer。文档答案只输出当前 accepted text、已有 Citation（exact span、版本、PDF locator/content URL）与 snapshot 中 document/version 绑定；不输出内部 Answer 的 prompt/usage/provider 信息。failed/old attempt 即使同一 Turn 后续 retry 成功，也不将后者标为前者的结果；head 与 attempt 是不同身份。
+持久准入、ProviderPhase 授权计量与执行状态绑定精确请求、owner/fence、head、scope 和绝对期限。安全 retry 有限且要求已知未执行证明；不确定提供商结果保留 UNKNOWN 与预算占用，不自动重派。取消、恢复和完成按事务顺序竞争，过期结果不能越过发布检查。恢复工具显式执行 reconciliation，不调用提供商。
 
-Trace 公开原问、scope、Conversation/Turn/Run/retry、输入 head、accepted/output-state bundle ID、状态和已存时间；documentary bundle 额外公开已存解释 mode/hash/selected query、History SourceRef、输入 state item ID、retrieval profile、document/version、pack hash、Evidence/Citation 身份与物理验证结果。无历史原文、state 值、隐藏思维链、私有 prompt、原始 provider payload、凭据或另一个 workspace 的内容。所有字段从已授权 durable readback 投影，不重新解释/检索。控制 bundle 的解释/检索字段为 null（`metadata_availability=control_bundle`）；未接受为 `no_accepted_bundle`。这些缺失并不表示没有尝试过该阶段。失败类别/完整解释输入/阶段计量未持久化则不补造，不为有限 Trace 改 schema。`CURRENT_PACK_PHYSICAL_ONLY` 不证明 semantic entailment，`semantic_support=NOT_ASSESSED`。
+执行允许至少一次，保证有效结果幂等；不声明物理投递恰好一次。取消会阻止失效发布，但不能保证停止上游计算。详见[可靠性](V02B_RUNTIME_RELIABILITY_M1.md)与[可观察性及恢复](V02B_OPERATIONAL_OBSERVABILITY_M2.md)。
 
-SSE 复用 `data: <JSON>\n\n`，`conversation-event-v1` 封装 lifecycle（Run snapshot）和存在时的 result（accepted bundle）。一次 GET 读取同一授权快照，发出一或两条事件后关闭；无 provisional draft、订阅/重放日志或 Last-Event-ID 保证。断线不取消执行；用 Run/result 或再次 GET events 重连读回。PG commit 前没有 final/partial documentary Trace 可见，HTTP reader 沿用 Core 锁得到一致结果。
+Acceptance 将已有 SQLAlchemy Session 传给证据与 Citation 读取，避免同一 Transaction 递归 checkout 耗尽 Connection Pool。知识库、Document 与 DocumentVersion 的只读来源检查使用 PostgreSQL `SELECT … FOR SHARE` 到事务结束，使读者可重叠，同时阻止冲突来源修改；Conversation 与 catalog writer 仍使用独占锁，提交前仍检查 owner/fence/head/deadline。
 
-实际隔离 PG、API、v0.1/#1–#4 回归与生成类型检查见 [HANDOFF](../HANDOFF.md)。**provider/model/Judge calls = 0；DEV/HARD/REG NOT_RUN；REAL_QDRANT NOT_VERIFIED；real provider/accounting、#5c NOT_STARTED；v0.2a NOT_COMPLETE。** 本增量不改变检索/ranking/prompt/EvidencePack/offsets，也不声称真实会话 runtime 已可用。另行授权的 React 会话 UI 见下节。
+指定本地合成 HTTP/PostgreSQL 工作量在并发 5 时，p95 由 2824.3 降为 1943.7 ms，成功吞吐由 1.919 升为 2.925 workflow/s。模型、检索和提供商响应是合成的；单独的小型真实 Qdrant 测量使用原创三条数据与合成二维 embedding。完整方法、失败分母、共享主机影响与复现步骤见[并发测量](V02B_CONCURRENCY_PERFORMANCE_M3.md)。这些观测不定义生产容量。
 
-### v0.2a React Conversational Product Surface（Implementation #5b）
+## 检查页面与可用性
 
-`workspace.tsx` 在现有知识库 Ask 工作台中提供会话/单轮选择；旧 `?run=` reader 继续走单轮路径。复用文档上传/选择、生成 API 类型、现有 Button、Citation token 解析和 `PdfEvidence`。`conversation-panel.tsx` 显式显示下一 Turn 的文档版本范围、原始问题、持久 Run 状态和三种已接受结果。clarification 可在下一 Turn 自然回复，evidence_insufficient 不显示文档引用；documentary_answer 的 Citation 绑定其自身不可变版本、exact span 和 content URL。切换范围/追问不会把旧引用重定向到新文档；物理定位语义不变。
+- Run/Trace Inspector 从认证、固定版本检查后的持久记录读取生命周期、阶段诊断、可用耗时与安全计量。
+- Publication Inspector 显示实际 Acceptance、已发布 State 摘要及当前 Conversation head。后续 head 已前进时，旧 Acceptance 仍保留原身份。
+- Context Inspector 将持久查询、使用来源与当前证据和可选观察细节分开。细节仅在本地记录与 durable provider phase 请求／响应哈希、当前 request/scope/head、各源 Acceptance/Admission 及解释指纹一致时展示；缺失或不一致分别标注 `NOT_RECORDED` / `UNVERIFIABLE`，不会推测为空输入。候选分支与近期归属仅来自本地观察，未作为独立持久事实保存。
+- Operations 使用有界认证读取及可用的服务探测，展示当时可观察状态；不会进行 LLM 健康调用。检查页面不授予执行权限，也不自动恢复或重派。
 
-`conversation-session.ts` 管理请求与读回，不成为第二套会话真相。每个有意 create/submit 先保存稳定 key，再发送；sessionStorage 仅保存本标签页当前 Conversation/已知 Run 身份、明确选择的版本和未确认请求（原问题/scope/expected_head/key）。结果和当前 head 每次由公开 Conversation/Run/Trace GET 获取；提交成功后也重新读取 head。无 mount/effect 自动提交；同步操作锁避免双击/StrictMode 重复发送。网络丢失/503 保留同 key 同 body，先读回，再由用户显式恢复；已有 Run 只读回，不重 dispatch。409 刷新状态，下一次提交须新的有意操作，不自动 rebase。存储写失败阻止发送；授权读回失败时移除可使用的缓存结果/head。
+默认 Conversation runtime 未配置执行授权。真实生成需要服务器端精确 policy、校验过的官方离线 tokenizer、有限调用/token/CNY/期限额度、本地模型与提供商 Key。配置缺失、过期或身份不符均 fail-closed。`/health/ready` 只表示持久 API 可读与启动迁移完成。
 
-ADMITTED 只表示后端已准入，UI 不猜测检索/生成阶段，也不把 HTTP 503 当作 FAILED。每次进入 pending 观察期最多三次自动 GET（空闲时相隔三秒），之后手动刷新；终态按后端 ACCEPTED/FAILED/CANCELLED/INTERRUPTED/UNKNOWN/STALE 展示。`/events` 仍是有限持久快照，本 UI 使用 GET 读回，不引入 token streaming、Last-Event-ID、订阅、事件日志或断线取消。当前 API 没有历史枚举；刷新只恢复本标签页已知 Run，不能恢复其他浏览器的完整历史。新会话不删除原有服务端记录。
+## 实现入口与历史记录
 
-Trace Inspector 是答案后的次级 disclosure，只显示 conversation-trace-v1 已公开的身份、原问/scope、状态/时间、解释模式、选定 query、文档/版本及 Evidence/Citation/validation 等字段。null 显示“未记录 / 不可用”，不推导 CLARIFY、阶段耗时、失败原因或费用。`CURRENT_PACK_PHYSICAL_ONLY ≠ semantic support`，语义评估保持 `NOT_ASSESSED`。
+当前实现入口：[`conversation_runtime.py`](../src/citeweave/conversation_runtime.py)、[`history_relevance.py`](../src/citeweave/history_relevance.py)、[`conversation_history_pg.py`](../src/citeweave/conversation_history_pg.py)、[`conversation_evidence.py`](../src/citeweave/conversation_evidence.py)、[`conversations.py`](../src/citeweave/conversations.py)、[`context_inspection.py`](../src/citeweave/context_inspection.py)。
 
-浏览器验收由 opt-in `tests/test_conversation_browser.py` 启动，Playwright 配置只接受该 harness 的本地 URL。它在现有 PostgreSQL 上创建/迁移/删除自己的 UUID 隔离库，生成原创单页 PDF 和对应 source hash，使用生产 web build、原有鉴权/公开 endpoint 和服务端 `ConversationalRuntime` seam。fake model/retrieval/generator 调用 #4 编排，LocalHistoryRead permit 仅存在于隔离测试中；Python 外发 HTTP adapter 被测试拦截。另起一个未注入 runtime 的应用验证默认 503/no-admission。没有新增测试 HTTP endpoint、生产配置开关或 React canned results。Chromium 覆盖三类结果、引用/PDF 高亮、accepted head、Trace、刷新、回执丢失同键恢复、键盘操作与小窗；PG 额外检查 Turn/Run/Acceptance 基数。命令、实际计数及 synthetic 限制见 [HANDOFF](../HANDOFF.md)。现有双平台离线 CI 不替代这次本地真实 PG/browser 证据。
-
-**生产会话 runtime 仍不可用，production history query 仍 DEFERRED/fail-closed；provider/model/Judge calls = 0。#5c 仍需另行授权，尚未开始；完整 Trace 重建/计量、真实语义质量与生产执行准入未完成，v0.2a NOT_COMPLETE。** #5b 不改变任何后端生产源码、durable schema、检索/Evidence/offset 契约。
-
-### 现有产品路径
-
-- `src/citeweave/api.py`、`answering.py`、`query_runtime.py`：API、SSE 与 Run。
-- `structure.py`、`structural_ingestion.py`：结构解析与摄取。
-- `structural_retrieval.py`、`evidence_selection.py`、`query_evidence.py`：混合检索与 EvidencePack。
-- `domain.py`、`ingestion_state.py`、`worker_runtime.py`：持久模型与任务。
-- `apps/web/src/workspace.tsx`、`pdf-evidence.tsx`、`structural-trace.tsx`：问答、PDF 与检索记录。
-
-细节 ADR 保留了实现时期的契约名称，仅用于理解工程约束。最新运行与验证范围以本页、README 和 QUICKSTART 为准。
+架构取舍与 schema 影响保留在 [ADR 目录](README.md#设计与历史记录)。原本附于本页的历史实施状态、授权和计数已原文移至[架构实现历史记录](history/ARCHITECTURE_IMPLEMENTATION_RECORDS.md)，不作为当前安装或执行权限。

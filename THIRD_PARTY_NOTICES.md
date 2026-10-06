@@ -7,11 +7,11 @@
 - 应用、原创文档和两页 `original-handbook.pdf`：MIT。手册由 ReportLab 生成，使用标准 CID 字体引用，不捆绑系统字体。
 - `tests/structure_fixtures.py` 的原创结构样本：CC0-1.0，见对应 fixture README。
 - 回答一致性合成样本：原创 MIT 测试材料，不包含私人历史题目。
-- 产品界面截图是实际 CiteWeave 画面的区域裁剪，没有重绘产品像素。其中第三方文档摘录继续受其来源条款约束。
+- 产品界面截图来自实际 CiteWeave 运行，没有重绘产品像素。其中第三方文档摘录继续受其来源条款约束。
 
 ## 产品截图与公开标准
 
-README 中两张截图显示 IETF RFC 9114 的少量原文与 PDF 区域。来源：Mike Bishop (ed.), **HTTP/3**, RFC 9114, June 2022, [RFC Editor](https://www.rfc-editor.org/rfc/rfc9114.html)。Copyright (c) 2022 IETF Trust and the persons identified as the document authors. All rights reserved. 适用 [IETF Trust Legal Provisions](https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/)。截图是问答产品的演示，不是修改后的 RFC 版本，也不表示 IETF 背书。
+README 的三张真实界面图片位于 `docs/assets/product/`：`product-workspace.png` 展示答案、Evidence 与原始 PDF，`multiturn-followup.png` 展示已接受的第二轮追问，`context-inspection.png` 展示实际上下文观察与当前证据。图片显示 IETF RFC 9114 的少量原文、回答与 PDF 区域；图片中的数据库记录和完整文档不随仓库分发。来源：Mike Bishop (ed.), **HTTP/3**, RFC 9114, June 2022, [RFC Editor](https://www.rfc-editor.org/rfc/rfc9114.html)。Copyright (c) 2022 IETF Trust and the persons identified as the document authors. All rights reserved. 适用 [IETF Trust Legal Provisions](https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/)。截图是问答产品的演示，不是修改后的 RFC 版本，也不表示 IETF 背书。
 
 RFC / NIST 评测短摘录保留出处与位置，并遵循 [docs/DATA_NOTICES.md](docs/DATA_NOTICES.md) 和 [协议来源声明](evals/PUBLIC_PROTOCOLS_HOLDOUT_NOTICES.md)。这些文字不归入软件 MIT 授权。完整标准从官方来源获取，保留原有版权与作者信息。
 

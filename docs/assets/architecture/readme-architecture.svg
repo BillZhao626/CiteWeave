@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="1260" viewBox="0 0 1160 1260" role="img" aria-labelledby="title desc">
+<title id="title">CiteWeave query and ingestion architecture</title>
+<desc id="desc">History and Working State interpret the request. Dense and BM25 retrieval, RRF and BGE rerank form current EvidencePack. Authorized generation, citation validation and atomic Acceptance publish PostgreSQL state. Ingestion uses PostgreSQL jobs, Redis/Celery, LocalBlobStore and a rebuildable Qdrant index; visibility requires a durable READY commit.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#64748b" stroke-width="1.5"/></marker></defs>
+<rect width="1160" height="1260" fill="#fff"/>
+<g font-family="Arial, Helvetica, sans-serif" fill="#172f34">
+<text x="329" y="34" text-anchor="middle" font-size="20" font-weight="600" fill="#172f34">QUERY / CONVERSATION</text>
+<text x="900" y="34" text-anchor="middle" font-size="20" font-weight="600" fill="#172f34">INGESTION</text>
+<rect x="60" y="70" width="538" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="110.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">React Workspace</text>
+<rect x="60" y="170" width="538" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="210.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">FastAPI</text>
+<path d="M329 134 V167" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="270" width="538" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="310.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Conversation / Turn / Run</text>
+<path d="M329 234 V267" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="370" width="538" height="108" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="404.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Context Interpretation</text>
+<text x="329.0" y="432.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Relevant / Recent History</text>
+<text x="329.0" y="460.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Working State</text>
+<path d="M329 334 V367" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="514" width="538" height="108" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="548.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Dense + BM25</text>
+<text x="329.0" y="576.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">RRF</text>
+<text x="329.0" y="604.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">BGE rerank</text>
+<path d="M329 478 V511" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="658" width="538" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="698.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Current EvidencePack</text>
+<path d="M329 622 V655" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="758" width="538" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="798.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Authorized LLM generation</text>
+<path d="M329 722 V755" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="858" width="538" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="898.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Citation / original span validation</text>
+<path d="M329 822 V855" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="958" width="538" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="998.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Atomic Acceptance</text>
+<path d="M329 922 V955" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="60" y="1058" width="538" height="88" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="329.0" y="1096.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">PostgreSQL</text>
+<text x="329.0" y="1124.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Business state / Run / Trace</text>
+<path d="M329 1022 V1055" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M60 1102 H28 V102 H57" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
+<path d="M28 302 H57" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
+<text x="329" y="1204" text-anchor="middle" font-size="18" font-weight="400" fill="#172f34">History / State: intent   |   Current Evidence: factual support</text>
+<rect x="706" y="70" width="388" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="110.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">PDF Upload</text>
+<path d="M706 102 H662 V202 H601" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="706" y="270" width="388" height="88" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="308.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">PostgreSQL Job</text>
+<text x="900.0" y="336.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Immutable DocumentVersion</text>
+<path d="M598 202 H650 V314 H703" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="706" y="394" width="388" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="434.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Redis / Celery</text>
+<path d="M900 358 V391" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="706" y="494" width="388" height="88" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="532.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Parse / Chunk</text>
+<text x="900.0" y="560.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Encode / Index</text>
+<path d="M900 458 V491" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="706" y="618" width="388" height="88" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="656.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Qdrant</text>
+<text x="900.0" y="684.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Rebuildable index</text>
+<path d="M900 582 V615" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M706 662 H670 V568 H601" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="706" y="742" width="388" height="88" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="780.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">PostgreSQL READY commit</text>
+<text x="900.0" y="808.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Index becomes queryable</text>
+<path d="M900 706 V739" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="706" y="890" width="388" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="930.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">LocalBlobStore</text>
+<path d="M598 202 H1128 V922 H1097" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M1094 922 H1112 V538 H1097" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<rect x="706" y="1010" width="388" height="64" rx="5" fill="#f5f8f7" stroke="#8ba59b" stroke-width="1.6"/>
+<text x="900.0" y="1050.0" text-anchor="middle" font-size="22" font-weight="400" fill="#172f34">Evidence / original PDF</text>
+<path d="M900 954 V1007" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="900" y="1174" text-anchor="middle" font-size="18" font-weight="400" fill="#172f34">PostgreSQL = business authority</text>
+<text x="900" y="1204" text-anchor="middle" font-size="18" font-weight="400" fill="#172f34">Redis = recoverable task transport</text>
+</g></svg>

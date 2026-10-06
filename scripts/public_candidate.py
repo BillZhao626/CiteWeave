@@ -143,6 +143,7 @@ PUBLIC_DOCS = {
     "docs/adr/0030-read-only-runtime-observations.md",
     "docs/adr/0031-read-only-publication-and-reliability-inspection.md",
     "docs/adr/0032-read-only-context-observations.md",
+    "docs/assets/architecture/readme-architecture.svg",
     "docs/assets/product/context-inspection.png",
     "docs/assets/product/multiturn-followup.png",
     "docs/assets/product/product-workspace.png",

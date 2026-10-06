@@ -25,31 +25,9 @@ Context Inspector 分开展示历史候选、相关来源、近期来源、输�
 
 ## 架构
 
-```mermaid
-flowchart TB
-    UI[React Workspace] --> API[FastAPI]
-    API --> Run[Conversation / Turn / Run]
-    Run --> Context[Context Interpretation<br/>Relevant / Recent History · Working State]
-    Context --> Retrieval["Dense + BM25<br/>RRF<br/>BGE rerank"]
-    QD[(Qdrant)] --> Retrieval
-    Retrieval --> Pack[Current EvidencePack]
-    Pack --> LLM[授权的 LLM generation]
-    LLM --> Validate[Citation / 原文校验]
-    Validate --> Accept[Atomic Acceptance]
-    Accept --> PG[(PostgreSQL<br/>业务状态 · Run / Trace)]
-    PG --> Run
-    PG --> UI
-    Upload[PDF Upload] --> API
-    API --> Job[PostgreSQL Job / DocumentVersion]
-    API --> Blob[LocalBlobStore]
-    Job --> Broker[Redis / Celery]
-    Broker --> Ingest[Parse → Chunk → Encode → Index]
-    Blob --> Ingest
-    Ingest --> QD
-    QD --> Ready[PostgreSQL READY commit]
-    Blob --> PDF[Evidence → PDF]
-    UI --> PDF
-```
+![CiteWeave 架构：查询与会话、Dense/BM25/RRF/BGE、当前证据、发布，以及入库与存储职责](docs/assets/architecture/readme-architecture.svg)
+
+图由 [`scripts/generate_readme_architecture.py`](scripts/generate_readme_architecture.py) 生成，使用原生 SVG 文字与显式留白，避免 GitHub 交互式图表裁切标签。
 
 PostgreSQL 是业务权威；Qdrant 是可重建索引；Redis 是可恢复的任务传输。逻辑 Document 与不可变 DocumentVersion 分开，索引只在持久 READY 提交后开放。同步 Conversation 查询不经过 Redis/Celery。详见[架构](docs/ARCHITECTURE.md)与[API](docs/API.md)。
 

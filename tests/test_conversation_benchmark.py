@@ -1,10 +1,12 @@
 """Measurement integrity risks; no real DB, network or provider."""
 
 import asyncio
+from types import SimpleNamespace
 
 import httpx
 import pytest
 
+from benchmarks import conversation as benchmark
 from benchmarks.conversation import operation, summarize, workload
 
 
@@ -12,11 +14,25 @@ def sample(identity):
     return dict(identity=identity, conversation="synthetic", body={"expected_head": None})
 
 
-def test_every_failed_attempt_is_recorded_in_all_latency_and_throughput():
+@pytest.mark.parametrize("measured_timeout_seconds", [0.0198261, 0.025])
+def test_every_failed_attempt_is_recorded_in_all_latency_and_throughput(
+    monkeypatch, measured_timeout_seconds
+):
+    # asyncio's deadline clock and perf_counter need not share resolution on
+    # Windows. Keep real cancellation, but make measured duration deterministic
+    # on both sides of the 20 ms deadline, including the observed Windows CI value.
+    clock = SimpleNamespace(now=0.0)
+    monkeypatch.setattr(benchmark, "time", SimpleNamespace(perf_counter=lambda: clock.now))
+
     async def run():
         async def respond(request):
             if request.headers["idempotency-key"] == "slow":
-                await asyncio.sleep(1)
+                try:
+                    await asyncio.sleep(1)
+                finally:
+                    clock.now = measured_timeout_seconds
+            else:
+                clock.now += 0.001
             return httpx.Response(503, json={"error": {"code": "synthetic"}})
 
         async with httpx.AsyncClient(
@@ -29,7 +45,11 @@ def test_every_failed_attempt_is_recorded_in_all_latency_and_throughput():
     assert {r["status"] for r in rows} == {"failure", "timeout"}
     result = summarize(rows, wall)
     assert result["attempted"] == result["failed"] == 3 and result["timeouts"] == 1
-    assert result["latency_ms"]["n"] == 3 and result["latency_ms"]["p95"] >= 20
+    timeout = next(r for r in rows if r["identity"] == "slow")
+    assert timeout["status"] == "timeout"
+    assert timeout["latency_ms"] == pytest.approx(measured_timeout_seconds * 1000)
+    assert result["latency_ms"]["n"] == 3
+    assert result["latency_ms"]["p95"] == pytest.approx(timeout["latency_ms"])
     assert result["throughput_rps"] == 0 and result["success_rate"] == 0
     assert result["latency_ms"]["p99"] is None
 

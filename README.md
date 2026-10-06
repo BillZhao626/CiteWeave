@@ -30,7 +30,7 @@ flowchart TB
     UI[React Workspace] --> API[FastAPI]
     API --> Run[Conversation / Turn / Run]
     Run --> Context[Context Interpretation<br/>Relevant / Recent History · Working State]
-    Context --> Retrieval[Dense + BM25 → RRF → BGE rerank]
+    Context --> Retrieval["Dense + BM25<br/>RRF<br/>BGE rerank"]
     QD[(Qdrant)] --> Retrieval
     Retrieval --> Pack[Current EvidencePack]
     Pack --> LLM[授权的 LLM generation]

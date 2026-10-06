@@ -28,6 +28,15 @@ from citeweave.conversation_history import HistoryQuery
 from citeweave.conversation_history_pg import RuntimeHistoryRead, read_history
 from citeweave.conversation_interpretation import InterpretationDraft, InterpretationInput, interpret
 from citeweave.costs import RATE_CARD, maximum_cost
+from citeweave.history_relevance import (
+    CandidateHistory,
+    candidate_messages,
+    record_context_receipt,
+    resolve_response,
+)
+from citeweave.interpretation_response import (
+    record_interpretation_failure,
+)
 from citeweave.llm import DeepSeekProvider, ProviderError, completion_payload
 from citeweave.model_client import ModelGateway
 from citeweave.operational_trace import observe, operational_stage, record_fenced, safe_error_code
@@ -318,6 +327,7 @@ class ProductionRuntime:
                 permit=RuntimeHistoryRead(
                     run=run, scan_limit=policy.history_scan_limit, statement_ms=policy.history_statement_ms
                 ),
+                candidate_mode=policy.reviewed_interpretation is None,
             )
         context = InterpretationInput(
             conversation_id=run.conversation_id,
@@ -328,16 +338,35 @@ class ProductionRuntime:
         )
         calls = RuntimeCalls(workspace, run, policy, self.accounting, self.provider_factory)
         draft = policy.reviewed_interpretation
+        raw = None
         # Validate history before any model side effect, even without a draft.
         from citeweave.conversation_interpretation import selected_sources
 
         selected_sources(context)
         with bounded_stage((run.deadline - datetime.now(timezone.utc)).total_seconds()):
             if draft is None:
-                raw, _ = calls.call("interpretation", interpretation_messages(context))
-                draft = InterpretationDraft.model_validate_json(raw)
+                candidates = CandidateHistory(query=query, history=history)
+                messages = candidate_messages(context, candidates)
+                raw, _ = calls.call("interpretation", messages)
+                context, draft, wire = resolve_response(
+                    raw, context=context, candidates=candidates, run_id=run.id
+                )
             with operational_stage("interpretation"):
-                interpret(context, draft=draft)  # Guard provider drafts before documentary retrieval.
+                try:
+                    interpret(context, draft=draft)  # Guard provider drafts before documentary retrieval.
+                    if raw is not None:
+                        record_context_receipt(
+                            run.id,
+                            messages=messages,
+                            candidates=candidates,
+                            context=context,
+                            wire=wire,
+                            raw=raw,
+                        )
+                except (CoreConflict, ValueError) as exc:
+                    if raw is not None:
+                        record_interpretation_failure(raw, run_id=run.id, exc=exc)
+                    raise
             core.execution_input(workspace, run)
             result, decision = produce(
                 workspace,

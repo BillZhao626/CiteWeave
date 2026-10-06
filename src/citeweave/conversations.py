@@ -293,6 +293,7 @@ def accept(
         acceptance_id = uuid4()
         previous = db.get(Accepted, turn.expected_head) if turn.expected_head else None
         if interpretation is not None:
+            from citeweave.conversation_history import AcceptedHistory
             from citeweave.conversation_interpretation import interpret, selected_sources
 
             context, draft = interpretation
@@ -325,7 +326,14 @@ def accept(
                 for a, q, status in rows
             }
             for source in sources:
-                if durable.get(source.acceptance.id) != (
+                observed = durable.get(source.acceptance.id)
+                if observed and isinstance(source.acceptance, AcceptedHistory):
+                    # Compare every projected field against immutable durable
+                    # truth. Old documentary results are not interpretation input;
+                    # current result validation below is unchanged.
+                    accepted, request, status = observed
+                    observed = (AcceptedHistory.from_acceptance(accepted), request, status)
+                if observed != (
                     source.acceptance,
                     source.request,
                     RunStatus.ACCEPTED,

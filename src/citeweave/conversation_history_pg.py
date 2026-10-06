@@ -116,13 +116,14 @@ WITH RECURSIVE corpus AS MATERIALIZED (
 ), wanted AS (
  SELECT DISTINCT c.member AS id FROM connected c JOIN seeds s ON s.id=c.root
 ), originals AS MATERIALIZED (
- SELECT a.*, t.request FROM cw5_acceptances a JOIN wanted w ON w.id=a.id
+ SELECT a.id, a.conversation_id, a.turn_id, a.run_id, a.state, a.created_at, t.request
+ FROM cw5_acceptances a JOIN wanted w ON w.id=a.id
  JOIN cw5_turns t ON t.id=a.turn_id
  WHERE (SELECT count(*) FROM wanted)<=:row_cap
 ), payload AS (
  SELECT coalesce(jsonb_agg(jsonb_build_object(
   'acceptance', jsonb_build_object('id',c.id,'conversation_id',c.conversation_id,
-    'turn_id',c.turn_id,'run_id',c.run_id,'result',c.result,'state',c.state,'created_at',c.created_at),
+    'turn_id',c.turn_id,'run_id',c.run_id,'state',c.state,'created_at',c.created_at),
   'request',c.request,
   'origins',coalesce((SELECT jsonb_agg(origin ORDER BY origin) FROM seeds s WHERE s.id=c.id), '[]'::jsonb)
  ) ORDER BY c.id), '[]'::jsonb)::text AS body,
@@ -142,12 +143,13 @@ def read_history(
     query: HistoryQuery,
     *,
     permit: LocalHistoryRead | RuntimeHistoryRead | None = None,
+    candidate_mode: bool = False,
 ):
     if not isinstance(permit, (LocalHistoryRead, RuntimeHistoryRead)):
         return HistorySelection(head=query.expected_head, failure="history_query_disabled")
     counter = [0]
     try:
-        return _read_local_history(workspace, conversation_id, query, counter, permit)
+        return _read_local_history(workspace, conversation_id, query, counter, permit, candidate_mode)
     except CoreConflict as exc:
         if str(exc) != "round_trip_cap":
             raise
@@ -187,7 +189,7 @@ def _bounded_transaction(counter):
             event.remove(connection, "before_cursor_execute", count)
 
 
-def _read_local_history(workspace, conversation_id, query, counter, permit):
+def _read_local_history(workspace, conversation_id, query, counter, permit, candidate_mode):
     with _bounded_transaction(counter) as db:
         # Timeout applies to locks as well as subsequent reads, and resets at commit.
         production = isinstance(permit, RuntimeHistoryRead)
@@ -297,6 +299,7 @@ def _read_local_history(workspace, conversation_id, query, counter, permit):
             rows=len(sources),
             payload_bytes=result.bytes if result.body else 0,
             trips=counter[0],
+            candidate_mode=candidate_mode,
         )
         # Head is returned inside the same bounded payload; no second state read.
         if (

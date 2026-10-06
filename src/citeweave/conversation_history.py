@@ -1,7 +1,8 @@
 """Deterministic intent memory mechanics. No text interpretation or Evidence types."""
 
+from datetime import datetime
 from hashlib import sha256
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID
 
 from pydantic import Field
@@ -17,6 +18,7 @@ from citeweave.conversation_contract import (
     Scope,
     SourceRef,
     StateEntry,
+    StateSnapshot,
     WorkingState,
 )
 
@@ -120,8 +122,30 @@ class HistoryQuery(DurableDTO):
     mandatory: tuple[SourceRef, ...] = ()
 
 
+class AcceptedHistory(DurableDTO):
+    """Read projection of an accepted intent snapshot, never a documentary result.
+
+    Identity and the complete state retain correction/provenance semantics.
+    The PG adapter constructs this allowlist before applying the byte boundary.
+    Persisted Acceptance and public result readers remain unchanged.
+    """
+
+    id: UUID
+    conversation_id: UUID
+    turn_id: UUID
+    run_id: UUID
+    state: Annotated[StateSnapshot | WorkingState, Field(discriminator="revision")]
+    created_at: datetime
+
+    @classmethod
+    def from_acceptance(cls, accepted: Acceptance):
+        return cls(**{name: getattr(accepted, name) for name in cls.model_fields})
+
+
 class HistorySource(DurableDTO):
-    acceptance: Acceptance
+    # Legacy in-memory/frozen receipts remain readable with their original type.
+    # The PG history adapter emits only AcceptedHistory, before the byte cap.
+    acceptance: Acceptance | AcceptedHistory
     request: Admission
     origins: tuple[str, ...] = ()
 
@@ -208,6 +232,7 @@ def select_history(
     rows: int = 0,
     payload_bytes: int = 0,
     trips: int = 0,
+    candidate_mode: bool = False,
 ) -> HistorySelection:
     """Input contains complete connected provenance groups from the PG adapter.
 
@@ -332,7 +357,7 @@ def select_history(
         mandatory = any(s.ref in required for s in members)
         if mandatory:
             reasons.add("explicit")
-        if not reasons:
+        if not reasons and not candidate_mode:
             rejected.append(Rejection(identity=ids, reason="no_active_relevance"))
             continue
         if superseded or partial:
@@ -350,7 +375,13 @@ def select_history(
                 request_hashes=tuple(sha256(s.request.question.encode("utf-8")).hexdigest() for s in members),
             )
         )
-    groups.sort(key=lambda g: (not g.mandatory, min(REASONS.index(r) for r in g.reasons), g.identity))
+    groups.sort(
+        key=lambda g: (
+            not g.mandatory,
+            min((REASONS.index(r) for r in g.reasons), default=len(REASONS)),
+            g.identity,
+        )
+    )
     base.update(
         a_inputs=tuple(sorted({s.ref for s in sources if "A" in s.origins}, key=lambda r: r.acceptance_id)),
         branch_matches={
@@ -367,6 +398,15 @@ def select_history(
         rejected.append(Rejection(identity=group.identity, reason="C_cutoff"))
     if sum(g.mandatory for g in candidates) > K:
         return HistorySelection(**base, candidates=candidates, failure="mandatory_exceeds_K")
+    if candidate_mode:
+        # C bounds inspection candidates. No candidate has become resolved
+        # context; semantic relevance is supplied at the product boundary.
+        return HistorySelection(
+            **base,
+            candidates=candidates,
+            rejected=tuple(rejected),
+            cutoff=("C_cutoff",) if len(groups) > C else (),
+        )
     for group in candidates[K:]:
         rejected.append(Rejection(identity=group.identity, reason="K_cutoff"))
     return HistorySelection(

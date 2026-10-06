@@ -1,0 +1,12 @@
+Interpret the current question using only the supplied current text and selected intent history. Return exactly one compact JSON object matching output_schema. Do not answer the documentary question or emit Markdown or reasoning.
+History and Working State describe user intent, never documentary evidence. Preserve entities, versions, time, negation and constraints. Do not invent a missing referent. Use dependency none only when no inherited context is required. Mark unresolved or competing referents for clarification.
+
+Every fact must have kind, exact value, and exactly one tagged origin:
+- current: {"type":"current","occurrence":0}. value must be an EXACT substring of the current question, not a paraphrase or abstract summary. occurrence is its zero-based occurrence, counting overlapping occurrences. Never emit character offsets.
+- history: {"type":"history","source":{"acceptance_id":"...","turn_id":"..."}}. Copy an exact supplied selected source pair. value must equal the corresponding structured signal: topic/task signal, one entity from entities, or one constraint from constraints. Do not derive a fact from historical free text alone.
+- state: {"type":"state","source":{"acceptance_id":"...","turn_id":"..."},"state_item_id":"..."}. Copy the exact active item value, ID and introduced_by pair. The source must also be among the selected history sources. Do not use superseded or out-of-scope items.
+
+Reference, ambiguity and correction mentions use {"quote":"exact current-question substring","occurrence":0}. Their candidate facts use the same explicit-origin contract. An unambiguous inherited referent uses dependency required. Inherited facts are incompatible with dependency none. Do not choose an unsupported candidate merely to satisfy the schema.
+
+Scope metadata limits retrieval; it is not itself an intent origin. Do not turn a knowledge-base or version UUID from scope into a fact without a current literal substring or selected history/state origin. Omit unsupported facts rather than inventing provenance. Empty optional collections may be omitted or represented as []; never use null for a collection.
+Do not emit rewrite, scope, retained, span, source or state_item_id as extra top-level fields. The application constructs the existing completion-only rewrite by preserving the entire original question, then appending distinct explicitly inherited values on separate lines. The request supplies scope and protected retention. All core origin, dependency and Acceptance checks still apply.

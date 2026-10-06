@@ -119,6 +119,55 @@ def test_documentary_real_rag_atomic_readback_and_lost_receipt(evidence_case):
         assert len(list(db.scalars(select(Accepted).where(Accepted.turn_id == prepared[0].turn_id)))) == 1
 
 
+def test_large_documentary_result_is_excluded_before_history_byte_cap(evidence_case):
+    """Synthetic isolated persisted bundle follows the observed Citation/boxes shape.
+
+    Geometry expansion is fixture setup, not a real accepted-run mutation or a
+    claim that duplicated geometry would pass the production evidence validator.
+    """
+    import json
+
+    from citeweave.conversation_history import MAX_BYTES, AcceptedHistory
+
+    sample, _ = evidence_case
+    prepared = prepare(evidence_case)
+    result = prepared[2].model_dump(mode="json")
+    span = result["answer"]["citations"][0]["span"]
+    span["boxes"] = span["boxes"] * 6000
+
+    # Insert an original synthetic large-row fixture; immutable rows are never
+    # updated and the production immutability trigger stays enabled.
+    def large_fixture(session, flush_context, instances):
+        for row in session.new:
+            if isinstance(row, Accepted) and row.run_id == prepared[0].id:
+                row.result = result
+
+    event.listen(Session, "before_flush", large_fixture)
+    try:
+        accepted = accept(evidence_case, prepared)
+    finally:
+        event.remove(Session, "before_flush", large_fixture)
+    before = json.dumps(result, sort_keys=True)
+    query = HistoryQuery(scope=sample[2].scope, expected_head=accepted.id, explicit=(accepted.state.source,))
+    selected = read_history(*sample[:2], query, permit=LocalHistoryRead())
+    assert len(before.encode()) > 206083 > MAX_BYTES
+    assert selected.failure is None and selected.materialized_rows == 1
+    assert selected.payload_bytes < 4096 < MAX_BYTES
+    source = selected.selected[0].sources[0]
+    assert isinstance(source.acceptance, AcceptedHistory)
+    assert source.ref == accepted.state.source
+    assert source.request.scope == sample[2].scope
+    assert source.acceptance.state == accepted.state
+    wire = source.model_dump_json()
+    assert all(
+        key not in json.loads(wire)["acceptance"] for key in ["result", "answer", "trace", "evidence_pack"]
+    )
+    assert '"boxes"' not in wire
+    assert selected == read_history(*sample[:2], query, permit=LocalHistoryRead())
+    with transaction() as db:
+        assert json.dumps(db.get(Accepted, accepted.id).result, sort_keys=True) == before
+
+
 def test_documentary_invisible_until_transaction_commits(evidence_case):
     prepared = prepare(evidence_case)
     flushed, release = Event(), Event()

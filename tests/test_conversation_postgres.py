@@ -705,6 +705,16 @@ def test_history_real_branch_and_payload_limits(sample):
     assert result.payload_bytes == 0 and result.materialized_rows == 0
 
 
+def test_projected_multiple_requests_still_share_fixed_byte_limit(sample):
+    first = history_accept(sample, question="界" * 24000)
+    one = history_read(sample, first, explicit=(first.state.source,))
+    assert one.failure is None and 70000 < one.payload_bytes < 131072
+    second = history_accept(sample, question="界" * 24000)
+    both = history_read(sample, second, explicit=(first.state.source, second.state.source))
+    assert both.search_incomplete and "payload_cap" in both.cutoff
+    assert not both.selected and both.payload_bytes == 0 and both.materialized_rows == 0
+
+
 def test_history_runtime_disabled_without_explicit_l1_permit(sample):
     result = read_history(sample[0], sample[1], HistoryQuery(expected_head=None, scope=sample[2].scope))
     assert result.failure == "history_query_disabled"
@@ -991,6 +1001,40 @@ def test_interpretation_stale_input_cannot_publish(sample):
         interpretation_accept(sample, next_run, context, draft, result)
     truth = core.read_run(sample[0], sample[1], "stale-interpretation")
     assert truth.accepted is None and truth.conversation.head == accepted
+
+
+@pytest.mark.parametrize("field", ["run_id", "created_at", "state"])
+def test_projected_provenance_is_rechecked_field_for_field_at_acceptance(sample, field):
+    from citeweave.conversation_history import AcceptedHistory
+
+    run, context, draft, result = interpretation_case(sample)
+    group = context.history.selected[0]
+    source = group.sources[0]
+    old = source.acceptance
+    assert isinstance(old, AcceptedHistory)
+    values = {
+        "run_id": uuid4(),
+        "created_at": old.created_at + timedelta(seconds=1),
+        "state": old.state.model_copy(
+            update={
+                "delta": old.state.delta.model_copy(
+                    update={"signals": ResolvedSignals(entities=("A", "B", "forged"))}
+                )
+            }
+        ),
+    }
+    forged = source.model_copy(update={"acceptance": old.model_copy(update={field: values[field]})})
+    context = context.model_copy(
+        update={
+            "history": context.history.model_copy(
+                update={"selected": (group.model_copy(update={"sources": (forged,)}),)}
+            )
+        }
+    )
+    with pytest.raises(CoreConflict, match="interpretation_durable_provenance_conflict"):
+        interpretation_accept(sample, run, context, draft, result)
+    truth = core.read_run(*sample[:2], "interpret")
+    assert truth.accepted is None and truth.conversation.head == context.previous
 
 
 def test_interpretation_scope_change_invalidates_binding_at_commit(sample):

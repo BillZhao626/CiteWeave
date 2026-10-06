@@ -22,6 +22,7 @@ from citeweave.conversation_interpretation import InterpretationDraft
 from citeweave.conversation_runtime import PhasePlan, ProductionRuntime, RuntimePolicy
 from citeweave.db import transaction
 from citeweave.domain import ProviderPhaseRow
+from citeweave.history_relevance import RelevanceDraft
 from citeweave.llm import DeepSeekProvider
 from citeweave.provider_accounting import request_hash
 from citeweave.settings import settings
@@ -110,8 +111,71 @@ def test_generation_only_runtime(evidence_case, monkeypatch):
     assert len(calls) == 1
 
 
+def test_real_adapter_format_origin_then_generation_accepts(evidence_case, monkeypatch):
+    sample, fixture = evidence_case
+    count = 0
+
+    def reply(request):
+        nonlocal count
+        count += 1
+        content = (
+            json.dumps(
+                {
+                    "topic_relation": "continue",
+                    "dependency": "none",
+                    "relevant_sources": [],
+                    "facts": [
+                        {
+                            "kind": "topic",
+                            "value": sample[2].question,
+                            "origin": {"type": "current", "occurrence": 0},
+                        }
+                    ],
+                }
+            )
+            if count == 1
+            else fixture.atom.text + " [E1]"
+        )
+        chunks = [
+            dict(choices=[dict(delta={"content": content}, finish_reason="stop")]),
+            dict(choices=[], usage={"prompt_tokens": 73, "completion_tokens": 20}),
+        ]
+        return httpx.Response(
+            200, text="".join("data: " + json.dumps(c) + "\n\n" for c in chunks) + "data: [DONE]\n\n"
+        )
+
+    value, run, calls = runtime(evidence_case, monkeypatch, draft=False, response=reply)
+    accepted = value.execute(sample[0], run)
+    assert accepted.result.answer.citations == [fixture.citation]
+    assert len(calls) == 2
+    assert core.read_run_id(*sample[:2], run.id).run.status == "ACCEPTED"
+
+
+def test_originless_provider_fact_still_unknown_no_redispatch(evidence_case, monkeypatch):
+    value, run, calls = runtime(
+        evidence_case,
+        monkeypatch,
+        draft=False,
+        response=json.dumps(
+            {
+                "topic_relation": "continue",
+                "dependency": "none",
+                "facts": [{"kind": "version", "value": str(evidence_case[0][2].scope.version_ids[0])}],
+            }
+        ),
+    )
+    value.retriever = SimpleNamespace(retrieve=lambda *args: pytest.fail("invalid draft retrieved"))
+    with pytest.raises(CoreConflict, match="interpretation_format_schema"):
+        value.execute(evidence_case[0][0], run)
+    truth = core.read_run_id(*evidence_case[0][:2], run.id)
+    assert truth.run.status == "UNKNOWN" and truth.accepted is None
+    with pytest.raises(CoreConflict):
+        value.execute(evidence_case[0][0], run)
+    assert len(calls) == 1
+
+
 def test_provider_clarify_bypasses_retrieval_generation(evidence_case, monkeypatch):
-    draft = InterpretationDraft(topic_relation="continue", dependency="unresolved")
+    draft = RelevanceDraft(topic_relation="continue", dependency="unresolved", relevant_sources=())
     value, run, calls = runtime(evidence_case, monkeypatch, draft=False, response=draft.model_dump_json())
     value.retriever = SimpleNamespace(retrieve=lambda *args: pytest.fail("CLARIFY must bypass retrieval"))
     result = value.execute(evidence_case[0][0], run)
@@ -123,7 +187,7 @@ def test_invalid_provider_draft_does_not_retrieve(evidence_case, monkeypatch):
         evidence_case,
         monkeypatch,
         draft=False,
-        response='{"topic_relation":"continue","dependency":"required"}',
+        response='{"topic_relation":"continue","dependency":"required","relevant_sources":[]}',
     )
     value.retriever = SimpleNamespace(retrieve=lambda *args: pytest.fail("invalid draft retrieved"))
     with pytest.raises(CoreConflict, match="rewrite_required"):
@@ -194,3 +258,88 @@ def test_production_history_selector_matches_local_with_complete_corrections(evi
             query,
             permit=permit.model_copy(update={"run": run.model_copy(update={"owner": uuid4()})}),
         )
+
+
+def test_real_adapter_resolves_bounded_recent_source_then_retrieves_current_evidence(
+    evidence_case, monkeypatch
+):
+    from test_conversation_postgres import history_accept
+
+    from citeweave.conversation_contract import ResolvedSignals
+
+    sample, fixture = evidence_case
+    first = history_accept(
+        sample, question="Explain the receiver", signals=ResolvedSignals(entities=("receiver",))
+    )
+    followup = sample[2].model_copy(update={"question": "What does it do?", "expected_head": first.id})
+    case = (sample[0], sample[1], followup), fixture
+    refs = first.state.source.model_dump(mode="json")
+    responses = [
+        json.dumps(
+            dict(
+                topic_relation="continue",
+                dependency="required",
+                relevant_sources=[refs],
+                references=[
+                    dict(
+                        mention=dict(quote="it", occurrence=0),
+                        candidates=[
+                            dict(kind="entity", value="receiver", origin=dict(type="history", source=refs))
+                        ],
+                    )
+                ],
+            )
+        ),
+        fixture.atom.text + " [E1]",
+    ]
+
+    def reply(request):
+        value = responses.pop(0)
+        return httpx.Response(
+            200,
+            text="data: "
+            + json.dumps(dict(choices=[dict(delta=dict(content=value), finish_reason="stop")]))
+            + "\n\ndata: [DONE]\n\n",
+        )
+
+    value, run, calls = runtime(case, monkeypatch, draft=False, response=reply)
+    material_calls = []
+    retrieve = value.retriever.retrieve
+
+    def current(*args):
+        material_calls.append(args)
+        return retrieve(*args)
+
+    value.retriever = SimpleNamespace(retrieve=current)
+    accepted = value.execute(sample[0], run)
+    input_payload = json.loads(calls[0]["messages"][1]["content"])
+    assert input_payload["candidate_history"]["groups"][0]["sources"][0]["source"] == refs
+    assert "history" not in input_payload
+    assert material_calls[0][2] == followup.question + "\nreceiver"
+    assert len(material_calls) == 1 and len(calls) == 2
+    assert accepted.result.answer.run_id == run.id and accepted.result.answer.citations == [fixture.citation]
+    assert accepted.result.trace.history_sources == (first.state.source,)
+    assert accepted.result.trace.interpretation_mode == "USE_REWRITE"
+    assert core.read_run_id(*sample[:2], run.id).accepted == accepted
+    with pytest.raises(CoreConflict):
+        value.execute(sample[0], run)
+    assert len(calls) == 2
+
+
+def test_forged_candidate_relevance_fails_unknown_without_retrieval_or_redispatch(evidence_case, monkeypatch):
+    forged = {"acceptance_id": str(uuid4()), "turn_id": str(uuid4())}
+    value, run, calls = runtime(
+        evidence_case,
+        monkeypatch,
+        draft=False,
+        response=json.dumps(
+            dict(topic_relation="continue", dependency="required", relevant_sources=[forged])
+        ),
+    )
+    value.retriever = SimpleNamespace(retrieve=lambda *args: pytest.fail("forged relevance retrieved"))
+    with pytest.raises(CoreConflict, match="interpretation_relevance_source_unavailable"):
+        value.execute(evidence_case[0][0], run)
+    assert core.read_run_id(*evidence_case[0][:2], run.id).run.status == "UNKNOWN"
+    with pytest.raises(CoreConflict):
+        value.execute(evidence_case[0][0], run)
+    assert len(calls) == 1
